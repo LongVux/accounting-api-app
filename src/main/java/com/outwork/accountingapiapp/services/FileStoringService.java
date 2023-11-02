@@ -36,7 +36,7 @@ public class FileStoringService {
                 .build()
         );
 
-        File createdFile = new File(String.join(DataFormat.BACKSLASH_SEPARATOR, appBucketPath, imageData.getFileName(), ));
+        File createdFile = new File(String.join(DataFormat.BACKSLASH_SEPARATOR, appBucketPath, imageData.getFileName()));
 
         file.transferTo(createdFile.getAbsoluteFile());
 
