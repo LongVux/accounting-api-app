@@ -22,7 +22,7 @@ public class ReceiptController {
     @Autowired
     private ReceiptService receiptService;
 
-    @GetMapping("/")
+    @GetMapping
     public ResponseEntity<Page<ReceiptTableItem>> getReceiptTableItems (@ModelAttribute GetReceiptTableItemRequest request) {
         return ResponseEntity.ok(receiptService.getReceiptTableItems(request));
     }
