@@ -2,6 +2,7 @@ package com.outwork.accountingapiapp.repositories;
 
 import com.outwork.accountingapiapp.models.entity.BranchEntity;
 import com.outwork.accountingapiapp.models.entity.ReceiptEntity;
+import com.outwork.accountingapiapp.models.entity.UserEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -14,8 +15,9 @@ import java.util.UUID;
 
 @Repository
 public interface ReceiptRepository extends JpaRepository<ReceiptEntity, UUID> {
-    Optional<ReceiptEntity> findFirstByCodeNotNullAndBranchAndCreatedDateBetweenOrderByCreatedDateDesc(
+    Optional<ReceiptEntity> findFirstByCodeNotNullAndBranchAndEmployeeAndCreatedDateBetweenOrderByCreatedDateDesc(
             BranchEntity branch,
+            UserEntity user,
             Date createdDateStart,
             Date createdDateEnd
     );

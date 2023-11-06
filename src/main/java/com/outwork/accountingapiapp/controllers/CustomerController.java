@@ -2,6 +2,7 @@ package com.outwork.accountingapiapp.controllers;
 
 import com.outwork.accountingapiapp.models.entity.CustomerEntity;
 import com.outwork.accountingapiapp.models.payload.requests.SaveCustomerRequest;
+import com.outwork.accountingapiapp.models.payload.responses.SuggestedCustomer;
 import com.outwork.accountingapiapp.services.CustomerService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -10,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -22,6 +24,11 @@ public class CustomerController {
     @GetMapping("/{id}")
     public ResponseEntity<CustomerEntity> getCustomerById (@PathVariable @NotNull UUID id) {
         return ResponseEntity.ok(customerService.getCustomerById(id));
+    }
+
+    @GetMapping("/findByName/{name}")
+    public ResponseEntity<List<SuggestedCustomer>> findCustomersByName (@PathVariable @NotNull String name) {
+        return ResponseEntity.ok(customerService.findCustomersByName(name));
     }
 
     @PostMapping

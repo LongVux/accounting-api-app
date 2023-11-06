@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -22,6 +23,11 @@ public class CustomerCardController {
     @GetMapping("/{id}")
     public ResponseEntity<CustomerCardEntity> getCustomerCardById (@PathVariable @NotNull UUID id) {
         return ResponseEntity.ok(customerCardService.getCustomerCardById(id));
+    }
+
+    @GetMapping("/findByCustomerId/{customerId}")
+    public ResponseEntity<List<CustomerCardEntity>> getCustomerCardByCustomerId (@PathVariable @NotNull UUID customerId) {
+        return ResponseEntity.ok(customerCardService.findCustomerCardByCustomerId(customerId));
     }
 
     @PostMapping

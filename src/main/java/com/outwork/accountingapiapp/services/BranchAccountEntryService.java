@@ -5,12 +5,14 @@ import com.outwork.accountingapiapp.models.entity.BranchAccountEntryEntity;
 import com.outwork.accountingapiapp.models.entity.ReceiptEntity;
 import com.outwork.accountingapiapp.models.payload.requests.SaveReceiptEntryRequest;
 import com.outwork.accountingapiapp.models.payload.requests.SaveReceiptRepaymentEntryRequest;
+import com.outwork.accountingapiapp.repositories.BillRepository;
 import com.outwork.accountingapiapp.repositories.BranchAccountEntryRepository;
+import com.outwork.accountingapiapp.utils.AccountEntryCodeHandler;
+import com.outwork.accountingapiapp.utils.DateTimeUtils;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.ObjectUtils;
 
 import java.util.*;
 
@@ -22,6 +24,8 @@ public class BranchAccountEntryService {
 
     @Autowired
     private ReceiptService receiptService;
+    @Autowired
+    private BillRepository billRepository;
 
     @Transactional(rollbackFor = {Exception.class, Throwable.class})
     public ReceiptEntity confirmReceiptEntry (@Valid SaveReceiptEntryRequest request) {
@@ -43,6 +47,8 @@ public class BranchAccountEntryService {
                 request.getRepaidAmount()
         );
 
+        repaidEntry.setEntryCode(getNewBranchEntryCode(repaidEntry));
+
         branchAccountEntryRepository.save(repaidEntry);
 
         return receipt;
@@ -57,14 +63,29 @@ public class BranchAccountEntryService {
         receiptEntryMap.put(TransactionTypeEnum.REPAYMENT, receipt.getRepayment());
 
         return receiptEntryMap.keySet().stream()
-                .filter(key -> ObjectUtils.isEmpty(receiptEntryMap.get(key)))
+                .filter(key -> Optional.ofNullable(receiptEntryMap.get(key)).orElse(0) != 0)
                 .map(key -> new BranchAccountEntryEntity(
                         receipt,
                         explanation,
                         key,
                         receiptEntryMap.get(key)
                 ))
+                .peek(entry -> entry.setEntryCode(getNewBranchEntryCode(entry)))
                 .toList();
     }
 
+    private String getNewBranchEntryCode (BranchAccountEntryEntity entry) {
+        Optional<BranchAccountEntryEntity> latestEntry = branchAccountEntryRepository.findFirstByEntryCodeNotNullAndBranchAndTransactionTypeAndCreatedDateBetweenOrderByCreatedDateDesc(
+                entry.getBranch(),
+                entry.getTransactionType(),
+                DateTimeUtils.atStartOfDay(new Date()),
+                DateTimeUtils.atEndOfDay(new Date())
+        );
+
+        return AccountEntryCodeHandler.generateAccountEntryCode(
+                entry.getBranch().getCode(),
+                entry.getTransactionType(),
+                latestEntry.map(BranchAccountEntryEntity::getEntryCode).orElse(null)
+        );
+    }
 }

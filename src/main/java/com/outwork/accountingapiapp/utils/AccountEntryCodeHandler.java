@@ -1,6 +1,7 @@
 package com.outwork.accountingapiapp.utils;
 
 import com.outwork.accountingapiapp.constants.DataFormat;
+import com.outwork.accountingapiapp.constants.TransactionTypeEnum;
 import com.outwork.accountingapiapp.exceptions.InvalidDataException;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.util.ObjectUtils;
@@ -8,24 +9,33 @@ import org.springframework.util.ObjectUtils;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
-public class ReceiptCodeHandler {
-    private static final String RECEIPT_CODE_REGEX = "^[A-Z0-9]+-[A-Z0-9]+-\\d{6}-\\d+$";
-    private static final String ERROR_MSG_INVALID_RECEIPT_CODE = "Mã hóa đơn không hợp lệ";
-    public static String generateReceiptCode(@NotNull String branchCode, @NotNull String employeeCode, String latestReceiptCode) {
+public class AccountEntryCodeHandler {
+    private static final String RECEIPT_CODE_REGEX = "^[A-Z0-9]+-[A-Z]+-\\d{6}-\\d+$";
+
+    private static final String ERROR_MSG_INVALID_ENTRY_CODE = "Mã bút toán không hợp lệ";
+
+    public static String generateAccountEntryCode(@NotNull String branchCode, @NotNull TransactionTypeEnum transactionType, String latestEntryCode) {
         LocalDate date = LocalDate.now();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DataFormat.DATE_FORMAT_ddMMyy);
         String dateString = date.format(formatter);
 
         // Get the order number from the latest code
-        int orderNumber = getOrderNumber(latestReceiptCode) + 1;
+        int orderNumber = getOrderNumber(latestEntryCode) + 1;
 
-        return String.join(DataFormat.DEFAULT_SEPARATOR, branchCode, employeeCode, dateString, Integer.toString(orderNumber));
+        return String.join(
+                DataFormat.DEFAULT_SEPARATOR,
+                branchCode,
+                MapBuilder.buildTransactionTypeString()
+                        .get(transactionType),
+                dateString,
+                Integer.toString(orderNumber)
+        );
     }
 
     // A method to check if a given string has the order string format
-    public static void validateReceiptCode(String code) {
+    public static void validateEntryCode(String code) {
         if (ObjectUtils.isEmpty(code) || !code.matches(RECEIPT_CODE_REGEX)) {
-            throw new InvalidDataException(ERROR_MSG_INVALID_RECEIPT_CODE);
+            throw new InvalidDataException(ERROR_MSG_INVALID_ENTRY_CODE);
         }
     }
 
@@ -34,7 +44,7 @@ public class ReceiptCodeHandler {
         if (ObjectUtils.isEmpty(code)) {
             return 0;
         } else {
-            validateReceiptCode(code);
+            validateEntryCode(code);
 
             // Split the string by the dash and get the last component
             String[] parts = code.split(DataFormat.DEFAULT_SEPARATOR);
@@ -44,4 +54,5 @@ public class ReceiptCodeHandler {
             return Integer.parseInt(number);
         }
     }
+
 }

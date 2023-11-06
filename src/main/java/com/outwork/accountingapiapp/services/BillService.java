@@ -6,7 +6,6 @@ import com.outwork.accountingapiapp.models.entity.PosCardFeeEntity;
 import com.outwork.accountingapiapp.models.entity.PosEntity;
 import com.outwork.accountingapiapp.models.entity.ReceiptEntity;
 import com.outwork.accountingapiapp.models.payload.requests.ReceiptBill;
-import com.outwork.accountingapiapp.models.payload.requests.SaveReceiptRequest;
 import com.outwork.accountingapiapp.repositories.BillRepository;
 import com.outwork.accountingapiapp.utils.BillCodeHandler;
 import com.outwork.accountingapiapp.utils.DateTimeUtils;
@@ -27,6 +26,7 @@ public class BillService {
     private static final String ERROR_MSG_SOME_BILL_INVALID_TO_APPROVE = "Một số bill không hợp lệ để tạo bút toán";
     private static final String ERROR_NO_BILL_TO_APPROVE = "Không có bill để tạo bút toán";
     private static final String ERROR_BILL_VALUE_EXCEED_POS_LIMIT = "Giá trị Bill vượt quá giới hạn của POS";
+
     @Autowired
     private BillRepository billRepository;
 

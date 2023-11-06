@@ -1,5 +1,6 @@
 package com.outwork.accountingapiapp.models.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.outwork.accountingapiapp.constants.DataConstraint;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -15,6 +16,11 @@ import java.util.UUID;
 public class UserEntity {
     public static final String FIELD_ID = "id";
     public static final String FIELD_CODE = "code";
+    public static final String FIELD_NAME = "name";
+    public static final String FIELD_EMAIL = "email";
+    public static final String FIELD_PHONE_NUMBER = "phoneNumber";
+    public static final String FIELD_BRANCHES = "branches";
+    public static final String FIELD_ROLES = "roles";
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -32,6 +38,7 @@ public class UserEntity {
     @Column(nullable = false, unique = true)
     private String phoneNumber;
 
+    @JsonIgnore
     @Column(nullable = false)
     private String password;
 

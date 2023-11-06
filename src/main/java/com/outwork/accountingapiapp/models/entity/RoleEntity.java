@@ -11,6 +11,8 @@ import java.util.UUID;
 @Entity
 @Table(name = "roles")
 public class RoleEntity {
+    public static final String FIELD_TITLE = "title";
+
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;

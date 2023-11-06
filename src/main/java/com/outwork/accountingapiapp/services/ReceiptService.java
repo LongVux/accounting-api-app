@@ -191,14 +191,16 @@ public class ReceiptService {
 
     private void assignNewReceiptCode (ReceiptEntity receipt) {
         Optional<ReceiptEntity> latestReceipt =
-                receiptRepository.findFirstByCodeNotNullAndBranchAndCreatedDateBetweenOrderByCreatedDateDesc(
+                receiptRepository.findFirstByCodeNotNullAndBranchAndEmployeeAndCreatedDateBetweenOrderByCreatedDateDesc(
                         receipt.getBranch(),
+                        receipt.getEmployee(),
                         DateTimeUtils.atStartOfDay(new Date()),
                         DateTimeUtils.atEndOfDay(new Date())
                 );
 
         String newCode = ReceiptCodeHandler.generateReceiptCode(
                 receipt.getBranch().getCode(),
+                receipt.getEmployee().getCode(),
                 latestReceipt.map(ReceiptEntity::getCode).orElse(null)
         );
 

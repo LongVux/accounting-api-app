@@ -1,8 +1,10 @@
 package com.outwork.accountingapiapp.services;
 
+import com.outwork.accountingapiapp.constants.DataFormat;
 import com.outwork.accountingapiapp.exceptions.DuplicatedValueException;
 import com.outwork.accountingapiapp.models.entity.CustomerEntity;
 import com.outwork.accountingapiapp.models.payload.requests.SaveCustomerRequest;
+import com.outwork.accountingapiapp.models.payload.responses.SuggestedCustomer;
 import com.outwork.accountingapiapp.repositories.CustomerRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
@@ -11,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -23,6 +26,10 @@ public class CustomerService {
 
     public CustomerEntity getCustomerById (@NotNull UUID id) {
         return customerRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(id.toString()));
+    }
+
+    public List<SuggestedCustomer> findCustomersByName (@NotNull String name) {
+        return customerRepository.findByNameLikeIgnoreCase(String.format(DataFormat.LIKE_QUERY_FORMAT, name));
     }
 
     public CustomerEntity saveCustomerEntity (@Valid SaveCustomerRequest request, UUID id) {

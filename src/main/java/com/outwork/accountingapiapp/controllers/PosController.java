@@ -1,13 +1,16 @@
 package com.outwork.accountingapiapp.controllers;
 
 import com.outwork.accountingapiapp.models.entity.PosEntity;
+import com.outwork.accountingapiapp.models.payload.requests.GetPosTableItemRequest;
 import com.outwork.accountingapiapp.models.payload.requests.SavePosRequest;
+import com.outwork.accountingapiapp.models.payload.responses.PosTableItem;
 import com.outwork.accountingapiapp.models.payload.responses.SuggestedPos;
 import com.outwork.accountingapiapp.services.PosService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -22,13 +25,18 @@ public class PosController {
     @Autowired
     private PosService posService;
 
+    @GetMapping
+    public ResponseEntity<Page<PosTableItem>> getPosTableItems (@ModelAttribute GetPosTableItemRequest request) {
+        return ResponseEntity.ok(posService.getPosTableItems(request));
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<PosEntity> getPosById (@PathVariable @NotNull UUID id) {
         return ResponseEntity.ok(posService.getPosById(id));
     }
 
-    @GetMapping("/searchByCode")
-    public ResponseEntity<List<SuggestedPos>> searchPosByCode(@RequestParam @Size(min = 2) String searchKey) {
+    @GetMapping("/searchByCode/{searchKey}")
+    public ResponseEntity<List<SuggestedPos>> searchPosByCode(@PathVariable @Size(min = 2) String searchKey) {
         return ResponseEntity.ok(posService.searchPosByCode(searchKey));
     }
 

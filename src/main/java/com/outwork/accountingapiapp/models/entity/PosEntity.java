@@ -19,6 +19,11 @@ import java.util.UUID;
         uniqueConstraints = {@UniqueConstraint(columnNames = {"accountNumber", "bank"})}
 )
 public class PosEntity {
+    public static final String FIELD_CODE = "code";
+    public static final String FIELD_NAME = "name";
+    public static final String FIELD_ACCOUNT_NUMBER = "accountNumber";
+    public static final String FIELD_BANK = "bank";
+    public static final String FIELD_MAX_BILL_AMOUNT = "maxBillAmount";
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -41,6 +46,9 @@ public class PosEntity {
 
     @Column(nullable = false, length = DataConstraint.ID_STRING_MAX_LENGTH)
     private String bank;
+
+    @Column
+    private String note;
 
     @Column
     private int maxBillAmount;

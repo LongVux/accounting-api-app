@@ -1,5 +1,6 @@
 package com.outwork.accountingapiapp.models.payload.requests;
 
+import com.outwork.accountingapiapp.constants.DataFormat;
 import com.outwork.accountingapiapp.constants.ReceiptSortingEnum;
 import com.outwork.accountingapiapp.constants.ReceiptStatusEnum;
 import com.outwork.accountingapiapp.models.entity.CustomerCardEntity;
@@ -11,6 +12,7 @@ import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.springframework.data.jpa.domain.Specification;
@@ -89,7 +91,7 @@ public class GetReceiptTableItemRequest extends SortedPagination<ReceiptSortingE
     private List<ReceiptStatusEnum> receiptStatusList;
 
     @Override
-    public Predicate toPredicate(Root<ReceiptEntity> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder) {
+    public Predicate toPredicate(@NotNull Root<ReceiptEntity> root, @NotNull CriteriaQuery<?> query, @NotNull CriteriaBuilder criteriaBuilder) {
         List<Predicate> predicates = new ArrayList<>();
 
         if (!ObjectUtils.isEmpty(employeeId)) {
@@ -106,7 +108,7 @@ public class GetReceiptTableItemRequest extends SortedPagination<ReceiptSortingE
                     root
                             .get(ReceiptEntity.FIELD_EMPLOYEE)
                             .get(UserEntity.FIELD_CODE),
-                    employeeCode
+                    String.format(DataFormat.LIKE_QUERY_FORMAT, employeeCode)
             ));
         }
 
@@ -121,9 +123,8 @@ public class GetReceiptTableItemRequest extends SortedPagination<ReceiptSortingE
 
         if (!ObjectUtils.isEmpty(receiptCode)) {
             predicates.add(criteriaBuilder.like(
-                    root
-                            .get(ReceiptEntity.FIELD_CODE),
-                    receiptCode
+                    root.get(ReceiptEntity.FIELD_CODE),
+                    String.format(DataFormat.LIKE_QUERY_FORMAT, receiptCode)
             ));
         }
 
@@ -132,7 +133,7 @@ public class GetReceiptTableItemRequest extends SortedPagination<ReceiptSortingE
                     root
                             .get(ReceiptEntity.FIELD_CUSTOMER_CARD)
                             .get(CustomerCardEntity.FIELD_NAME),
-                    cardName
+                    String.format(DataFormat.LIKE_QUERY_FORMAT, cardName)
             ));
         }
 

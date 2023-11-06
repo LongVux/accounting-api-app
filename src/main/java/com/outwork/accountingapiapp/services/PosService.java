@@ -4,8 +4,10 @@ import com.outwork.accountingapiapp.constants.PosStatusEnum;
 import com.outwork.accountingapiapp.exceptions.DuplicatedValueException;
 import com.outwork.accountingapiapp.exceptions.InvalidDataException;
 import com.outwork.accountingapiapp.models.entity.PosEntity;
+import com.outwork.accountingapiapp.models.payload.requests.GetPosTableItemRequest;
 import com.outwork.accountingapiapp.models.payload.requests.ReceiptBill;
 import com.outwork.accountingapiapp.models.payload.requests.SavePosRequest;
+import com.outwork.accountingapiapp.models.payload.responses.PosTableItem;
 import com.outwork.accountingapiapp.models.payload.responses.SuggestedPos;
 import com.outwork.accountingapiapp.repositories.PosRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -13,6 +15,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
@@ -35,6 +38,10 @@ public class PosService {
 
     public PosEntity getPosById (@NotNull UUID id) {
         return posRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(id.toString()));
+    }
+
+    public Page<PosTableItem> getPosTableItems (GetPosTableItemRequest request) {
+        return posRepository.findAll(request, request.retrievePageConfig());
     }
 
     public List<SuggestedPos> searchPosByCode (@Size(min = 2) String searchKey) {

@@ -16,6 +16,7 @@ import java.util.UUID;
         uniqueConstraints = {@UniqueConstraint(columnNames = {"accountNumber", "bank"})}
 )
 public class BranchEntity {
+    public static final String FIELD_CODE = "code";
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column
