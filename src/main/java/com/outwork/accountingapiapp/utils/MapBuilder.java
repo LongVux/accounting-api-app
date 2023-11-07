@@ -1,10 +1,7 @@
 package com.outwork.accountingapiapp.utils;
 
 import com.outwork.accountingapiapp.constants.*;
-import com.outwork.accountingapiapp.models.entity.CustomerCardEntity;
-import com.outwork.accountingapiapp.models.entity.PosEntity;
-import com.outwork.accountingapiapp.models.entity.ReceiptEntity;
-import com.outwork.accountingapiapp.models.entity.UserEntity;
+import com.outwork.accountingapiapp.models.entity.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -48,6 +45,28 @@ public class MapBuilder {
         sorterMap.put(UserSortingEnum.code, UserEntity.FIELD_CODE);
         sorterMap.put(UserSortingEnum.email, UserEntity.FIELD_EMAIL);
         sorterMap.put(UserSortingEnum.phoneNumber, UserEntity.FIELD_PHONE_NUMBER);
+
+        return sorterMap;
+    }
+
+    public static Map<CustomerSortingEnum, String> buildCustomerTableItemSorter () {
+        Map<CustomerSortingEnum, String> sorterMap = new HashMap<>();
+
+        sorterMap.put(CustomerSortingEnum.name, CustomerEntity.FIELD_NAME);
+        sorterMap.put(CustomerSortingEnum.address, CustomerEntity.FIELD_ADDRESS);
+
+        return sorterMap;
+    }
+
+    public static Map<CustomerCardSortingEnum, String> buildCustomerCardTableItemSorter () {
+        Map<CustomerCardSortingEnum, String> sorterMap = new HashMap<>();
+
+        sorterMap.put(CustomerCardSortingEnum.name, CustomerCardEntity.FIELD_NAME);
+        sorterMap.put(CustomerCardSortingEnum.cardType, String.join(DataFormat.DOT_SEPARATOR, CustomerCardEntity.FIELD_CARD_TYPE, CardTypeEntity.FIELD_NAME));
+        sorterMap.put(CustomerCardSortingEnum.bank, CustomerCardEntity.FIELD_BANK);
+        sorterMap.put(CustomerCardSortingEnum.customerName, String.join(DataFormat.DOT_SEPARATOR, CustomerCardEntity.FIELD_CUSTOMER, CustomerEntity.FIELD_NAME));
+        sorterMap.put(CustomerCardSortingEnum.paymentLimit, CustomerCardEntity.FIELD_PAYMENT_LIMIT);
+        sorterMap.put(CustomerCardSortingEnum.paymentDueDate, CustomerCardEntity.FIELD_PAYMENT_DUE_DATE);
 
         return sorterMap;
     }

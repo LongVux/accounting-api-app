@@ -4,12 +4,15 @@ import com.outwork.accountingapiapp.exceptions.DuplicatedValueException;
 import com.outwork.accountingapiapp.models.entity.CardTypeEntity;
 import com.outwork.accountingapiapp.models.entity.CustomerCardEntity;
 import com.outwork.accountingapiapp.models.entity.CustomerEntity;
+import com.outwork.accountingapiapp.models.payload.requests.GetCustomerCardTableItemRequest;
 import com.outwork.accountingapiapp.models.payload.requests.SaveCustomerCardRequest;
+import com.outwork.accountingapiapp.models.payload.responses.CustomerCardTableItem;
 import com.outwork.accountingapiapp.repositories.CustomerCardRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
@@ -28,6 +31,10 @@ public class CustomerCardService {
 
     @Autowired
     private CustomerService customerService;
+
+    public Page<CustomerCardTableItem> getCustomerCardTableItems (GetCustomerCardTableItemRequest request) {
+        return customerCardRepository.findAll(request, request.retrievePageConfig());
+    }
 
     public CustomerCardEntity getCustomerCardById (@NotNull UUID id) {
         return customerCardRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(id.toString()));

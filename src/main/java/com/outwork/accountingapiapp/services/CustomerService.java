@@ -3,13 +3,16 @@ package com.outwork.accountingapiapp.services;
 import com.outwork.accountingapiapp.constants.DataFormat;
 import com.outwork.accountingapiapp.exceptions.DuplicatedValueException;
 import com.outwork.accountingapiapp.models.entity.CustomerEntity;
+import com.outwork.accountingapiapp.models.payload.requests.GetCustomerTableItemRequest;
 import com.outwork.accountingapiapp.models.payload.requests.SaveCustomerRequest;
+import com.outwork.accountingapiapp.models.payload.responses.CustomerTableItem;
 import com.outwork.accountingapiapp.models.payload.responses.SuggestedCustomer;
 import com.outwork.accountingapiapp.repositories.CustomerRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
@@ -26,6 +29,10 @@ public class CustomerService {
 
     public CustomerEntity getCustomerById (@NotNull UUID id) {
         return customerRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(id.toString()));
+    }
+
+    public Page<CustomerTableItem> getCustomerTableItems (GetCustomerTableItemRequest request) {
+        return customerRepository.findAll(request, request.retrievePageConfig());
     }
 
     public List<SuggestedCustomer> findCustomersByName (@NotNull String name) {

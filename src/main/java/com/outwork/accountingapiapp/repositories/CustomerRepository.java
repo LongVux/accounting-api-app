@@ -1,7 +1,11 @@
 package com.outwork.accountingapiapp.repositories;
 
 import com.outwork.accountingapiapp.models.entity.CustomerEntity;
+import com.outwork.accountingapiapp.models.payload.responses.CustomerTableItem;
 import com.outwork.accountingapiapp.models.payload.responses.SuggestedCustomer;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -15,4 +19,6 @@ public interface CustomerRepository extends JpaRepository<CustomerEntity, UUID> 
     boolean existsByPhoneNumberAndIdNot(String phoneNumber, UUID id);
 
     List<SuggestedCustomer> findByNameLikeIgnoreCase(String name);
+
+    Page<CustomerTableItem> findAll (Specification<CustomerTableItem> specification, Pageable pageable);
 }

@@ -20,6 +20,12 @@ import java.util.UUID;
 )
 public class CustomerCardEntity extends Auditable<String> {
     public static final String FIELD_NAME = "name";
+    public static final String FIELD_CARD_TYPE = "cardType";
+    public static final String FIELD_BANK = "bank";
+    public static final String FIELD_NATIONAL_ID = "nationalId";
+    public static final String FIELD_PAYMENT_LIMIT = "paymentLimit";
+    public static final String FIELD_PAYMENT_DUE_DATE = "paymentDueDate";
+    public static final String FIELD_CUSTOMER = "Customer";
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -37,6 +43,9 @@ public class CustomerCardEntity extends Auditable<String> {
 
     @Column(nullable = false, length = DataConstraint.ID_STRING_MAX_LENGTH)
     private String bank;
+
+    @Column(unique = true, nullable = false, length = DataConstraint.ID_STRING_MAX_LENGTH)
+    private String nationalId;
 
     private int paymentLimit;
 

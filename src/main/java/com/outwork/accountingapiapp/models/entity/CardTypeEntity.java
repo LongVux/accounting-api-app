@@ -16,6 +16,9 @@ import java.util.UUID;
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 @Table(name = "card_types")
 public class CardTypeEntity {
+    public static final String FIELD_ID = "id";
+    public static final String FIELD_NAME = "name";
+
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;

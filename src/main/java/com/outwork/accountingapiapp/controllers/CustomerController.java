@@ -1,12 +1,15 @@
 package com.outwork.accountingapiapp.controllers;
 
 import com.outwork.accountingapiapp.models.entity.CustomerEntity;
+import com.outwork.accountingapiapp.models.payload.requests.GetCustomerTableItemRequest;
 import com.outwork.accountingapiapp.models.payload.requests.SaveCustomerRequest;
+import com.outwork.accountingapiapp.models.payload.responses.CustomerTableItem;
 import com.outwork.accountingapiapp.models.payload.responses.SuggestedCustomer;
 import com.outwork.accountingapiapp.services.CustomerService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,6 +23,11 @@ public class CustomerController {
 
     @Autowired
     private CustomerService customerService;
+
+    @GetMapping
+    public ResponseEntity<Page<CustomerTableItem>> getCustomerTableItems (@ModelAttribute GetCustomerTableItemRequest request) {
+        return ResponseEntity.ok(customerService.getCustomerTableItems(request));
+    }
 
     @GetMapping("/{id}")
     public ResponseEntity<CustomerEntity> getCustomerById (@PathVariable @NotNull UUID id) {

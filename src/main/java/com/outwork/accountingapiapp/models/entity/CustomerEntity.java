@@ -14,6 +14,11 @@ import java.util.UUID;
 @Entity
 @Table(name = "customers")
 public class CustomerEntity extends Auditable<String> {
+    public static final String FIELD_ID = "id";
+    public static final String FIELD_NAME = "name";
+    public static final String FIELD_ADDRESS = "address";
+    public static final String FIELD_PHONE_NUMBER = "phoneNumber";
+    public static final String FIELD_NATIONAL_ID = "nationalId";
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
