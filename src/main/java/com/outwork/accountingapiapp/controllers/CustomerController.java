@@ -8,6 +8,7 @@ import com.outwork.accountingapiapp.models.payload.responses.SuggestedCustomer;
 import com.outwork.accountingapiapp.services.CustomerService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -35,7 +36,7 @@ public class CustomerController {
     }
 
     @GetMapping("/findByName/{name}")
-    public ResponseEntity<List<SuggestedCustomer>> findCustomersByName (@PathVariable @NotNull String name) {
+    public ResponseEntity<List<SuggestedCustomer>> findCustomersByName (@PathVariable @Size(min = 2) String name) {
         return ResponseEntity.ok(customerService.findCustomersByName(name));
     }
 

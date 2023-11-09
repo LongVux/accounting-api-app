@@ -11,6 +11,7 @@ import com.outwork.accountingapiapp.repositories.CustomerRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
@@ -21,8 +22,8 @@ import java.util.UUID;
 
 @Service
 public class CustomerService {
-    private static final String ERROR_MSG_CUSTOMER_PHONE_EXISTED = "Số điện thoại khách hàng đã tồn tại";
-    private static final String ERROR_MSG_CUSTOMER_NATION_ID_EXISTED = "Số thẻ căn cước công dân đã tồn tại";
+    public static final String ERROR_MSG_CUSTOMER_PHONE_EXISTED = "Số điện thoại khách hàng đã tồn tại";
+    public static final String ERROR_MSG_CUSTOMER_NATION_ID_EXISTED = "Số thẻ căn cước công dân đã tồn tại";
 
     @Autowired
     private CustomerRepository customerRepository;
@@ -35,7 +36,7 @@ public class CustomerService {
         return customerRepository.findAll(request, request.retrievePageConfig());
     }
 
-    public List<SuggestedCustomer> findCustomersByName (@NotNull String name) {
+    public List<SuggestedCustomer> findCustomersByName (@Size(min = 2) String name) {
         return customerRepository.findByNameLikeIgnoreCase(String.format(DataFormat.LIKE_QUERY_FORMAT, name));
     }
 

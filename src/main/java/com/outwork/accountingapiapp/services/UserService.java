@@ -15,7 +15,6 @@ import java.util.UUID;
 
 @Service
 public class UserService {
-
     @Autowired
     private UserRepository userRepository;
 

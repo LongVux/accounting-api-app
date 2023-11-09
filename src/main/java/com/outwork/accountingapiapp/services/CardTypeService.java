@@ -16,11 +16,10 @@ import java.util.UUID;
 
 @Service
 public class CardTypeService {
+    public static final String ERROR_MSG_CARD_TYPE_NAME_EXISTED = "Tên loại thẻ đã tồn tại";
 
     @Autowired
     private CardTypeRepository cardTypeRepository;
-
-    private static final String ERROR_MSG_CARD_TYPE_NAME_EXISTED = "Tên loại thẻ đã tồn tại";
 
     public List<CardTypeEntity> getCardTypes () {
         return cardTypeRepository.findAll();
@@ -43,5 +42,9 @@ public class CardTypeService {
         savedCardType.setName(request.getName());
 
         return cardTypeRepository.save(savedCardType);
+    }
+
+    public void deleteCardTypeById (@NotNull UUID id) {
+        cardTypeRepository.deleteById(id);
     }
 }

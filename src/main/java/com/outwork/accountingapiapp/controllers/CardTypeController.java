@@ -34,4 +34,9 @@ public class CardTypeController {
     public ResponseEntity<CardTypeEntity> updateCardType (@RequestBody SaveCardTypeRequest request, @PathVariable @NotNull UUID id) {
         return ResponseEntity.ok(cardTypeService.saveCardType(request, id));
     }
+
+    @DeleteMapping("/{id}")
+    public void deleteCardType (@PathVariable @NotNull UUID id) {
+        cardTypeService.deleteCardTypeById(id);
+    }
 }

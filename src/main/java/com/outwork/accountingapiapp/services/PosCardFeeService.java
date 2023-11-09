@@ -1,11 +1,9 @@
 package com.outwork.accountingapiapp.services;
 
 import com.outwork.accountingapiapp.models.entity.*;
-import com.outwork.accountingapiapp.models.payload.requests.SavePosRequest;
 import com.outwork.accountingapiapp.models.payload.requests.SupportedCardType;
 import com.outwork.accountingapiapp.repositories.PosCardFeeRepository;
 import jakarta.persistence.EntityNotFoundException;
-import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -15,7 +13,7 @@ import java.util.*;
 
 @Service
 public class PosCardFeeService {
-    private static final String ERROR_MSG_SOME_CARD_TYPES_ID_NOT_EXISTED = "Một số ID loại thẻ không tồn tại";
+    public static final String ERROR_MSG_SOME_CARD_TYPES_ID_NOT_EXISTED = "Một số ID loại thẻ không tồn tại";
     @Autowired
     private PosCardFeeRepository posCardFeeRepository;
 
@@ -59,9 +57,5 @@ public class PosCardFeeService {
             pos.getSupportedCardTypes().clear();
             pos.getSupportedCardTypes().addAll( posCardFeeMap.values().stream().toList());
         }
-    }
-
-    private void deletePosCardFees (List<PosCardFeeEntity> posCardFees) {
-        posCardFeeRepository.deleteAll(posCardFees);
     }
 }

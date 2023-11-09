@@ -15,7 +15,7 @@ import java.util.UUID;
 @Service
 public class RoleService {
 
-    private String ERROR_MSG_ROLE_TITLE_EXISTED = "Tên vai trò đã tồn tại";
+    public static final String ERROR_MSG_ROLE_TITLE_EXISTED = "Tên vai trò đã tồn tại";
 
     @Autowired
     private RoleRepository roleRepository;

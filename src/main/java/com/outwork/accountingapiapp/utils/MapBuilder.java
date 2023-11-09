@@ -71,6 +71,17 @@ public class MapBuilder {
         return sorterMap;
     }
 
+    public static Map<BranchAccountEntrySortingEnum, String> buildBranchAccountTableItemSorter () {
+        Map<BranchAccountEntrySortingEnum, String> sorterMap = new HashMap<>();
+
+        sorterMap.put(BranchAccountEntrySortingEnum.createdDate, BranchAccountEntryEntity.FIELD_CREATED_DATE);
+        sorterMap.put(BranchAccountEntrySortingEnum.entryCode, BranchAccountEntryEntity.FIELD_ENTRY_CODE);
+        sorterMap.put(BranchAccountEntrySortingEnum.entryType, BranchAccountEntryEntity.FIELD_ENTRY_TYPE);
+        sorterMap.put(BranchAccountEntrySortingEnum.branchCode, String.join(DataFormat.DOT_SEPARATOR, BranchAccountEntryEntity.FIELD_BRANCH, BranchEntity.FIELD_CODE));
+
+        return sorterMap;
+    }
+
     public static Map<TransactionTypeEnum, String> buildTransactionTypeString () {
         Map<TransactionTypeEnum, String> map = new HashMap<>();
 

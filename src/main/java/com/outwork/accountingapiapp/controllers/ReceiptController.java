@@ -2,8 +2,11 @@ package com.outwork.accountingapiapp.controllers;
 
 import com.outwork.accountingapiapp.models.entity.ReceiptEntity;
 import com.outwork.accountingapiapp.models.payload.requests.GetReceiptTableItemRequest;
+import com.outwork.accountingapiapp.models.payload.requests.SaveReceiptEntryRequest;
+import com.outwork.accountingapiapp.models.payload.requests.SaveReceiptRepaymentEntryRequest;
 import com.outwork.accountingapiapp.models.payload.requests.SaveReceiptRequest;
 import com.outwork.accountingapiapp.models.payload.responses.ReceiptTableItem;
+import com.outwork.accountingapiapp.services.BranchAccountEntryService;
 import com.outwork.accountingapiapp.services.ReceiptService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -22,6 +25,9 @@ public class ReceiptController {
     @Autowired
     private ReceiptService receiptService;
 
+    @Autowired
+    private BranchAccountEntryService branchAccountEntryService;
+
     @GetMapping
     public ResponseEntity<Page<ReceiptTableItem>> getReceiptTableItems (@ModelAttribute GetReceiptTableItemRequest request) {
         return ResponseEntity.ok(receiptService.getReceiptTableItems(request));
@@ -36,6 +42,17 @@ public class ReceiptController {
     public ResponseEntity<ReceiptEntity> createReceipt (@RequestBody @Valid SaveReceiptRequest request) {
         return new ResponseEntity<>(receiptService.saveReceipt(request, null), HttpStatus.CREATED);
     }
+
+    @PutMapping("/confirmReceipt")
+    public ResponseEntity<ReceiptEntity> confirmReceipt (@RequestBody SaveReceiptEntryRequest request) {
+        return ResponseEntity.ok(branchAccountEntryService.confirmReceiptEntry(request));
+    }
+
+    @PutMapping("/repayReceipt")
+    public ResponseEntity<ReceiptEntity> repayReceipt (@RequestBody SaveReceiptRepaymentEntryRequest request) {
+        return ResponseEntity.ok(branchAccountEntryService.confirmRepayReceipt(request));
+    }
+
 
     @PutMapping("/{id}")
     public ResponseEntity<ReceiptEntity> updateReceipt (@RequestBody @Valid SaveReceiptRequest request, @PathVariable @NotNull UUID id) {

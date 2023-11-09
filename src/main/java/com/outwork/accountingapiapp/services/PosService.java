@@ -25,10 +25,10 @@ import java.util.*;
 @Service
 public class PosService {
 
-    private static final String ERROR_MSG_POS_CODE_EXISTED = "Mã POS đã tồn tại";
-    private static final String ERROR_MSG_POS_BANK_ACCOUNT_EXISTED = "Tài khoản ngân hàng của POS đã tồn tại";
-    private static final String ERROR_MSG_SOME_POS_NOT_SUPPORT_CARD = "Một số POS không hỗ trợ loại thẻ này";
-    private static final String ERROR_MSG_POS_HAS_NO_CARD_TYPE = "POS phải hỗ trợ ít nhất một loại thẻ";
+    public static final String ERROR_MSG_POS_CODE_EXISTED = "Mã POS đã tồn tại";
+    public static final String ERROR_MSG_POS_BANK_ACCOUNT_EXISTED = "Tài khoản ngân hàng của POS đã tồn tại";
+    public static final String ERROR_MSG_SOME_POS_NOT_SUPPORT_CARD = "Một số POS không hỗ trợ loại thẻ này";
+    public static final String ERROR_MSG_POS_HAS_NO_CARD_TYPE = "POS phải hỗ trợ ít nhất một loại thẻ";
 
     @Autowired
     private PosRepository posRepository;

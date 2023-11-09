@@ -2,9 +2,11 @@ package com.outwork.accountingapiapp.controllers;
 
 import com.outwork.accountingapiapp.models.entity.BranchEntity;
 import com.outwork.accountingapiapp.models.payload.requests.SaveBranchRequest;
+import com.outwork.accountingapiapp.models.payload.responses.SuggestedBranch;
 import com.outwork.accountingapiapp.services.BranchService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,6 +30,11 @@ public class BranchController {
     @GetMapping("/{id}")
     public ResponseEntity<BranchEntity> getBranchById(@PathVariable @NotNull UUID id) {
         return ResponseEntity.ok(branchService.getBranchById(id));
+    }
+
+    @GetMapping("/findByKeyCode/{keyCode}")
+    public ResponseEntity<List<SuggestedBranch>> findBranchesByKeyCode (@PathVariable @Size(min = 2) String keyCode) {
+        return ResponseEntity.ok(branchService.findBranchesByKeyCode(keyCode));
     }
 
     @PostMapping

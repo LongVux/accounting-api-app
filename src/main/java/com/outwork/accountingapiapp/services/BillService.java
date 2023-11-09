@@ -21,11 +21,11 @@ import java.util.stream.Collectors;
 
 @Service
 public class BillService {
-    private static final String ERROR_MSG_NO_POS_FEE_FOUND_FOR_THE_BILL = "Không tìm thấy phí POS cho loại thẻ của bill";
-    private static final String ERROR_MSG_BILL_ALREADY_HAS_CODE = "Bill đã được tạo mã. Không thể xử lý";
-    private static final String ERROR_MSG_SOME_BILL_INVALID_TO_APPROVE = "Một số bill không hợp lệ để tạo bút toán";
-    private static final String ERROR_NO_BILL_TO_APPROVE = "Không có bill để tạo bút toán";
-    private static final String ERROR_BILL_VALUE_EXCEED_POS_LIMIT = "Giá trị Bill vượt quá giới hạn của POS";
+    public static final String ERROR_MSG_NO_POS_FEE_FOUND_FOR_THE_BILL = "Không tìm thấy phí POS cho loại thẻ của bill";
+    public static final String ERROR_MSG_BILL_ALREADY_HAS_CODE = "Bill đã được tạo mã. Không thể xử lý";
+    public static final String ERROR_MSG_SOME_BILL_INVALID_TO_APPROVE = "Một số bill không hợp lệ để tạo bút toán";
+    public static final String ERROR_MSG_NO_BILL_TO_APPROVE = "Không có bill để tạo bút toán";
+    public static final String ERROR_MSG_BILL_VALUE_EXCEED_POS_LIMIT = "Giá trị Bill vượt quá giới hạn của POS";
 
     @Autowired
     private BillRepository billRepository;
@@ -74,7 +74,7 @@ public class BillService {
             BillEntity savedBill = billMap.getOrDefault(request.getBillId(), BillEntity.buildNewBill(savedReceipt));
 
             if (posMap.get(request.getPosId()).getMaxBillAmount() < request.getMoneyAmount()) {
-                throw new InvalidDataException(ERROR_BILL_VALUE_EXCEED_POS_LIMIT);
+                throw new InvalidDataException(ERROR_MSG_BILL_VALUE_EXCEED_POS_LIMIT);
             }
 
             savedBill.setMoneyAmount(request.getMoneyAmount());
@@ -132,7 +132,7 @@ public class BillService {
 
     private void validateBillsForApproval (List<BillEntity> bills) {
         if (CollectionUtils.isEmpty(bills)) {
-            throw new InvalidDataException(ERROR_NO_BILL_TO_APPROVE);
+            throw new InvalidDataException(ERROR_MSG_NO_BILL_TO_APPROVE);
         }
 
         if (bills.stream().anyMatch(bill -> !ObjectUtils.isEmpty(bill.getCode()))) {

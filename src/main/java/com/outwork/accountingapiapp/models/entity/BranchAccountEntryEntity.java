@@ -15,6 +15,13 @@ import java.util.UUID;
 @Entity
 @Table(name = "branch_account_entries")
 public class BranchAccountEntryEntity extends Auditable<String> {
+    public static final String FIELD_ENTRY_CODE = "entryCode";
+    public static final String FIELD_ENTRY_TYPE = "entryType";
+    public static final String FIELD_BRANCH = "branch";
+    public static final String FIELD_ENTRY_STATUS = "entryStatus";
+    public static final String FIELD_TRANSACTION_TYPE = "transactionType";
+    public static final String FIELD_MONEY_AMOUNT = "moneyAmount";
+
     public BranchAccountEntryEntity (
             ReceiptEntity receipt,
             String explanation,
@@ -46,7 +53,7 @@ public class BranchAccountEntryEntity extends Auditable<String> {
     private String entryType;
 
     @Column(nullable = false, updatable = false)
-    private int moneyAmount;
+    private double moneyAmount;
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)

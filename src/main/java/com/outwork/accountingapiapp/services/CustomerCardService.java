@@ -21,7 +21,7 @@ import java.util.UUID;
 
 @Service
 public class CustomerCardService {
-    private static final String ERROR_MSG_CUSTOMER_CARD_NUMBER_EXISTED = "Số tài khoản thẻ đã tồn tại";
+    public static final String ERROR_MSG_CUSTOMER_CARD_NUMBER_EXISTED = "Số tài khoản thẻ đã tồn tại";
 
     @Autowired
     private CustomerCardRepository customerCardRepository;
