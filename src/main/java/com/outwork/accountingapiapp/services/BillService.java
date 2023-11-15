@@ -39,7 +39,7 @@ public class BillService {
 
     public void estimateBillProfit(BillEntity bill) {
         int posFee = getPosFeeFromBillByCardTypeId(bill);
-        bill.setEstimatedProfit(bill.getFee() - bill.getMoneyAmount()*posFee);
+        bill.setEstimatedProfit(bill.getFee() - bill.getMoneyAmount()*posFee/100);
     }
 
     public int getPosFeeFromBillByCardTypeId (@NotNull BillEntity bill) {

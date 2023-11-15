@@ -26,10 +26,10 @@ public class BillEntity extends Auditable<String> {
     private long timeStampOrder;
 
     @Column(nullable = false)
-    private int moneyAmount;
+    private double moneyAmount;
 
     @Column(nullable = false)
-    private int fee;
+    private double fee;
 
     @Column(nullable = false)
     private double estimatedProfit;

@@ -15,12 +15,12 @@ public class ReceiptTableItem {
     private String code;
     private Date createdDate;
     private ReceiptStatusEnum receiptStatusEnum;
-    private int percentageFee;
-    private int shipmentFee;
-    private int intake;
-    private int payout;
-    private int loan;
-    private int repayment;
+    private double percentageFee;
+    private double shipmentFee;
+    private double intake;
+    private double payout;
+    private double loan;
+    private double repayment;
     private double transactionTotal;
     private double calculatedProfit;
     private double estimatedProfit;
@@ -52,6 +52,4 @@ public class ReceiptTableItem {
         this.branchId = receipt.getBranch().getId();
         this.branchName = receipt.getBranch().getName();
     }
-
-
 }

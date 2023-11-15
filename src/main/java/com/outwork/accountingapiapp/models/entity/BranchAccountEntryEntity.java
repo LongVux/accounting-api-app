@@ -26,7 +26,7 @@ public class BranchAccountEntryEntity extends Auditable<String> {
             ReceiptEntity receipt,
             String explanation,
             TransactionTypeEnum transactionType,
-            int moneyAmount
+            double moneyAmount
     ) {
         BranchAccountEntryEntity entry = new BranchAccountEntryEntity();
         entry.setEntryType(receipt.getCode());

@@ -118,7 +118,7 @@ public class BranchAccountEntryService {
     }
 
     private List<BranchAccountEntryEntity> generateBranchAccountEntriesFromReceipt (ReceiptEntity receipt, String explanation) {
-        Map<TransactionTypeEnum, Integer> receiptEntryMap = new HashMap<>();
+        Map<TransactionTypeEnum, Double> receiptEntryMap = new HashMap<>();
 
         receiptEntryMap.put(TransactionTypeEnum.INTAKE, receipt.getIntake());
         receiptEntryMap.put(TransactionTypeEnum.PAYOUT, receipt.getPayout());
@@ -126,7 +126,7 @@ public class BranchAccountEntryService {
         receiptEntryMap.put(TransactionTypeEnum.REPAYMENT, receipt.getRepayment());
 
         return receiptEntryMap.keySet().stream()
-                .filter(key -> Optional.ofNullable(receiptEntryMap.get(key)).orElse(0) != 0)
+                .filter(key -> Optional.ofNullable(receiptEntryMap.get(key)).orElse(0d) != 0d)
                 .map(key -> new BranchAccountEntryEntity(
                         receipt,
                         explanation,

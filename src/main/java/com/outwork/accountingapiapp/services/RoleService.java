@@ -24,8 +24,8 @@ public class RoleService {
         return roleRepository.findByIdIn(roleIds);
     }
 
-    public List<String> getRoles () {
-        return roleRepository.findAll().stream().map(RoleEntity::getTitle).toList();
+    public List<RoleEntity> getRoles () {
+        return roleRepository.findAll();
     }
 
     public RoleEntity createRole (@NotNull @Valid CreateRoleRequest request) {

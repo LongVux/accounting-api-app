@@ -13,9 +13,9 @@ public class ReceiptBill {
         @NotNull
         private UUID posId;
 
-        private int moneyAmount;
+        private double moneyAmount;
 
-        private int fee;
+        private double fee;
 
         private double estimatedProfit;
 }

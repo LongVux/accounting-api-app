@@ -22,22 +22,22 @@ public class SaveReceiptRequest {
     private UUID customerCardId;
 
     @Min(0)
-    private int percentageFee;
+    private double percentageFee;
 
     @Min(0)
-    private int shipmentFee;
+    private double shipmentFee;
 
     @Min(0)
-    private int intake;
+    private double intake;
 
     @Min(0)
-    private int payout;
+    private double payout;
 
     @Min(0)
-    private int loan;
+    private double loan;
 
     @Min(0)
-    private int repayment;
+    private double repayment;
 
     @NotNull
     private UUID employeeId;

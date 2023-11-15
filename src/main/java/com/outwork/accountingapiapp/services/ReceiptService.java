@@ -80,6 +80,16 @@ public class ReceiptService {
         return receiptRepository.save(savedReceipt);
     }
 
+    public ReceiptEntity reCalculatedReceipt (UUID id) {
+        ReceiptEntity receipt = getReceipt(id);
+
+        calculateReceiptTransactionTotal(receipt);
+        estimateReceiptProfit(receipt);
+        calculateReceiptProfit(receipt);
+
+        return receiptRepository.save(receipt);
+    }
+
     public ReceiptEntity approveReceiptForEntry (@NotNull UUID id) {
         ReceiptEntity receipt = getReceipt(id);
 
@@ -136,7 +146,7 @@ public class ReceiptService {
         double givenReceiptBalance = - request.getIntake() + request.getPayout() + request.getLoan() - request.getRepayment();
         double transactionTotal = request.getReceiptBills().stream()
                 .map(ReceiptBill::getMoneyAmount)
-                .mapToInt(Integer::intValue)
+                .mapToDouble(Double::doubleValue)
                 .sum()
                 + request.getShipmentFee();
 
@@ -158,7 +168,7 @@ public class ReceiptService {
          receipt.setTransactionTotal(
                  receipt.getBills().stream()
                 .map(BillEntity::getMoneyAmount)
-                .mapToInt(Integer::intValue)
+                .mapToDouble(Double::doubleValue)
                 .sum()
                 + receipt.getShipmentFee()
          );
@@ -185,8 +195,8 @@ public class ReceiptService {
         receipt.setCalculatedProfit(billProfitSum + calculateReceiptBalance(receipt));
     }
 
-    private int calculateReceiptBalance (ReceiptEntity receipt) {
-        return - receipt.getIntake() + receipt.getPayout() + receipt.getLoan() - receipt.getRepayment();
+    private double calculateReceiptBalance (ReceiptEntity receipt) {
+        return receipt.getIntake() - receipt.getPayout() - receipt.getLoan() + receipt.getRepayment();
     }
 
     private void assignNewReceiptCode (ReceiptEntity receipt) {

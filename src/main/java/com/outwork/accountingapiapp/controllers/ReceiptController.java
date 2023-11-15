@@ -38,6 +38,11 @@ public class ReceiptController {
         return ResponseEntity.ok(receiptService.getReceipt(id));
     }
 
+    @PostMapping("/reCalculate/{id}")
+    public ResponseEntity<ReceiptEntity> reCalculatedReceipt (@PathVariable @NotNull UUID id) {
+        return ResponseEntity.ok(receiptService.reCalculatedReceipt(id));
+    }
+
     @PostMapping
     public ResponseEntity<ReceiptEntity> createReceipt (@RequestBody @Valid SaveReceiptRequest request) {
         return new ResponseEntity<>(receiptService.saveReceipt(request, null), HttpStatus.CREATED);

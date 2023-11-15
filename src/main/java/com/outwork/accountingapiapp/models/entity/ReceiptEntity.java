@@ -38,21 +38,21 @@ public class ReceiptEntity extends Auditable<String> {
     private ReceiptStatusEnum receiptStatus;
 
     @Column(nullable = false)
-    private int percentageFee;
+    private double percentageFee;
 
-    private int shipmentFee;
-
-    @Column(nullable = false)
-    private int intake;
+    private double shipmentFee;
 
     @Column(nullable = false)
-    private int payout;
+    private double intake;
 
     @Column(nullable = false)
-    private int loan;
+    private double payout;
 
     @Column(nullable = false)
-    private int repayment;
+    private double loan;
+
+    @Column(nullable = false)
+    private double repayment;
 
     @Column(nullable = false)
     private double transactionTotal;
