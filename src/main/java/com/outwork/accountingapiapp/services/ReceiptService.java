@@ -192,11 +192,7 @@ public class ReceiptService {
                 .mapToDouble(Double::doubleValue)
                 .sum();
 
-        receipt.setCalculatedProfit(billProfitSum + calculateReceiptBalance(receipt));
-    }
-
-    private double calculateReceiptBalance (ReceiptEntity receipt) {
-        return receipt.getIntake() - receipt.getPayout() - receipt.getLoan() + receipt.getRepayment();
+        receipt.setCalculatedProfit(billProfitSum - receipt.getLoan() + receipt.getRepayment() + receipt.getIntake());
     }
 
     private void assignNewReceiptCode (ReceiptEntity receipt) {
