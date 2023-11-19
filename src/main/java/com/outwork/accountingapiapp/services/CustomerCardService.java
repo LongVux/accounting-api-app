@@ -68,6 +68,7 @@ public class CustomerCardService {
         customerCard.setPaymentLimit(request.getPaymentLimit());
         customerCard.setPaymentDueDate(request.getPaymentDueDate());
         customerCard.setCustomer(customer);
+        customerCard.setNationalId(request.getNationalId());
     }
 
     private void validateSaveCustomerCardRequest (SaveCustomerCardRequest request, UUID id) {

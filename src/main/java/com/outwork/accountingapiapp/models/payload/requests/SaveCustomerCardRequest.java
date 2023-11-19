@@ -26,4 +26,7 @@ public class SaveCustomerCardRequest {
     private Date paymentDueDate;
 
     private UUID customerId;
+
+    @Size(min = DataConstraint.SHORT_STRING_MIN_LENGTH, max = DataConstraint.ID_STRING_MAX_LENGTH)
+    private String nationalId;
 }
