@@ -7,7 +7,9 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.util.ObjectUtils;
 
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 @Setter
@@ -23,6 +25,10 @@ public class BillEntity extends Auditable<String> {
     public static final String FIELD_RETURNED_TIME = "returnedTime";
     public static final String FIELD_POS = "pos";
     public static final String FIELD_RECEIPT = "receipt";
+
+    public static List<String> getSumUpFields () {
+        return Arrays.asList(FIELD_MONEY_AMOUNT, FIELD_ESTIMATED_PROFIT, FIELD_RETURNED_PROFIT);
+    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)

@@ -1,6 +1,7 @@
 package com.outwork.accountingapiapp.controllers;
 
 import com.outwork.accountingapiapp.models.payload.requests.GetBillTableItemRequest;
+import com.outwork.accountingapiapp.models.payload.responses.BillSumUpInfo;
 import com.outwork.accountingapiapp.models.payload.responses.BillTableItem;
 import com.outwork.accountingapiapp.services.BillService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,5 +22,10 @@ public class BillController {
     @GetMapping
     public ResponseEntity<Page<BillTableItem>> getBillTableItems (@ModelAttribute GetBillTableItemRequest request) {
         return ResponseEntity.ok(billService.getBillTableItems(request));
+    }
+
+    @GetMapping("/sumUp")
+    public ResponseEntity<BillSumUpInfo> getBillSumUpInfo (@ModelAttribute GetBillTableItemRequest request) {
+        return ResponseEntity.ok(billService.getBillSumUpInfo(request));
     }
 }

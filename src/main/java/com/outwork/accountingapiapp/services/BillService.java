@@ -7,10 +7,12 @@ import com.outwork.accountingapiapp.models.entity.PosEntity;
 import com.outwork.accountingapiapp.models.entity.ReceiptEntity;
 import com.outwork.accountingapiapp.models.payload.requests.GetBillTableItemRequest;
 import com.outwork.accountingapiapp.models.payload.requests.ReceiptBill;
+import com.outwork.accountingapiapp.models.payload.responses.BillSumUpInfo;
 import com.outwork.accountingapiapp.models.payload.responses.BillTableItem;
 import com.outwork.accountingapiapp.repositories.BillRepository;
 import com.outwork.accountingapiapp.utils.BillCodeHandler;
 import com.outwork.accountingapiapp.utils.DateTimeUtils;
+import com.outwork.accountingapiapp.utils.Util;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,12 +38,27 @@ public class BillService {
     @Autowired
     private PosService posService;
 
+    @Autowired
+    private Util util;
+
     public BillEntity getBillById (@NotNull UUID id) {
         return billRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(id.toString()));
     }
 
     public Page<BillTableItem> getBillTableItems (GetBillTableItemRequest request) {
         return billRepository.findAll(request, request.retrievePageConfig());
+    }
+
+    public BillSumUpInfo getBillSumUpInfo (GetBillTableItemRequest request) {
+        List<Double> result = util.getSumsBySpecifications(Collections.singletonList(request), BillEntity.getSumUpFields(), BillTableItem.class);
+
+        BillSumUpInfo sumUpInfo = new BillSumUpInfo();
+
+        sumUpInfo.setTotalMoneyAmount(result.get(0));
+        sumUpInfo.setTotalEstimatedProfit(result.get(1));
+        sumUpInfo.setTotalReturnedProfit(result.get(2));
+
+        return sumUpInfo;
     }
 
     public void estimateBillProfit(BillEntity bill) {
