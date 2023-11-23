@@ -82,6 +82,32 @@ public class MapBuilder {
         return sorterMap;
     }
 
+    public static Map<GeneralAccountEntrySortingEnum, String> buildGeneralAccountTableItemSorter () {
+        Map<GeneralAccountEntrySortingEnum, String> sorterMap = new HashMap<>();
+
+        sorterMap.put(GeneralAccountEntrySortingEnum.createdDate, GeneralAccountEntryEntity.FIELD_CREATED_DATE);
+        sorterMap.put(GeneralAccountEntrySortingEnum.entryCode, GeneralAccountEntryEntity.FIELD_ENTRY_CODE);
+        sorterMap.put(GeneralAccountEntrySortingEnum.entryType, GeneralAccountEntryEntity.FIELD_ENTRY_TYPE);
+
+        return sorterMap;
+    }
+
+    public static Map<BillSortingEnum, String> buildBillTableItemSorter () {
+        Map<BillSortingEnum, String> sorterMap = new HashMap<>();
+
+        sorterMap.put(BillSortingEnum.createdDate, BillEntity.FIELD_CREATED_DATE);
+        sorterMap.put(BillSortingEnum.code, BillEntity.FIELD_CODE);
+        sorterMap.put(BillSortingEnum.posCode, String.join(DataFormat.DOT_SEPARATOR, BillEntity.FIELD_POS, PosEntity.FIELD_CODE));
+        sorterMap.put(BillSortingEnum.moneyAmount, BillEntity.FIELD_MONEY_AMOUNT);
+        sorterMap.put(BillSortingEnum.fee, BillEntity.FIELD_FEE);
+        sorterMap.put(BillSortingEnum.estimatedProfit, BillEntity.FIELD_ESTIMATED_PROFIT);
+        sorterMap.put(BillSortingEnum.returnedProfit, BillEntity.FIELD_RETURNED_PROFIT);
+        sorterMap.put(BillSortingEnum.returnedTime, BillEntity.FIELD_RETURNED_TIME);
+        sorterMap.put(BillSortingEnum.receiptCode, String.join(DataFormat.DOT_SEPARATOR, BillEntity.FIELD_RECEIPT, ReceiptEntity.FIELD_CODE));
+
+        return sorterMap;
+    }
+
     public static Map<TransactionTypeEnum, String> buildTransactionTypeString () {
         Map<TransactionTypeEnum, String> map = new HashMap<>();
 

@@ -3,6 +3,7 @@ package com.outwork.accountingapiapp.controllers;
 import com.outwork.accountingapiapp.models.entity.BranchAccountEntryEntity;
 import com.outwork.accountingapiapp.models.payload.requests.GetBranchAccountEntryTableItemRequest;
 import com.outwork.accountingapiapp.models.payload.requests.SaveBranchAccountEntryRequest;
+import com.outwork.accountingapiapp.models.payload.responses.AccountEntrySumUpInfo;
 import com.outwork.accountingapiapp.models.payload.responses.BranchAccountEntryTableItem;
 import com.outwork.accountingapiapp.services.BranchAccountEntryService;
 import jakarta.validation.Valid;
@@ -24,6 +25,11 @@ public class BranchAccountEntryController {
     @GetMapping
     public ResponseEntity<Page<BranchAccountEntryTableItem>> getBranchAccountEntryTableItems (@ModelAttribute GetBranchAccountEntryTableItemRequest request) {
         return ResponseEntity.ok(branchAccountEntryService.getBranchAccountEntryTableItems(request));
+    }
+
+    @GetMapping("/sumUp")
+    public ResponseEntity<AccountEntrySumUpInfo> getBranchAccountEntrySumUpInfo (@ModelAttribute GetBranchAccountEntryTableItemRequest request) {
+        return ResponseEntity.ok(branchAccountEntryService.getBranchAccountEntrySumUpInfo(request));
     }
 
     @GetMapping("/{id}")

@@ -5,6 +5,7 @@ import com.outwork.accountingapiapp.models.payload.requests.GetReceiptTableItemR
 import com.outwork.accountingapiapp.models.payload.requests.SaveReceiptEntryRequest;
 import com.outwork.accountingapiapp.models.payload.requests.SaveReceiptRepaymentEntryRequest;
 import com.outwork.accountingapiapp.models.payload.requests.SaveReceiptRequest;
+import com.outwork.accountingapiapp.models.payload.responses.ReceiptSumUpInfo;
 import com.outwork.accountingapiapp.models.payload.responses.ReceiptTableItem;
 import com.outwork.accountingapiapp.services.BranchAccountEntryService;
 import com.outwork.accountingapiapp.services.ReceiptService;
@@ -31,6 +32,11 @@ public class ReceiptController {
     @GetMapping
     public ResponseEntity<Page<ReceiptTableItem>> getReceiptTableItems (@ModelAttribute GetReceiptTableItemRequest request) {
         return ResponseEntity.ok(receiptService.getReceiptTableItems(request));
+    }
+
+    @GetMapping("/sumUp")
+    public ResponseEntity<ReceiptSumUpInfo> getReceiptSumUpInfo (@ModelAttribute GetReceiptTableItemRequest request) {
+        return ResponseEntity.ok(receiptService.getReceiptSumUpInfo(request));
     }
 
     @GetMapping("/{id}")

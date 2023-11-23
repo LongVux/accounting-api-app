@@ -8,10 +8,12 @@ import com.outwork.accountingapiapp.models.payload.requests.GetReceiptTableItemR
 import com.outwork.accountingapiapp.models.payload.requests.ReceiptBill;
 import com.outwork.accountingapiapp.models.payload.requests.SaveReceiptRepaymentEntryRequest;
 import com.outwork.accountingapiapp.models.payload.requests.SaveReceiptRequest;
+import com.outwork.accountingapiapp.models.payload.responses.ReceiptSumUpInfo;
 import com.outwork.accountingapiapp.models.payload.responses.ReceiptTableItem;
 import com.outwork.accountingapiapp.repositories.ReceiptRepository;
 import com.outwork.accountingapiapp.utils.DateTimeUtils;
 import com.outwork.accountingapiapp.utils.ReceiptCodeHandler;
+import com.outwork.accountingapiapp.utils.Util;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -43,6 +45,9 @@ public class ReceiptService {
     @Autowired
     private BillService billService;
 
+    @Autowired
+    private Util util;
+
     public ReceiptEntity getReceipt (@NotNull UUID id) {
         return receiptRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(id.toString()));
     }
@@ -50,6 +55,22 @@ public class ReceiptService {
     public Page<ReceiptTableItem> getReceiptTableItems (GetReceiptTableItemRequest request) {
         Page<ReceiptEntity> results = receiptRepository.findAll(request, request.retrievePageConfig());
         return results.map(ReceiptTableItem::new);
+    }
+
+    public ReceiptSumUpInfo getReceiptSumUpInfo (GetReceiptTableItemRequest request) {
+        List<Double> result = util.getSumsBySpecifications(Collections.singletonList(request), ReceiptEntity.getSumUpFields(), ReceiptEntity.class);
+
+        ReceiptSumUpInfo sumUpInfo = new ReceiptSumUpInfo();
+
+        sumUpInfo.setTotal(result.get(0));
+        sumUpInfo.setTotalIntake(result.get(1));
+        sumUpInfo.setTotalPayout(result.get(2));
+        sumUpInfo.setTotalLoan(result.get(3));
+        sumUpInfo.setTotalRepayment(result.get(4));
+        sumUpInfo.setTotalEstimatedProfit(result.get(5));
+        sumUpInfo.setTotalCalculatedProfit(result.get(6));
+
+        return sumUpInfo;
     }
 
     @Transactional(rollbackFor = {Exception.class, Throwable.class})

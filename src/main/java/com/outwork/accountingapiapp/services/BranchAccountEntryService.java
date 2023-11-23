@@ -9,11 +9,13 @@ import com.outwork.accountingapiapp.models.payload.requests.GetBranchAccountEntr
 import com.outwork.accountingapiapp.models.payload.requests.SaveBranchAccountEntryRequest;
 import com.outwork.accountingapiapp.models.payload.requests.SaveReceiptEntryRequest;
 import com.outwork.accountingapiapp.models.payload.requests.SaveReceiptRepaymentEntryRequest;
+import com.outwork.accountingapiapp.models.payload.responses.AccountEntrySumUpInfo;
 import com.outwork.accountingapiapp.models.payload.responses.BranchAccountEntryTableItem;
 import com.outwork.accountingapiapp.repositories.BillRepository;
 import com.outwork.accountingapiapp.repositories.BranchAccountEntryRepository;
-import com.outwork.accountingapiapp.utils.AccountEntryCodeHandler;
+import com.outwork.accountingapiapp.utils.BranchAccountEntryCodeHandler;
 import com.outwork.accountingapiapp.utils.DateTimeUtils;
+import com.outwork.accountingapiapp.utils.Util;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -38,6 +40,9 @@ public class BranchAccountEntryService {
     private BillRepository billRepository;
     @Autowired
     private BranchService branchService;
+
+    @Autowired
+    private Util util;
 
     @Transactional(rollbackFor = {Exception.class, Throwable.class})
     public ReceiptEntity confirmReceiptEntry (@Valid SaveReceiptEntryRequest request) {
@@ -73,6 +78,20 @@ public class BranchAccountEntryService {
 
     public Page<BranchAccountEntryTableItem> getBranchAccountEntryTableItems (GetBranchAccountEntryTableItemRequest request) {
         return branchAccountEntryRepository.findAll(request, request.retrievePageConfig());
+    }
+
+    public AccountEntrySumUpInfo getBranchAccountEntrySumUpInfo (GetBranchAccountEntryTableItemRequest request) {
+        Map<Object, Double> queryResult = util.getGroupedSumsBySpecification(request, BranchAccountEntryEntity.FIELD_TRANSACTION_TYPE, BranchAccountEntryEntity.FIELD_MONEY_AMOUNT, BranchAccountEntryTableItem.class);
+
+        AccountEntrySumUpInfo response = new AccountEntrySumUpInfo();
+
+        response.setTotalIntake(queryResult.get(TransactionTypeEnum.INTAKE));
+        response.setTotalIntake(queryResult.get(TransactionTypeEnum.PAYOUT));
+        response.setTotalIntake(queryResult.get(TransactionTypeEnum.LOAN));
+        response.setTotalIntake(queryResult.get(TransactionTypeEnum.REPAYMENT));
+        response.setTotal(response.getTotalIntake() - response.getTotalPayout() - response.getTotalLoan() + response.getTotalRepayment());
+
+        return response;
     }
 
     public BranchAccountEntryEntity saveEntry (@Valid SaveBranchAccountEntryRequest request, UUID id) {
@@ -148,7 +167,7 @@ public class BranchAccountEntryService {
                 DateTimeUtils.atEndOfDay(new Date())
         );
 
-        return AccountEntryCodeHandler.generateAccountEntryCode(
+        return BranchAccountEntryCodeHandler.generateAccountEntryCode(
                 entry.getBranch().getCode(),
                 entry.getTransactionType(),
                 latestEntry.map(BranchAccountEntryEntity::getEntryCode).orElse(null)

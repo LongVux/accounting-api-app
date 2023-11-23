@@ -5,13 +5,16 @@ import com.outwork.accountingapiapp.models.entity.BillEntity;
 import com.outwork.accountingapiapp.models.entity.PosCardFeeEntity;
 import com.outwork.accountingapiapp.models.entity.PosEntity;
 import com.outwork.accountingapiapp.models.entity.ReceiptEntity;
+import com.outwork.accountingapiapp.models.payload.requests.GetBillTableItemRequest;
 import com.outwork.accountingapiapp.models.payload.requests.ReceiptBill;
+import com.outwork.accountingapiapp.models.payload.responses.BillTableItem;
 import com.outwork.accountingapiapp.repositories.BillRepository;
 import com.outwork.accountingapiapp.utils.BillCodeHandler;
 import com.outwork.accountingapiapp.utils.DateTimeUtils;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
@@ -35,6 +38,10 @@ public class BillService {
 
     public BillEntity getBillById (@NotNull UUID id) {
         return billRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(id.toString()));
+    }
+
+    public Page<BillTableItem> getBillTableItems (GetBillTableItemRequest request) {
+        return billRepository.findAll(request, request.retrievePageConfig());
     }
 
     public void estimateBillProfit(BillEntity bill) {

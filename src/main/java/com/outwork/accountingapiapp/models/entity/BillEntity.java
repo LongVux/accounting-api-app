@@ -15,6 +15,15 @@ import java.util.UUID;
 @Entity
 @Table(name = "bills")
 public class BillEntity extends Auditable<String> {
+    public static final String FIELD_CODE = "code";
+    public static final String FIELD_MONEY_AMOUNT = "moneyAmount";
+    public static final String FIELD_FEE = "fee";
+    public static final String FIELD_ESTIMATED_PROFIT = "estimatedProfit";
+    public static final String FIELD_RETURNED_PROFIT = "returnedProfit";
+    public static final String FIELD_RETURNED_TIME = "returnedTime";
+    public static final String FIELD_POS = "pos";
+    public static final String FIELD_RECEIPT = "receipt";
+
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;

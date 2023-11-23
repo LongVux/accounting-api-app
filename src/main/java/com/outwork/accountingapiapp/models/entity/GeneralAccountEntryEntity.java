@@ -13,6 +13,12 @@ import java.util.UUID;
 @Entity
 @Table(name = "general_account_entries")
 public class GeneralAccountEntryEntity extends Auditable<String> {
+    public static final String FIELD_ENTRY_CODE = "entryCode";
+    public static final String FIELD_ENTRY_TYPE = "entryType";
+    public static final String FIELD_ENTRY_STATUS = "entryStatus";
+    public static final String FIELD_TRANSACTION_TYPE = "transactionType";
+    public static final String FIELD_MONEY_AMOUNT = "moneyAmount";
+
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
@@ -28,7 +34,7 @@ public class GeneralAccountEntryEntity extends Auditable<String> {
     private String entryType;
 
     @Column(nullable = false, updatable = false)
-    private int moneyAmount;
+    private double moneyAmount;
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)

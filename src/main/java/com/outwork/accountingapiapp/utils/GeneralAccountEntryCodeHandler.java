@@ -9,12 +9,12 @@ import org.springframework.util.ObjectUtils;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
-public class AccountEntryCodeHandler {
-    private static final String RECEIPT_CODE_REGEX = "^[A-Z0-9]+-[A-Z]+-\\d{6}-\\d+$";
+public class GeneralAccountEntryCodeHandler {
+    private static final String ENTRY_CODE_REGEX = "^[A-Z0-9]+-\\d{6}-\\d+$";
 
     private static final String ERROR_MSG_INVALID_ENTRY_CODE = "Mã bút toán không hợp lệ";
 
-    public static String generateAccountEntryCode(@NotNull String branchCode, @NotNull TransactionTypeEnum transactionType, String latestEntryCode) {
+    public static String generateAccountEntryCode(@NotNull TransactionTypeEnum transactionType, String latestEntryCode) {
         LocalDate date = LocalDate.now();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DataFormat.DATE_FORMAT_ddMMyy);
         String dateString = date.format(formatter);
@@ -24,7 +24,6 @@ public class AccountEntryCodeHandler {
 
         return String.join(
                 DataFormat.DEFAULT_SEPARATOR,
-                branchCode,
                 MapBuilder.buildTransactionTypeString()
                         .get(transactionType),
                 dateString,
@@ -34,7 +33,7 @@ public class AccountEntryCodeHandler {
 
     // A method to check if a given string has the order string format
     public static void validateEntryCode(String code) {
-        if (ObjectUtils.isEmpty(code) || !code.matches(RECEIPT_CODE_REGEX)) {
+        if (ObjectUtils.isEmpty(code) || !code.matches(ENTRY_CODE_REGEX)) {
             throw new InvalidDataException(ERROR_MSG_INVALID_ENTRY_CODE);
         }
     }
@@ -54,5 +53,4 @@ public class AccountEntryCodeHandler {
             return Integer.parseInt(number);
         }
     }
-
 }

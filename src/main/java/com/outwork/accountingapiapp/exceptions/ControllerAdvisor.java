@@ -2,7 +2,6 @@ package com.outwork.accountingapiapp.exceptions;
 
 import com.outwork.accountingapiapp.models.payload.responses.ApiError;
 import com.outwork.accountingapiapp.utils.Util;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -22,9 +21,6 @@ public class ControllerAdvisor extends ResponseEntityExceptionHandler {
     public static final String ERROR_MSG_INVALID_PAYLOAD = "Dữ liệu payload không hợp lệ";
     public static final String ERROR_MSG_INVALID_REQUEST_PATH_VARIABLE = "Dữ liệu path variables không hợp lệ";
 
-    @Autowired
-    private Util util;
-
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(
             MethodArgumentNotValidException ex,
@@ -35,11 +31,11 @@ public class ControllerAdvisor extends ResponseEntityExceptionHandler {
 
         ex.getBindingResult()
                 .getFieldErrors()
-                .forEach(error -> errors.add(util.getSimpleMessage(error.getField(), error.getDefaultMessage())));
+                .forEach(error -> errors.add(Util.getSimpleMessage(error.getField(), error.getDefaultMessage())));
 
         ex.getBindingResult()
                 .getGlobalErrors()
-                .forEach(error -> errors.add(util.getSimpleMessage(error.getObjectName(), error.getDefaultMessage())));
+                .forEach(error -> errors.add(Util.getSimpleMessage(error.getObjectName(), error.getDefaultMessage())));
 
         ApiError apiError =
                 new ApiError(HttpStatus.BAD_REQUEST, ERROR_MSG_INVALID_PAYLOAD, errors);
