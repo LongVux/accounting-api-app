@@ -10,6 +10,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -22,4 +23,7 @@ public interface BillRepository extends JpaRepository<BillEntity, UUID> {
     );
 
     Page<BillTableItem> findAll(Specification<BillTableItem> specification, Pageable pageable);
+
+    List<BillEntity> findByPos_IdAndCreatedDateBetweenOrderByCreatedDateAsc(UUID id, Date createdDateStart,
+                                                                            Date createdDateEnd);
 }

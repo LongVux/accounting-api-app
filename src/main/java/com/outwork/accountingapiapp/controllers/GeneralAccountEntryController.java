@@ -42,6 +42,11 @@ public class GeneralAccountEntryController {
         return new ResponseEntity<>(generalAccountEntryService.saveEntry(request, null), HttpStatus.CREATED);
     }
 
+    @PutMapping("/approve/{id}")
+    public ResponseEntity<GeneralAccountEntryEntity> approveEntry (@PathVariable @NotNull UUID id) {
+        return ResponseEntity.ok(generalAccountEntryService.approveEntry(id));
+    }
+
     @PutMapping("/{id}")
     public ResponseEntity<GeneralAccountEntryEntity> updateEntry (@RequestBody @Valid SaveGeneralAccountEntryRequest request, @PathVariable @NotNull UUID id) {
         return ResponseEntity.ok(generalAccountEntryService.saveEntry(request, id));

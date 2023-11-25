@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -40,6 +41,10 @@ public class BranchService {
 
     public BranchEntity getBranchById (@NotNull UUID id) {
         return branchRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(id.toString()));
+    }
+
+    public Optional<BranchEntity> getBranchByCode (@NotNull String code) {
+        return branchRepository.findByCode(code);
     }
 
     public BranchEntity saveBranch (@Valid SaveBranchRequest request, UUID id) {

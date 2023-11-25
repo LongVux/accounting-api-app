@@ -42,6 +42,11 @@ public class BranchAccountEntryController {
         return new ResponseEntity<>(branchAccountEntryService.saveEntry(request, null), HttpStatus.CREATED);
     }
 
+    @PutMapping("/approve/{id}")
+    public ResponseEntity<BranchAccountEntryEntity> approveEntry (@PathVariable @NotNull UUID id) {
+        return ResponseEntity.ok(branchAccountEntryService.approveEntry(id));
+    }
+
     @PutMapping("/{id}")
     public ResponseEntity<BranchAccountEntryEntity> updateEntry (@RequestBody @Valid SaveBranchAccountEntryRequest request, @PathVariable @NotNull UUID id) {
         return ResponseEntity.ok(branchAccountEntryService.saveEntry(request, id));

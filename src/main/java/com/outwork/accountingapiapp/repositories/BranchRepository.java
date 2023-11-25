@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Repository
@@ -21,4 +22,6 @@ public interface BranchRepository extends JpaRepository<BranchEntity, UUID> {
     List<BranchEntity> findByIdIn(Collection<UUID> ids);
 
     List<SuggestedBranch> findByCodeContainsIgnoreCase(String code);
+
+    Optional<BranchEntity> findByCode(String code);
 }

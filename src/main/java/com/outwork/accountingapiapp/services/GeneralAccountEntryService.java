@@ -1,9 +1,11 @@
 package com.outwork.accountingapiapp.services;
 
 import com.outwork.accountingapiapp.constants.AccountEntryStatusEnum;
+import com.outwork.accountingapiapp.constants.StringConstant;
 import com.outwork.accountingapiapp.constants.TransactionTypeEnum;
 import com.outwork.accountingapiapp.exceptions.InvalidDataException;
 import com.outwork.accountingapiapp.models.entity.BranchAccountEntryEntity;
+import com.outwork.accountingapiapp.models.entity.BranchEntity;
 import com.outwork.accountingapiapp.models.entity.GeneralAccountEntryEntity;
 import com.outwork.accountingapiapp.models.payload.requests.*;
 import com.outwork.accountingapiapp.models.payload.responses.AccountEntrySumUpInfo;
@@ -18,6 +20,7 @@ import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 
 import java.util.*;
@@ -25,9 +28,16 @@ import java.util.*;
 @Service
 public class GeneralAccountEntryService {
     public static final String ERROR_MSG_INVALID_ACTION_ON_ENTRY = "Không thể thực hiện hành động này trên bút toán được chọn";
+    public static final String ERROR_UNSUPPORTED_TRANSACTION_TYPE = "Không hỗ trợ loại giao dịch này";
 
     @Autowired
     private GeneralAccountEntryRepository generalAccountEntryRepository;
+
+    @Autowired
+    private BranchAccountEntryService branchAccountEntryService;
+
+    @Autowired
+    private BranchService branchService;
 
     @Autowired
     private Util util;
@@ -69,6 +79,7 @@ public class GeneralAccountEntryService {
         return generalAccountEntryRepository.save(savedEntry);
     }
 
+    @Transactional(rollbackFor = {Exception.class, Throwable.class})
     public GeneralAccountEntryEntity approveEntry (@NotNull UUID id) {
         GeneralAccountEntryEntity approvedEntry = getEntryById(id);
 
@@ -78,7 +89,32 @@ public class GeneralAccountEntryService {
         approvedEntry.setEntryStatus(AccountEntryStatusEnum.APPROVED);
         approvedEntry.setCreatedDate(new Date());
 
+        branchService.getBranchByCode(approvedEntry.getEntryType())
+                .ifPresent(branchEntity -> handleApprovingEntryRelatedToBranch(approvedEntry, branchEntity));
+
         return generalAccountEntryRepository.save(approvedEntry);
+    }
+
+    public void handleApprovingEntryRelatedToBranch (GeneralAccountEntryEntity entry, BranchEntity branch) {
+        SaveBranchAccountEntryRequest request = new SaveBranchAccountEntryRequest();
+
+        if (TransactionTypeEnum.PAYOUT.equals(entry.getTransactionType())) {
+            request.setTransactionType(TransactionTypeEnum.INTAKE);
+            request.setEntryType(StringConstant.ENTRY_TYPE_ADVANCED_PAYOUT);
+        } else if (TransactionTypeEnum.INTAKE.equals(entry.getTransactionType())) {
+            request.setTransactionType(TransactionTypeEnum.PAYOUT);
+            request.setEntryType(StringConstant.ENTRY_TYPE_REPAYMENT);
+        } else {
+            throw new InvalidDataException(ERROR_UNSUPPORTED_TRANSACTION_TYPE);
+        }
+
+        request.setBranchId(branch.getId());
+        request.setExplanation(entry.getExplanation());
+        request.setImageId(entry.getImageId());
+        request.setMoneyAmount(entry.getMoneyAmount());
+
+        BranchAccountEntryEntity branchEntry = branchAccountEntryService.saveEntry(request, null);
+        branchAccountEntryService.approveEntry(branchEntry.getId());
     }
 
     public void deleteBranchAccountEntry (@NotNull UUID id) {

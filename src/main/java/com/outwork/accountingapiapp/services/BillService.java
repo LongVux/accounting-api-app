@@ -6,6 +6,8 @@ import com.outwork.accountingapiapp.models.entity.PosCardFeeEntity;
 import com.outwork.accountingapiapp.models.entity.PosEntity;
 import com.outwork.accountingapiapp.models.entity.ReceiptEntity;
 import com.outwork.accountingapiapp.models.payload.requests.GetBillTableItemRequest;
+import com.outwork.accountingapiapp.models.payload.requests.GetMatchingBillsRequest;
+import com.outwork.accountingapiapp.models.payload.requests.MatchingBillRequest;
 import com.outwork.accountingapiapp.models.payload.requests.ReceiptBill;
 import com.outwork.accountingapiapp.models.payload.responses.BillSumUpInfo;
 import com.outwork.accountingapiapp.models.payload.responses.BillTableItem;
@@ -31,6 +33,8 @@ public class BillService {
     public static final String ERROR_MSG_SOME_BILL_INVALID_TO_APPROVE = "Một số bill không hợp lệ để tạo bút toán";
     public static final String ERROR_MSG_NO_BILL_TO_APPROVE = "Không có bill để tạo bút toán";
     public static final String ERROR_MSG_BILL_VALUE_EXCEED_POS_LIMIT = "Giá trị Bill vượt quá giới hạn của POS";
+    public static final String ERROR_MSG_SOME_BILL_IDS_NOT_FOUND = "Một số bill không tồn tại";
+    public static final String ERROR_MSG_MONEY_AMOUNT_DOES_NOT_MATCH_BILL = "Số tiền không khớp với bills";
 
     @Autowired
     private BillRepository billRepository;
@@ -130,6 +134,44 @@ public class BillService {
         }
 
         billRepository.deleteAll(bills);
+    }
+
+    public List<BillEntity> getMatchingBills (GetMatchingBillsRequest request) {
+        List<BillEntity> bills = billRepository.findByPos_IdAndCreatedDateBetweenOrderByCreatedDateAsc(request.getPosId(), request.getFromCreatedDate(), request.getToCreatedDate());
+
+        List<BillEntity> responseList = new ArrayList<>();
+        double moneyAmount = 0.0;
+
+        for (BillEntity bill : bills) {
+            moneyAmount += bill.getMoneyAmount();
+
+            if (moneyAmount > request.getMoneyAmount()) {
+                break;
+            }
+
+            responseList.add(bill);
+        }
+
+        return responseList;
+    }
+
+    public List<BillEntity> matchBill (MatchingBillRequest request) {
+        List<BillEntity> bills = billRepository.findAllById(request.getBillIds());
+
+        if (bills.size() != request.getBillIds().size()) {
+            throw new EntityNotFoundException(ERROR_MSG_SOME_BILL_IDS_NOT_FOUND);
+        }
+
+        if (bills.stream().mapToDouble(BillEntity::getEstimatedProfit).sum() != request.getMoneyAmount() && !request.isBypassDifference()) {
+            throw new InvalidDataException(ERROR_MSG_MONEY_AMOUNT_DOES_NOT_MATCH_BILL);
+        }
+
+        bills.forEach(bill -> {
+           bill.setReturnedProfit(bill.getEstimatedProfit());
+           bill.setReturnedTime(new Date());
+        });
+
+        return billRepository.saveAll(bills);
     }
 
     public void assignNewBillCodes (List<BillEntity> bills) {
