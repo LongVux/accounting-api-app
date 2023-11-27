@@ -34,7 +34,7 @@ public class BillEntity extends Auditable<String> {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @Column(unique = true, updatable = false, length = DataConstraint.ID_STRING_MAX_LENGTH)
+    @Column(unique = true, updatable = false)
     private String code;
 
     @Column(nullable = false, updatable = false)

@@ -36,7 +36,7 @@ public class ReceiptEntity extends Auditable<String> {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @Column(unique = true, length = DataConstraint.ID_STRING_MAX_LENGTH)
+    @Column(unique = true)
     private String code;
 
     @Enumerated(EnumType.STRING)
