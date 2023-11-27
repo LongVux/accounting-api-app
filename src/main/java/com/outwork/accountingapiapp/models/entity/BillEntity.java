@@ -38,7 +38,7 @@ public class BillEntity extends Auditable<String> {
     private String code;
 
     @Column(nullable = false, updatable = false)
-    private long timeStampOrder;
+    private long timeStampSeq;
 
     @Column(nullable = false)
     private double moneyAmount;

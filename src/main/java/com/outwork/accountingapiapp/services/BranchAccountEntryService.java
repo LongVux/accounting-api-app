@@ -48,7 +48,9 @@ public class BranchAccountEntryService {
     public ReceiptEntity confirmReceiptEntry (@Valid SaveReceiptEntryRequest request) {
         ReceiptEntity receipt = receiptService.approveReceiptForEntry(request.getReceiptId());
 
-        branchAccountEntryRepository.saveAll(generateBranchAccountEntriesFromReceipt(receipt, request.getExplanation()));
+        List<BranchAccountEntryEntity> entities = generateBranchAccountEntriesFromReceipt(receipt, request.getExplanation());
+
+        branchAccountEntryRepository.saveAll(entities);
 
         return receipt;
     }

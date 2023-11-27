@@ -116,7 +116,7 @@ public class BillService {
         long currentTimeStamp = (new Date()).getTime();
 
         for (BillEntity savedBill: savedBills) {
-            savedBill.setTimeStampOrder(currentTimeStamp);
+            savedBill.setTimeStampSeq(currentTimeStamp);
             currentTimeStamp += 1;
         }
 
@@ -177,7 +177,7 @@ public class BillService {
     public void assignNewBillCodes (List<BillEntity> bills) {
         validateBillsForApproval(bills);
 
-        bills.sort((a, b) -> Math.toIntExact(a.getTimeStampOrder() - b.getTimeStampOrder()));
+        bills.sort((a, b) -> Math.toIntExact(a.getTimeStampSeq() - b.getTimeStampSeq()));
 
         Map<UUID, String> billCodeMap = new HashMap<>();
 
@@ -209,7 +209,7 @@ public class BillService {
     private String getNewBillCode(BillEntity bill, String latestBillCode) {
         if (latestBillCode == null) {
             Optional<BillEntity> latestBill =
-                    billRepository.findFirstByCodeNotNullAndPosAndCreatedDateBetweenOrderByTimeStampOrderDesc(
+                    billRepository.findFirstByCodeNotNullAndPosAndCreatedDateBetweenOrderByTimeStampSeqDesc(
                             bill.getPos(),
                             DateTimeUtils.atStartOfDay(new Date()),
                             DateTimeUtils.atEndOfDay(new Date())

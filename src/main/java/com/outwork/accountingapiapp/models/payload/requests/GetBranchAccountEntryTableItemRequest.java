@@ -13,12 +13,16 @@ import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.util.ObjectUtils;
 
 import java.util.*;
 
+@EqualsAndHashCode(callSuper = true)
+@Data
 public class GetBranchAccountEntryTableItemRequest extends SortedPagination<BranchAccountEntrySortingEnum> implements Specification<BranchAccountEntryTableItem> {
     @Nullable
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)

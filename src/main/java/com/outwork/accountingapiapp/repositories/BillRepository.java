@@ -16,7 +16,7 @@ import java.util.UUID;
 
 @Repository
 public interface BillRepository extends JpaRepository<BillEntity, UUID> {
-    Optional<BillEntity> findFirstByCodeNotNullAndPosAndCreatedDateBetweenOrderByTimeStampOrderDesc(
+    Optional<BillEntity> findFirstByCodeNotNullAndPosAndCreatedDateBetweenOrderByTimeStampSeqDesc(
             PosEntity pos,
             Date createdDateStart,
             Date createdDateEnd
