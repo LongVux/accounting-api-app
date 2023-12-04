@@ -164,7 +164,7 @@ public class ReceiptService {
     }
 
     private void validateSaveReceiptRequestBalance (SaveReceiptRequest request) {
-        double givenReceiptBalance = - request.getIntake() + request.getPayout() + request.getLoan() - request.getRepayment();
+        double givenReceiptBalance = request.getIntake() + request.getPayout() + request.getLoan() - request.getRepayment();
         double transactionTotal = request.getReceiptBills().stream()
                 .map(ReceiptBill::getMoneyAmount)
                 .mapToDouble(Double::doubleValue)
@@ -177,7 +177,7 @@ public class ReceiptService {
     }
 
     private void validateReceiptBalance (ReceiptEntity receipt) {
-        double givenReceiptBalance = - receipt.getIntake() + receipt.getPayout() + receipt.getLoan() - receipt.getRepayment();
+        double givenReceiptBalance = receipt.getIntake() + receipt.getPayout() + receipt.getLoan() - receipt.getRepayment();
         double transactionTotal = receipt.getTransactionTotal();
 
         if (Math.abs(givenReceiptBalance) < Math.abs(transactionTotal)) {
@@ -213,7 +213,7 @@ public class ReceiptService {
                 .mapToDouble(Double::doubleValue)
                 .sum();
 
-        receipt.setCalculatedProfit(billProfitSum - receipt.getLoan() + receipt.getRepayment() + receipt.getIntake());
+        receipt.setCalculatedProfit(billProfitSum - receipt.getLoan() + receipt.getRepayment() + receipt.getShipmentFee());
     }
 
     private void assignNewReceiptCode (ReceiptEntity receipt) {
