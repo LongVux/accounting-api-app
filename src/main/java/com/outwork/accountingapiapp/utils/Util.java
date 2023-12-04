@@ -1,5 +1,6 @@
 package com.outwork.accountingapiapp.utils;
 
+import com.outwork.accountingapiapp.services.MessageService;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
 import jakarta.persistence.Tuple;
@@ -10,6 +11,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -19,20 +21,23 @@ public class Util {
     @Autowired
     private EntityManager entityManager;
 
-    public static String getSimpleMessage(String title, String content) {
+    @Autowired
+    private MessageService messageService;
+
+    public String getSimpleMessage(String title, String content, Locale locale) {
         if (StringUtils.isEmpty(title) && StringUtils.isEmpty(content)) {
             return "";
         }
 
         if (StringUtils.isEmpty(title)) {
-            return content;
+            return messageService.getMessage(content, locale);
         }
 
         if (StringUtils.isEmpty(content)) {
-            return title;
+            return messageService.getMessage(title, locale);
         }
 
-        return title + ": " + content;
+        return messageService.getMessage(title, locale) + ": " + messageService.getMessage(content, locale);
     }
 
     public <T> List<Double> getSumsBySpecifications(List<Specification<T>> specs, List<String> attributeNames, Class<T> entityClass) {

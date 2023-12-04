@@ -52,7 +52,6 @@ public class CustomerCardEntity extends Auditable<String> {
     @Temporal(TemporalType.TIMESTAMP)
     private Date paymentDueDate;
 
-    @JsonIgnore
     @ManyToOne(optional = false, cascade = CascadeType.ALL)
     @JoinColumn(name = "customerId", nullable = false, updatable = false)
     private CustomerEntity customer;

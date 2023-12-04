@@ -1,5 +1,6 @@
 package com.outwork.accountingapiapp.models.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.outwork.accountingapiapp.constants.AccountEntryStatusEnum;
 import com.outwork.accountingapiapp.constants.TransactionTypeEnum;
 import jakarta.persistence.*;
@@ -65,6 +66,7 @@ public class BranchAccountEntryEntity extends Auditable<String> {
     @JoinColumn(name = "branchId", nullable = false)
     private BranchEntity branch;
 
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "receiptId", updatable = false)
     private ReceiptEntity receipt;

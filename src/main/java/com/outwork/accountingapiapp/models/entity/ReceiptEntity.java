@@ -1,5 +1,6 @@
 package com.outwork.accountingapiapp.models.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.outwork.accountingapiapp.constants.DataConstraint;
 import com.outwork.accountingapiapp.constants.ReceiptStatusEnum;
 import jakarta.persistence.*;
@@ -83,6 +84,7 @@ public class ReceiptEntity extends Auditable<String> {
     @Setter(AccessLevel.NONE)
     private List<BillEntity> bills;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "receipt", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
     @Setter(AccessLevel.NONE)
     private List<BranchAccountEntryEntity> branchAccountEntries;
