@@ -1,5 +1,6 @@
 package com.outwork.accountingapiapp.models.payload.requests;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -7,4 +8,7 @@ import lombok.EqualsAndHashCode;
 @Data
 public class SaveReceiptRepaymentEntryRequest extends SaveReceiptEntryRequest {
     private int repaidAmount;
+
+    @NotNull
+    private String imageId;
 }

@@ -13,6 +13,7 @@ import java.util.UUID;
 @Data
 public class SaveReceiptRequest {
 
+    @NotNull
     private String imageId;
 
     @NotNull
