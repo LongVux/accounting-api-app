@@ -171,7 +171,7 @@ public class ReceiptService {
                 .sum()
                 + request.getShipmentFee();
 
-        if (Math.abs(givenReceiptBalance) > Math.abs(transactionTotal)) {
+        if (Math.abs(givenReceiptBalance) < Math.abs(transactionTotal)) {
             throw new InvalidDataException(ERROR_MSG_IMBALANCED_RECEIPT);
         }
     }
@@ -180,7 +180,7 @@ public class ReceiptService {
         double givenReceiptBalance = - receipt.getIntake() + receipt.getPayout() + receipt.getLoan() - receipt.getRepayment();
         double transactionTotal = receipt.getTransactionTotal();
 
-        if (Math.abs(givenReceiptBalance) > Math.abs(transactionTotal)) {
+        if (Math.abs(givenReceiptBalance) < Math.abs(transactionTotal)) {
             throw new InvalidDataException(ERROR_MSG_IMBALANCED_RECEIPT);
         }
     }
