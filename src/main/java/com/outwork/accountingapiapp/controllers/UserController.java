@@ -28,4 +28,9 @@ public class UserController {
     public ResponseEntity<UserEntity> getUserById (@PathVariable @NotNull UUID id) {
         return ResponseEntity.ok(userService.getUserEntityById(id));
     }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<UserEntity> updateUserById (@PathVariable @NotNull UUID id, @RequestBody UserEntity user) {
+        return ResponseEntity.ok(userService.saveUserEntity(user));
+    }
 }
