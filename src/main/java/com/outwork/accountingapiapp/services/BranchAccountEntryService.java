@@ -79,18 +79,18 @@ public class BranchAccountEntryService {
     }
 
     public Page<BranchAccountEntryTableItem> getBranchAccountEntryTableItems (GetBranchAccountEntryTableItemRequest request) {
-        return branchAccountEntryRepository.findAll(request, request.retrievePageConfig());
+        return branchAccountEntryRepository.findAll(request, request.retrievePageConfig()).map(BranchAccountEntryTableItem::new);
     }
 
     public AccountEntrySumUpInfo getBranchAccountEntrySumUpInfo (GetBranchAccountEntryTableItemRequest request) {
-        Map<Object, Double> queryResult = util.getGroupedSumsBySpecification(request, BranchAccountEntryEntity.FIELD_TRANSACTION_TYPE, BranchAccountEntryEntity.FIELD_MONEY_AMOUNT, BranchAccountEntryTableItem.class);
+        Map<Object, Double> queryResult = util.getGroupedSumsBySpecification(request, BranchAccountEntryEntity.FIELD_TRANSACTION_TYPE, BranchAccountEntryEntity.FIELD_MONEY_AMOUNT, BranchAccountEntryEntity.class);
 
         AccountEntrySumUpInfo response = new AccountEntrySumUpInfo();
 
-        response.setTotalIntake(queryResult.get(TransactionTypeEnum.INTAKE));
-        response.setTotalIntake(queryResult.get(TransactionTypeEnum.PAYOUT));
-        response.setTotalIntake(queryResult.get(TransactionTypeEnum.LOAN));
-        response.setTotalIntake(queryResult.get(TransactionTypeEnum.REPAYMENT));
+        response.setTotalIntake(Optional.ofNullable(queryResult.get(TransactionTypeEnum.INTAKE)).orElse(0d));
+        response.setTotalIntake(Optional.ofNullable(queryResult.get(TransactionTypeEnum.PAYOUT)).orElse(0d));
+        response.setTotalIntake(Optional.ofNullable(queryResult.get(TransactionTypeEnum.LOAN)).orElse(0d));
+        response.setTotalIntake(Optional.ofNullable(queryResult.get(TransactionTypeEnum.REPAYMENT)).orElse(0d));
         response.setTotal(response.getTotalIntake() - response.getTotalPayout() - response.getTotalLoan() + response.getTotalRepayment());
 
         return response;

@@ -16,5 +16,5 @@ import java.util.UUID;
 public interface BranchAccountEntryRepository extends JpaRepository<BranchAccountEntryEntity, UUID> {
     Optional<BranchAccountEntryEntity> findFirstByEntryCodeNotNullAndBranchAndTransactionTypeAndCreatedDateBetweenOrderByCreatedDateDesc(BranchEntity branch, TransactionTypeEnum transactionType, Date createdDateStart, Date createdDateEnd);
 
-    Page<BranchAccountEntryTableItem> findAll (Specification<BranchAccountEntryTableItem> specification, Pageable pageable);
+    Page<BranchAccountEntryEntity> findAll (Specification<BranchAccountEntryEntity> specification, Pageable pageable);
 }

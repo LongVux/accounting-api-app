@@ -13,7 +13,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface GeneralAccountEntryRepository extends JpaRepository<GeneralAccountEntryEntity, UUID> {
-    Page<GeneralAccountEntryTableItem> findAll (Specification<GeneralAccountEntryTableItem> specification, Pageable pageable);
+    Page<GeneralAccountEntryEntity> findAll (Specification<GeneralAccountEntryEntity> specification, Pageable pageable);
 
     Optional<GeneralAccountEntryEntity> findFirstByEntryCodeNotNullAndTransactionTypeAndCreatedDateBetweenOrderByCreatedDateDesc(TransactionTypeEnum transactionType, Date createdDateStart, Date createdDateEnd);
 }

@@ -22,7 +22,7 @@ import java.util.Map;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
-public class GetGeneralAccountEntryTableItemRequest extends SortedPagination<GeneralAccountEntrySortingEnum> implements Specification<GeneralAccountEntryTableItem> {
+public class GetGeneralAccountEntryTableItemRequest extends SortedPagination<GeneralAccountEntrySortingEnum> implements Specification<GeneralAccountEntryEntity> {
     @Nullable
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private Date fromCreatedDate;
@@ -56,7 +56,7 @@ public class GetGeneralAccountEntryTableItemRequest extends SortedPagination<Gen
     }
 
     @Override
-    public Predicate toPredicate(Root<GeneralAccountEntryTableItem> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder) {
+    public Predicate toPredicate(Root<GeneralAccountEntryEntity> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder) {
         List<Predicate> predicates = new ArrayList<>();
 
         if (!ObjectUtils.isEmpty(fromCreatedDate) && !ObjectUtils.isEmpty(toCreatedDate)) {
