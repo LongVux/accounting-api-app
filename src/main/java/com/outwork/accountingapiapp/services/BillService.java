@@ -145,7 +145,7 @@ public class BillService {
         for (BillEntity bill : bills) {
             moneyAmount += bill.getMoneyAmount();
 
-            if (moneyAmount > request.getMoneyAmount()) {
+            if (moneyAmount > request.getMoneyAmount() + request.getDelta()) {
                 break;
             }
 

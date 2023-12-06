@@ -18,4 +18,7 @@ public class GetMatchingBillsRequest {
 
     @NotNull
     private Date toCreatedDate;
+
+    @NotNull
+    private double delta;
 }
