@@ -22,7 +22,7 @@ public interface BillRepository extends JpaRepository<BillEntity, UUID> {
             Date createdDateEnd
     );
 
-    Page<BillTableItem> findAll(Specification<BillTableItem> specification, Pageable pageable);
+    Page<BillEntity> findAll(Specification<BillEntity> specification, Pageable pageable);
 
     List<BillEntity> findByPos_IdAndCreatedDateBetweenOrderByCreatedDateAsc(UUID id, Date createdDateStart,
                                                                             Date createdDateEnd);

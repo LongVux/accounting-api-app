@@ -9,7 +9,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
 public class ReceiptCodeHandler {
-    private static final String RECEIPT_CODE_REGEX = "^[A-Z0-9]+-[A-Z0-9]+-\\d{6}-\\d+$";
+    private static final String RECEIPT_CODE_REGEX = "^[A-Z0-9]+-[A-Za-z0-9]+-\\d{6}-\\d+$";
     private static final String ERROR_MSG_INVALID_RECEIPT_CODE = "Mã hóa đơn không hợp lệ";
     public static String generateReceiptCode(@NotNull String branchCode, @NotNull String employeeCode, String latestReceiptCode) {
         LocalDate date = LocalDate.now();

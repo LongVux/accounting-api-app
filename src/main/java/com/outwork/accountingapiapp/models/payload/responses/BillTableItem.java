@@ -1,37 +1,41 @@
 package com.outwork.accountingapiapp.models.payload.responses;
 
 import com.outwork.accountingapiapp.constants.RecordStatusEnum;
+import com.outwork.accountingapiapp.models.entity.BillEntity;
+import lombok.Data;
 
 import java.util.Date;
 import java.util.UUID;
 
-/**
- * Projection for {@link com.outwork.accountingapiapp.models.entity.BillEntity}
- */
-public interface BillTableItem {
-    String getCreatedBy();
+@Data
+public class BillTableItem {
+    private String createdBy;
+    private Date createdDate;
+    private RecordStatusEnum recordStatusEnum;
+    private UUID id;
+    private String code;
+    private long timeStampSeq;
+    private double moneyAmount;
+    private double fee;
+    private double estimatedProfit;
+    private double returnedProfit;
+    private Date returnedTime;
+    private String posCode;
+    private String receiptCode;
 
-    Date getCreatedDate();
-
-    RecordStatusEnum getRecordStatusEnum();
-
-    UUID getId();
-
-    String getCode();
-
-    long getTimeStampOrder();
-
-    double getMoneyAmount();
-
-    double getFee();
-
-    double getEstimatedProfit();
-
-    double getReturnedProfit();
-
-    Date getReturnedTime();
-
-    SuggestedPos getPos();
-
-    SuggestedReceipt getReceipt();
+    public BillTableItem (BillEntity bill) {
+        this.createdBy = bill.getCreatedBy();
+        this.createdDate = bill.getCreatedDate();
+        this.recordStatusEnum = bill.getRecordStatusEnum();
+        this.id = bill.getId();
+        this.code = bill.getCode();
+        this.timeStampSeq = bill.getTimeStampSeq();
+        this.moneyAmount = bill.getMoneyAmount();
+        this.fee = bill.getFee();
+        this.estimatedProfit = bill.getEstimatedProfit();
+        this.returnedProfit = bill.getReturnedProfit();
+        this.returnedTime = bill.getReturnedTime();
+        this.posCode = bill.getPos().getCode();
+        this.receiptCode = bill.getReceipt().getCode();
+    }
 }

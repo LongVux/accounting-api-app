@@ -80,12 +80,12 @@ public class ReceiptEntity extends Auditable<String> {
     @JoinColumn(name = "employee", nullable = false)
     private UserEntity employee;
 
-    @OneToMany(mappedBy = "receipt", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "receipt", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     @Setter(AccessLevel.NONE)
     private List<BillEntity> bills;
 
     @JsonIgnore
-    @OneToMany(mappedBy = "receipt", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "receipt", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     @Setter(AccessLevel.NONE)
     private List<BranchAccountEntryEntity> branchAccountEntries;
 

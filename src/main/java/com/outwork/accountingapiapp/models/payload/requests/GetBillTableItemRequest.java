@@ -25,7 +25,7 @@ import java.util.Map;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
-public class GetBillTableItemRequest extends SortedPagination<BillSortingEnum> implements Specification<BillTableItem> {
+public class GetBillTableItemRequest extends SortedPagination<BillSortingEnum> implements Specification<BillEntity> {
     @Nullable
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private Date fromCreatedDate;
@@ -81,7 +81,7 @@ public class GetBillTableItemRequest extends SortedPagination<BillSortingEnum> i
     }
 
     @Override
-    public Predicate toPredicate(Root<BillTableItem> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder) {
+    public Predicate toPredicate(Root<BillEntity> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder) {
         List<Predicate> predicates = new ArrayList<>();
 
         if (!ObjectUtils.isEmpty(fromCreatedDate) && !ObjectUtils.isEmpty(toCreatedDate)) {

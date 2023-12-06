@@ -50,11 +50,11 @@ public class BillService {
     }
 
     public Page<BillTableItem> getBillTableItems (GetBillTableItemRequest request) {
-        return billRepository.findAll(request, request.retrievePageConfig());
+        return billRepository.findAll(request, request.retrievePageConfig()).map(BillTableItem::new);
     }
 
     public BillSumUpInfo getBillSumUpInfo (GetBillTableItemRequest request) {
-        List<Double> result = util.getSumsBySpecifications(Collections.singletonList(request), BillEntity.getSumUpFields(), BillTableItem.class);
+        List<Double> result = util.getSumsBySpecifications(Collections.singletonList(request), BillEntity.getSumUpFields(), BillEntity.class);
 
         BillSumUpInfo sumUpInfo = new BillSumUpInfo();
 
