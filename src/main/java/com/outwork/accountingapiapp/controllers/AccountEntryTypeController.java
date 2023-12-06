@@ -29,8 +29,8 @@ public class AccountEntryTypeController {
     }
 
     @PostMapping
-    public ResponseEntity<AccountEntryTypeEntity> createEntryType (@Size(min = 2) String title) {
-        return new ResponseEntity<>(accountEntryTypeService.createEntryType(title), HttpStatus.CREATED);
+    public ResponseEntity<AccountEntryTypeEntity> createEntryType (AccountEntryTypeEntity entryType) {
+        return new ResponseEntity<>(accountEntryTypeService.createEntryType(entryType.getTitle()), HttpStatus.CREATED);
     }
 
     @PutMapping
