@@ -62,7 +62,12 @@ public class SecurityConfig {
                 .headers(header -> header.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable))
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(cors -> cors
-                        .configurationSource(request -> new CorsConfiguration().applyPermitDefaultValues())
+                        .configurationSource(request -> {
+                            CorsConfiguration corsConfiguration = new CorsConfiguration();
+                            corsConfiguration.applyPermitDefaultValues();
+                            corsConfiguration.addAllowedMethod("*"); // Allow PUT method
+                            return corsConfiguration;
+                        })
                 )
                 .authorizeHttpRequests((auth) -> auth
                         .requestMatchers("/api/auth/**").permitAll()

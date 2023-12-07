@@ -10,6 +10,8 @@ import java.util.UUID;
 public class MatchingBillRequest {
     @NotNull
     private List<UUID> billIds;
-    private double moneyAmount;
-    private boolean bypassDifference;
+
+    private String explanation;
+
+    private String imageId;
 }

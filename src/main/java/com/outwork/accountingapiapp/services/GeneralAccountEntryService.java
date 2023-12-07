@@ -1,9 +1,11 @@
 package com.outwork.accountingapiapp.services;
 
 import com.outwork.accountingapiapp.constants.AccountEntryStatusEnum;
+import com.outwork.accountingapiapp.constants.DataFormat;
 import com.outwork.accountingapiapp.constants.StringConstant;
 import com.outwork.accountingapiapp.constants.TransactionTypeEnum;
 import com.outwork.accountingapiapp.exceptions.InvalidDataException;
+import com.outwork.accountingapiapp.models.entity.BillEntity;
 import com.outwork.accountingapiapp.models.entity.BranchAccountEntryEntity;
 import com.outwork.accountingapiapp.models.entity.BranchEntity;
 import com.outwork.accountingapiapp.models.entity.GeneralAccountEntryEntity;
@@ -29,7 +31,7 @@ import java.util.*;
 public class GeneralAccountEntryService {
     public static final String ERROR_MSG_INVALID_ACTION_ON_ENTRY = "Không thể thực hiện hành động này trên bút toán được chọn";
     public static final String ERROR_UNSUPPORTED_TRANSACTION_TYPE = "Không hỗ trợ loại giao dịch này";
-
+    public static final String ENTRY_TYPE_BANK_RETURN = "Ngân hàng kết toán";
     @Autowired
     private GeneralAccountEntryRepository generalAccountEntryRepository;
 
@@ -77,6 +79,22 @@ public class GeneralAccountEntryService {
         validateAccountEntryForModification(savedEntry);
 
         return generalAccountEntryRepository.save(savedEntry);
+    }
+
+    public void generateGeneralAccountEntryFromMatchedBills(MatchingBillRequest request, List<BillEntity> matchedBills) {
+        GeneralAccountEntryEntity savedEntry = new GeneralAccountEntryEntity();
+
+        savedEntry.setEntryType(ENTRY_TYPE_BANK_RETURN);
+        savedEntry.setTransactionType(TransactionTypeEnum.INTAKE);
+        savedEntry.setEntryCode(getNewGeneralEntryCode(savedEntry));
+        savedEntry.setEntryStatus(AccountEntryStatusEnum.APPROVED);
+        savedEntry.setImageId(request.getImageId());
+
+        String joinedBillCodes = String.join(DataFormat.NEW_LINE_SEPARATOR, matchedBills.stream().map(BillEntity::getCode).toList());
+        savedEntry.setExplanation(String.join(DataFormat.NEW_LINE_SEPARATOR, joinedBillCodes, request.getExplanation()));
+        savedEntry.setMoneyAmount(matchedBills.stream().mapToDouble(BillEntity::getReturnedProfit).sum());
+
+        generalAccountEntryRepository.save(savedEntry);
     }
 
     @Transactional(rollbackFor = {Exception.class, Throwable.class})

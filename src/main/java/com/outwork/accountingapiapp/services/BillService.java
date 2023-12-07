@@ -20,6 +20,7 @@ import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 
@@ -41,6 +42,9 @@ public class BillService {
 
     @Autowired
     private PosService posService;
+
+    @Autowired
+    private GeneralAccountEntryService generalAccountEntryService;
 
     @Autowired
     private Util util;
@@ -155,6 +159,7 @@ public class BillService {
         return responseList;
     }
 
+    @Transactional(rollbackFor = {Exception.class, Throwable.class})
     public List<BillEntity> matchBill (MatchingBillRequest request) {
         List<BillEntity> bills = billRepository.findAllById(request.getBillIds());
 
@@ -162,14 +167,12 @@ public class BillService {
             throw new EntityNotFoundException(ERROR_MSG_SOME_BILL_IDS_NOT_FOUND);
         }
 
-        if (bills.stream().mapToDouble(BillEntity::getEstimatedProfit).sum() != request.getMoneyAmount() && !request.isBypassDifference()) {
-            throw new InvalidDataException(ERROR_MSG_MONEY_AMOUNT_DOES_NOT_MATCH_BILL);
-        }
-
         bills.forEach(bill -> {
            bill.setReturnedProfit(bill.getEstimatedProfit());
            bill.setReturnedTime(new Date());
         });
+
+        generalAccountEntryService.generateGeneralAccountEntryFromMatchedBills(request, bills);
 
         return billRepository.saveAll(bills);
     }
