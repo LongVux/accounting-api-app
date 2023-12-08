@@ -35,7 +35,7 @@ public class BillService {
     public static final String ERROR_MSG_NO_BILL_TO_APPROVE = "Không có bill để tạo bút toán";
     public static final String ERROR_MSG_BILL_VALUE_EXCEED_POS_LIMIT = "Giá trị Bill vượt quá giới hạn của POS";
     public static final String ERROR_MSG_SOME_BILL_IDS_NOT_FOUND = "Một số bill không tồn tại";
-    public static final String ERROR_MSG_MONEY_AMOUNT_DOES_NOT_MATCH_BILL = "Số tiền không khớp với bills";
+    public static final String ERROR_MSG_SOME_BILL_INVALID_TO_MATCH = "Một số bill không hợp lệ để kết toán";
 
     @Autowired
     private BillRepository billRepository;
@@ -141,7 +141,7 @@ public class BillService {
     }
 
     public List<BillEntity> getMatchingBills (GetMatchingBillsRequest request) {
-        List<BillEntity> bills = billRepository.findByPos_IdAndCreatedDateBetweenOrderByCreatedDateAsc(request.getPosId(), request.getFromCreatedDate(), request.getToCreatedDate());
+        List<BillEntity> bills = billRepository.findByPos_IdAndCreatedDateBetweenAndCodeNotNullOrderByCreatedDateAsc(request.getPosId(), request.getFromCreatedDate(), request.getToCreatedDate());
 
         List<BillEntity> responseList = new ArrayList<>();
         double moneyAmount = 0.0;
@@ -165,6 +165,10 @@ public class BillService {
 
         if (bills.size() != request.getBillIds().size()) {
             throw new EntityNotFoundException(ERROR_MSG_SOME_BILL_IDS_NOT_FOUND);
+        }
+
+        if (bills.stream().anyMatch(bill -> ObjectUtils.isEmpty(bill.getCode()))) {
+            throw new InvalidDataException(ERROR_MSG_SOME_BILL_INVALID_TO_MATCH);
         }
 
         bills.forEach(bill -> {
