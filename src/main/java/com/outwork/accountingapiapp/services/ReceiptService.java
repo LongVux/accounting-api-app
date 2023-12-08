@@ -218,7 +218,7 @@ public class ReceiptService {
 
     private void assignNewReceiptCode (ReceiptEntity receipt) {
         Optional<ReceiptEntity> latestReceipt =
-                receiptRepository.findFirstByCodeNotNullAndBranchAndEmployeeAndCreatedDateBetweenOrderByCreatedDateDesc(
+                receiptRepository.findFirstByCodeNotNullAndBranchAndEmployeeAndLastModifiedDateBetweenOrderByLastModifiedDateDesc(
                         receipt.getBranch(),
                         receipt.getEmployee(),
                         DateTimeUtils.atStartOfDay(new Date()),

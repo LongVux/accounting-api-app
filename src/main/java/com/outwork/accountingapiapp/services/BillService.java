@@ -212,7 +212,7 @@ public class BillService {
     private String getNewBillCode(BillEntity bill, String latestBillCode) {
         if (latestBillCode == null) {
             Optional<BillEntity> latestBill =
-                    billRepository.findFirstByCodeNotNullAndPosAndCreatedDateBetweenOrderByTimeStampSeqDesc(
+                    billRepository.findFirstByCodeNotNullAndPosAndLastModifiedDateBetweenOrderByTimeStampSeqDesc(
                             bill.getPos(),
                             DateTimeUtils.atStartOfDay(new Date()),
                             DateTimeUtils.atEndOfDay(new Date())

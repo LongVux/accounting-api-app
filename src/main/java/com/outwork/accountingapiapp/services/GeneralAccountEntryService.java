@@ -150,7 +150,7 @@ public class GeneralAccountEntryService {
     }
 
     private String getNewGeneralEntryCode (GeneralAccountEntryEntity entry) {
-        Optional<GeneralAccountEntryEntity> latestEntry = generalAccountEntryRepository.findFirstByEntryCodeNotNullAndTransactionTypeAndCreatedDateBetweenOrderByCreatedDateDesc(
+        Optional<GeneralAccountEntryEntity> latestEntry = generalAccountEntryRepository.findFirstByEntryCodeNotNullAndTransactionTypeAndLastModifiedDateBetweenOrderByLastModifiedDateDesc(
                 entry.getTransactionType(),
                 DateTimeUtils.atStartOfDay(new Date()),
                 DateTimeUtils.atEndOfDay(new Date())
