@@ -1,5 +1,6 @@
 package com.outwork.accountingapiapp.models.payload.requests;
 
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
@@ -10,7 +11,7 @@ public class ReceiptBill {
 
         private UUID billId;
 
-        @NotNull
+        @NotNull(message = "{msg.err.string.blank}")
         private UUID posId;
 
         private double moneyAmount;

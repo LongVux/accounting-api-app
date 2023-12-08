@@ -15,7 +15,7 @@ import java.util.UUID;
 
 @Repository
 public interface ReceiptRepository extends JpaRepository<ReceiptEntity, UUID> {
-    Optional<ReceiptEntity> findFirstByCodeNotNullAndBranchAndEmployeeAndLastModifiedDateBetweenOrderByLastModifiedDateDesc(
+    Optional<ReceiptEntity> findFirstByCodeNotNullAndBranchAndEmployeeAndCreatedDateBetweenOrderByCreatedDateDesc(
             BranchEntity branch,
             UserEntity user,
             Date createdDateStart,

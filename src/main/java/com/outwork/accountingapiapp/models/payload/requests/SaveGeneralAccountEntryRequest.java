@@ -7,13 +7,13 @@ import lombok.Data;
 
 @Data
 public class SaveGeneralAccountEntryRequest {
-    @NotNull
+    @NotNull(message = "{msg.err.string.blank}")
     private String entryType;
 
-    @NotNull
+    @NotNull(message = "{msg.err.string.blank}")
     private TransactionTypeEnum transactionType;
 
-    @Min(1000)
+    @Min(value = 1000, message = "{msg.err.double.min}")
     private double moneyAmount;
 
     @NotNull

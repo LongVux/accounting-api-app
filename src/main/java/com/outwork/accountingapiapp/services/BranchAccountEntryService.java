@@ -162,7 +162,7 @@ public class BranchAccountEntryService {
     }
 
     private String getNewBranchEntryCode (BranchAccountEntryEntity entry) {
-        Optional<BranchAccountEntryEntity> latestEntry = branchAccountEntryRepository.findFirstByEntryCodeNotNullAndBranchAndTransactionTypeAndLastModifiedDateBetweenOrderByLastModifiedDateDesc(
+        Optional<BranchAccountEntryEntity> latestEntry = branchAccountEntryRepository.findFirstByEntryCodeNotNullAndBranchAndTransactionTypeAndCreatedDateBetweenOrderByCreatedDateDesc(
                 entry.getBranch(),
                 entry.getTransactionType(),
                 DateTimeUtils.atStartOfDay(new Date()),

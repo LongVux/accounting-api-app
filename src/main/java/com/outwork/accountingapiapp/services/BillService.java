@@ -177,7 +177,7 @@ public class BillService {
         return billRepository.saveAll(bills);
     }
 
-    public void assignNewBillCodes (List<BillEntity> bills) {
+    public void approveBills (List<BillEntity> bills) {
         validateBillsForApproval(bills);
 
         bills.sort((a, b) -> Math.toIntExact(a.getTimeStampSeq() - b.getTimeStampSeq()));
@@ -191,6 +191,7 @@ public class BillService {
             );
 
             bill.setCode(newBillCode);
+            bill.setCreatedDate(new Date());
 
             billCodeMap.put(
                     bill.getPos().getId(),
@@ -212,7 +213,7 @@ public class BillService {
     private String getNewBillCode(BillEntity bill, String latestBillCode) {
         if (latestBillCode == null) {
             Optional<BillEntity> latestBill =
-                    billRepository.findFirstByCodeNotNullAndPosAndLastModifiedDateBetweenOrderByTimeStampSeqDesc(
+                    billRepository.findFirstByCodeNotNullAndPosAndCreatedDateBetweenOrderByTimeStampSeqDesc(
                             bill.getPos(),
                             DateTimeUtils.atStartOfDay(new Date()),
                             DateTimeUtils.atEndOfDay(new Date())

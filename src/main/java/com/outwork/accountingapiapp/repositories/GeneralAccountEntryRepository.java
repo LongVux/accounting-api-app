@@ -15,5 +15,5 @@ import java.util.UUID;
 public interface GeneralAccountEntryRepository extends JpaRepository<GeneralAccountEntryEntity, UUID> {
     Page<GeneralAccountEntryEntity> findAll (Specification<GeneralAccountEntryEntity> specification, Pageable pageable);
 
-    Optional<GeneralAccountEntryEntity> findFirstByEntryCodeNotNullAndTransactionTypeAndLastModifiedDateBetweenOrderByLastModifiedDateDesc(TransactionTypeEnum transactionType, Date lastModifiedDateStart, Date lastModifiedDateEnd);
+    Optional<GeneralAccountEntryEntity> findFirstByEntryCodeNotNullAndTransactionTypeAndCreatedDateBetweenOrderByCreatedDateDesc(TransactionTypeEnum transactionType, Date lastModifiedDateStart, Date lastModifiedDateEnd);
 }

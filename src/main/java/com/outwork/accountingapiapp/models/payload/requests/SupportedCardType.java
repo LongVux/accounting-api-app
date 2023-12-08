@@ -11,7 +11,7 @@ import java.util.UUID;
 public class SupportedCardType {
     private UUID id;
 
-    @NotNull
+    @NotNull(message = "{msg.err.string.blank}")
     private UUID cardTypeId;
 
     private int posCardFee;

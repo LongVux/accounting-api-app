@@ -13,34 +13,52 @@ import java.util.UUID;
 @Data
 public class SaveReceiptRequest {
 
-    @NotNull
+    @NotNull(message = "{msg.err.string.blank}")
     private String imageId;
 
-    @NotNull
+    @NotNull(message = "{msg.err.string.blank}")
     private UUID branchId;
 
-    @NotNull
+    @NotNull(message = "{msg.err.string.blank}")
     private UUID customerCardId;
 
-    @Min(0)
+    @Min(
+            value = 0,
+            message = "{msg.err.double.min}"
+    )
     private double percentageFee;
 
-    @Min(0)
+    @Min(
+            value = 0,
+            message = "{msg.err.double.min}"
+    )
     private double shipmentFee;
 
-    @Min(0)
+    @Min(
+            value = 0,
+            message = "{msg.err.double.min}"
+    )
     private double intake;
 
-    @Min(0)
+    @Min(
+            value = 0,
+            message = "{msg.err.double.min}"
+    )
     private double payout;
 
-    @Min(0)
+    @Min(
+            value = 0,
+            message = "{msg.err.double.min}"
+    )
     private double loan;
 
-    @Min(0)
+    @Min(
+            value = 0,
+            message = "{msg.err.double.min}"
+    )
     private double repayment;
 
-    @NotNull
+    @NotNull(message = "{msg.err.string.blank}")
     private UUID employeeId;
 
     private List<@Valid ReceiptBill> receiptBills;
