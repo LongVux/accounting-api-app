@@ -31,7 +31,7 @@ public class ReceiptService {
     public static final String ERROR_MSG_IMBALANCED_RECEIPT = "Hóa đơn cân đối kế toán không hợp lệ";
     public static final String ERROR_MSG_RECEIPT_ALREADY_HAS_CODE = "Hóa đơn đã được tạo mã. Không thể xử lý";
     public static final String ERROR_MSG_RECEIPT_HAS_NO_BILL = "Hóa đơn phải chứa tối thiểu một bill";
-    public static final String ERROR_MSG_RECEIPT_INVALID_TO_APPROVE = "Hóa đơn không hợp lệ để tạo bút toán";
+    public static final String ERROR_MSG_RECEIPT_NOT_HAVE_CODE = "Hóa đơn chưa được tạo mã. Không thể xử lý";
 
     @Autowired
     private ReceiptRepository receiptRepository;
@@ -75,8 +75,6 @@ public class ReceiptService {
 
     @Transactional(rollbackFor = {Exception.class, Throwable.class})
     public ReceiptEntity saveReceipt (@Valid SaveReceiptRequest request, UUID id) {
-        validateSaveReceiptRequestBalance(request);
-
         ReceiptEntity savedReceipt = ObjectUtils.isEmpty(id) ? new ReceiptEntity() : getReceipt(id);
 
         savedReceipt.setPercentageFee(request.getPercentageFee());
@@ -114,7 +112,7 @@ public class ReceiptService {
     public ReceiptEntity approveReceiptForEntry (@NotNull UUID id) {
         ReceiptEntity receipt = getReceipt(id);
 
-        validateReceiptForEntry(receipt);
+        validateReceiptForModify(receipt);
 
         assignReceiptStatus(receipt);
         assignNewReceiptCode(receipt);
@@ -127,7 +125,9 @@ public class ReceiptService {
     public ReceiptEntity repayReceiptForEntry (@Valid SaveReceiptRepaymentEntryRequest request) {
         ReceiptEntity receipt = getReceipt(request.getReceiptId());
 
-        validateReceiptForEntry(receipt);
+        if (ObjectUtils.isEmpty(receipt.getCode())) {
+            throw new InvalidDataException(ERROR_MSG_RECEIPT_NOT_HAVE_CODE);
+        }
 
         receipt.setRepayment(receipt.getRepayment() + request.getRepaidAmount());
         receipt.setCalculatedProfit(receipt.getCalculatedProfit() + request.getRepaidAmount());
@@ -146,14 +146,6 @@ public class ReceiptService {
         receiptRepository.deleteById(id);
     }
 
-    private void validateReceiptForEntry (ReceiptEntity receipt) {
-        if (!ObjectUtils.isEmpty(receipt.getCode())) {
-            throw new InvalidDataException(ERROR_MSG_RECEIPT_INVALID_TO_APPROVE);
-        }
-
-        validateReceiptBalance(receipt);
-    }
-
     private void validateReceiptForModify(ReceiptEntity receipt) {
         if (!ObjectUtils.isEmpty(receipt.getCode())) {
             throw new InvalidDataException(ERROR_MSG_RECEIPT_ALREADY_HAS_CODE);
@@ -162,26 +154,14 @@ public class ReceiptService {
         if (CollectionUtils.isEmpty(receipt.getBills())) {
             throw new InvalidDataException(ERROR_MSG_RECEIPT_HAS_NO_BILL);
         }
-    }
 
-    private void validateSaveReceiptRequestBalance (SaveReceiptRequest request) {
-        double givenReceiptBalance = request.getIntake() + request.getPayout() + request.getLoan() - request.getRepayment();
-        double transactionTotal = request.getReceiptBills().stream()
-                .map(ReceiptBill::getMoneyAmount)
-                .mapToDouble(Double::doubleValue)
-                .sum()
-                + request.getShipmentFee();
-
-        if (Math.abs(givenReceiptBalance) < Math.abs(transactionTotal)) {
-            throw new InvalidDataException(ERROR_MSG_IMBALANCED_RECEIPT);
-        }
+        validateReceiptBalance(receipt);
     }
 
     private void validateReceiptBalance (ReceiptEntity receipt) {
-        double givenReceiptBalance = receipt.getIntake() + receipt.getPayout() + receipt.getLoan() - receipt.getRepayment();
-        double transactionTotal = receipt.getTransactionTotal();
+        double totalFee = receipt.getBills().stream().mapToDouble(BillEntity::getFee).sum() + receipt.getShipmentFee();
 
-        if (Math.abs(givenReceiptBalance) < Math.abs(transactionTotal)) {
+        if (receipt.getTransactionTotal() < totalFee + receipt.getPayout() - receipt.getIntake() - receipt.getLoan()) {
             throw new InvalidDataException(ERROR_MSG_IMBALANCED_RECEIPT);
         }
     }

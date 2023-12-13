@@ -44,8 +44,8 @@ public class CustomerCardEntity extends Auditable<String> {
     @Column(nullable = false, length = DataConstraint.ID_STRING_MAX_LENGTH)
     private String bank;
 
-    @Column(unique = true, nullable = false, length = DataConstraint.ID_STRING_MAX_LENGTH)
-    private String nationalId;
+//    @Column(nullable = false, length = DataConstraint.ID_STRING_MAX_LENGTH)
+//    private String nationalId;
 
     private int paymentLimit;
 

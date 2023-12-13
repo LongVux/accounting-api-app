@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -34,7 +35,7 @@ public class CardTypeService {
     }
 
     public CardTypeEntity saveCardType (@Valid SaveCardTypeRequest request, UUID id) {
-        if (cardTypeRepository.existsByNameIgnoreCaseAndIdNot(request.getName(), id)) {
+        if (cardTypeRepository.existsByNameIgnoreCaseAndIdNot(request.getName(), Optional.ofNullable(id).orElse(UUID.randomUUID()))) {
             throw new DuplicatedValueException(ERROR_MSG_CARD_TYPE_NAME_EXISTED);
         }
 

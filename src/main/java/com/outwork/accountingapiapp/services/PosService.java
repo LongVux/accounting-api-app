@@ -76,11 +76,11 @@ public class PosService {
     }
 
     private void validateSavePosRequest (SavePosRequest request, UUID id) {
-        if (posRepository.existsByCodeIgnoreCaseAndIdNot(request.getCode(), id)) {
+        if (posRepository.existsByCodeIgnoreCaseAndIdNot(request.getCode(), Optional.ofNullable(id).orElse(UUID.randomUUID()))) {
             throw new DuplicatedValueException(ERROR_MSG_POS_CODE_EXISTED);
         }
 
-        if (posRepository.existsByAccountNumberAndBankIgnoreCaseAndIdNot(request.getAccountNumber(), request.getBank(), id)) {
+        if (posRepository.existsByAccountNumberAndBankIgnoreCaseAndIdNot(request.getAccountNumber(), request.getBank(), Optional.ofNullable(id).orElse(UUID.randomUUID()))) {
             throw new DuplicatedValueException(ERROR_MSG_POS_BANK_ACCOUNT_EXISTED);
         }
     }

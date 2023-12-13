@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -62,11 +63,11 @@ public class CustomerService {
     }
 
     private void validateSaveCustomerRequest (SaveCustomerRequest request, UUID id) {
-        if (customerRepository.existsByPhoneNumberAndIdNot(request.getPhoneNumber(), id)) {
+        if (customerRepository.existsByPhoneNumberAndIdNot(request.getPhoneNumber(), Optional.ofNullable(id).orElse(UUID.randomUUID()))) {
             throw new DuplicatedValueException(ERROR_MSG_CUSTOMER_PHONE_EXISTED);
         }
 
-        if (customerRepository.existsByNationalIdAndIdNot(request.getNationalId(), id)) {
+        if (customerRepository.existsByNationalIdAndIdNot(request.getNationalId(), Optional.ofNullable(id).orElse(UUID.randomUUID()))) {
             throw new DuplicatedValueException(ERROR_MSG_CUSTOMER_NATION_ID_EXISTED);
         }
     }

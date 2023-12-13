@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -68,11 +69,10 @@ public class CustomerCardService {
         customerCard.setPaymentLimit(request.getPaymentLimit());
         customerCard.setPaymentDueDate(request.getPaymentDueDate());
         customerCard.setCustomer(customer);
-        customerCard.setNationalId(request.getNationalId());
     }
 
     private void validateSaveCustomerCardRequest (SaveCustomerCardRequest request, UUID id) {
-        if (customerCardRepository.existsByAccountNumberAndBankIgnoreCaseAndIdNot(request.getAccountNumber(), request.getBank(), id)) {
+        if (customerCardRepository.existsByAccountNumberAndBankIgnoreCaseAndIdNot(request.getAccountNumber(), request.getBank(), Optional.ofNullable(id).orElse(UUID.randomUUID()))) {
             throw new DuplicatedValueException(ERROR_MSG_CUSTOMER_CARD_NUMBER_EXISTED);
         }
     }

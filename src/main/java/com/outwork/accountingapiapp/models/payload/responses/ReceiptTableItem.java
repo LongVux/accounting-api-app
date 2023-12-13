@@ -1,6 +1,7 @@
 package com.outwork.accountingapiapp.models.payload.responses;
 
 import com.outwork.accountingapiapp.constants.ReceiptStatusEnum;
+import com.outwork.accountingapiapp.models.entity.BillEntity;
 import com.outwork.accountingapiapp.models.entity.ReceiptEntity;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -21,6 +22,7 @@ public class ReceiptTableItem {
     private double payout;
     private double loan;
     private double repayment;
+    private double totalFee;
     private double transactionTotal;
     private double calculatedProfit;
     private double estimatedProfit;
@@ -51,5 +53,6 @@ public class ReceiptTableItem {
         this.employeeName = receipt.getEmployee().getName();
         this.branchId = receipt.getBranch().getId();
         this.branchName = receipt.getBranch().getName();
+        this.totalFee = receipt.getBills().stream().mapToDouble(BillEntity::getFee).sum() + receipt.getShipmentFee();
     }
 }

@@ -65,19 +65,19 @@ public class BranchService {
     }
 
     private void validateSaveBranchRequest (SaveBranchRequest request, UUID id) {
-        if (branchRepository.existsByNameIgnoreCaseAndIdNot(request.getName(), id)) {
+        if (branchRepository.existsByNameIgnoreCaseAndIdNot(request.getName(), Optional.ofNullable(id).orElse(UUID.randomUUID()))) {
             throw new DuplicatedValueException(ERROR_MSG_BRANCH_NAME_EXISTED);
         }
 
-        if (branchRepository.existsByCodeIgnoreCaseAndIdNot(request.getCode(), id)) {
+        if (branchRepository.existsByCodeIgnoreCaseAndIdNot(request.getCode(), Optional.ofNullable(id).orElse(UUID.randomUUID()))) {
             throw new DuplicatedValueException(ERROR_MSG_BRANCH_CODE_EXISTED);
         }
 
-        if (branchRepository.existsByPhoneNumberAndIdNot(request.getPhoneNumber(), id)) {
+        if (branchRepository.existsByPhoneNumberAndIdNot(request.getPhoneNumber(), Optional.ofNullable(id).orElse(UUID.randomUUID()))) {
             throw new DuplicatedValueException(ERROR_MSG_BRANCH_PHONE_NUMBER_EXISTED);
         }
 
-        if (branchRepository.existsByAccountNumberAndBankIgnoreCaseAndIdNot(request.getAccountNumber(), request.getBank(), id)) {
+        if (branchRepository.existsByAccountNumberAndBankIgnoreCaseAndIdNot(request.getAccountNumber(), request.getBank(), Optional.ofNullable(id).orElse(UUID.randomUUID()))) {
             throw new DuplicatedValueException(ERROR_MSG_BRANCH_BANK_ACCOUNT_EXISTED);
         }
     }
