@@ -27,5 +27,5 @@ public class PosCardFeeEntity {
     private PosEntity pos;
 
     @Column
-    private int posCardFee;
+    private double posCardFee;
 }

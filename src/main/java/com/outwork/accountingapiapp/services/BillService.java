@@ -70,11 +70,11 @@ public class BillService {
     }
 
     public void estimateBillProfit(BillEntity bill) {
-        int posFee = getPosFeeFromBillByCardTypeId(bill);
+        double posFee = getPosFeeFromBillByCardTypeId(bill);
         bill.setEstimatedProfit(bill.getFee() - bill.getMoneyAmount()*posFee/100);
     }
 
-    public int getPosFeeFromBillByCardTypeId (@NotNull BillEntity bill) {
+    public double getPosFeeFromBillByCardTypeId (@NotNull BillEntity bill) {
         for (PosCardFeeEntity cardFee : bill.getPos().getSupportedCardTypes()) {
             if (cardFee.getCardType().getId().equals(bill.getReceipt().getCustomerCard().getCardType().getId())) {
                 return cardFee.getPosCardFee();

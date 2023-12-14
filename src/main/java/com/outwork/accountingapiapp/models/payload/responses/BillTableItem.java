@@ -2,7 +2,11 @@ package com.outwork.accountingapiapp.models.payload.responses;
 
 import com.outwork.accountingapiapp.constants.RecordStatusEnum;
 import com.outwork.accountingapiapp.models.entity.BillEntity;
+import com.outwork.accountingapiapp.models.entity.PosCardFeeEntity;
+import com.outwork.accountingapiapp.models.payload.requests.SupportedCardType;
 import lombok.Data;
+import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.Date;
 import java.util.UUID;
@@ -21,6 +25,7 @@ public class BillTableItem {
     private double returnedProfit;
     private Date returnedTime;
     private String posCode;
+    private double posFee;
     private String receiptCode;
 
     public BillTableItem (BillEntity bill) {
@@ -37,5 +42,14 @@ public class BillTableItem {
         this.returnedTime = bill.getReturnedTime();
         this.posCode = bill.getPos().getCode();
         this.receiptCode = bill.getReceipt().getCode();
+
+        for (PosCardFeeEntity cardType : bill.getPos().getSupportedCardTypes()) {
+            if (bill.getReceipt().getCustomerCard().getCardType().getId().equals(cardType.getId())) {
+                this.posFee = cardType.getPosCardFee();
+                break;
+            }
+        }
+
+
     }
 }

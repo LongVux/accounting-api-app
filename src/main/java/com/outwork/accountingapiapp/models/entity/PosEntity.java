@@ -51,7 +51,7 @@ public class PosEntity {
     private String note;
 
     @Column
-    private int maxBillAmount;
+    private double maxBillAmount;
 
     @OneToMany(mappedBy = "pos", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
     @Setter(AccessLevel.NONE)
