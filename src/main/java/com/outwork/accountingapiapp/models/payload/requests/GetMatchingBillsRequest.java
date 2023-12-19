@@ -22,6 +22,5 @@ public class GetMatchingBillsRequest {
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private Date toCreatedDate;
 
-    @NotNull
     private double delta;
 }

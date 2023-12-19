@@ -41,11 +41,4 @@ public class SaveCustomerCardRequest {
 
     @NotNull(message = "{msg.err.string.blank}")
     private UUID customerId;
-
-    @Size(
-            min = DataConstraint.SHORT_STRING_MIN_LENGTH,
-            max = DataConstraint.ID_STRING_MAX_LENGTH,
-            message = "{msg.err.string.range}"
-    )
-    private String nationalId;
 }
