@@ -62,13 +62,13 @@ public class ReceiptService {
 
         ReceiptSumUpInfo sumUpInfo = new ReceiptSumUpInfo();
 
-        sumUpInfo.setTotal(result.get(0));
-        sumUpInfo.setTotalIntake(result.get(1));
-        sumUpInfo.setTotalPayout(result.get(2));
-        sumUpInfo.setTotalLoan(result.get(3));
-        sumUpInfo.setTotalRepayment(result.get(4));
-        sumUpInfo.setTotalEstimatedProfit(result.get(5));
-        sumUpInfo.setTotalCalculatedProfit(result.get(6));
+        sumUpInfo.setTotal(Optional.ofNullable(result.get(0)).orElse(0d));
+        sumUpInfo.setTotalIntake(Optional.ofNullable(result.get(1)).orElse(0d));
+        sumUpInfo.setTotalPayout(Optional.ofNullable(result.get(2)).orElse(0d));
+        sumUpInfo.setTotalLoan(Optional.ofNullable(result.get(3)).orElse(0d));
+        sumUpInfo.setTotalRepayment(Optional.ofNullable(result.get(4)).orElse(0d));
+        sumUpInfo.setTotalEstimatedProfit(Optional.ofNullable(result.get(5)).orElse(0d));
+        sumUpInfo.setTotalCalculatedProfit(Optional.ofNullable(result.get(6)).orElse(0d));
 
         return sumUpInfo;
     }

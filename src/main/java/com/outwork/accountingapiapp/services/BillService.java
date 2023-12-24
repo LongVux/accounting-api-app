@@ -62,9 +62,9 @@ public class BillService {
 
         BillSumUpInfo sumUpInfo = new BillSumUpInfo();
 
-        sumUpInfo.setTotalMoneyAmount(result.get(0));
-        sumUpInfo.setTotalEstimatedProfit(result.get(1));
-        sumUpInfo.setTotalReturnedProfit(result.get(2));
+        sumUpInfo.setTotalMoneyAmount(Optional.ofNullable(result.get(0)).orElse(0d));
+        sumUpInfo.setTotalEstimatedProfit(Optional.ofNullable(result.get(1)).orElse(0d));
+        sumUpInfo.setTotalReturnedProfit(Optional.ofNullable(result.get(2)).orElse(0d));
 
         return sumUpInfo;
     }
