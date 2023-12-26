@@ -25,7 +25,7 @@ public class BillTableItem {
     private double returnedProfit;
     private Date returnedTime;
     private String posCode;
-    private double posFee;
+    private double posCardFee;
     private String receiptCode;
 
     public BillTableItem (BillEntity bill) {
@@ -45,7 +45,7 @@ public class BillTableItem {
 
         for (PosCardFeeEntity cardType : bill.getPos().getSupportedCardTypes()) {
             if (bill.getReceipt().getCustomerCard().getCardType().getId().equals(cardType.getId())) {
-                this.posFee = cardType.getPosCardFee();
+                this.posCardFee = cardType.getPosCardFee();
                 break;
             }
         }
