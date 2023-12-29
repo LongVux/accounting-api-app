@@ -28,6 +28,7 @@ public class ReceiptEntity extends Auditable<String> {
     public static final String FIELD_CALCULATED_PROFIT = "calculatedProfit";
     public static final String FIELD_ESTIMATED_PROFIT = "estimatedProfit";
     public static final String FIELD_RECEIPT_STATUS = "receiptStatus";
+    public static final String FIELD_BRANCH = "branch";
 
     public static List<String> getSumUpFields () {
         return Arrays.asList(FIELD_TRANSACTION_TOTAL, FIELD_INTAKE, FIELD_PAYOUT, FIELD_LOAN, FIELD_REPAYMENT, FIELD_ESTIMATED_PROFIT, FIELD_CALCULATED_PROFIT);

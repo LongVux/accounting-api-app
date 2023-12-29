@@ -3,9 +3,7 @@ package com.outwork.accountingapiapp.models.payload.requests;
 import com.outwork.accountingapiapp.constants.DataFormat;
 import com.outwork.accountingapiapp.constants.ReceiptSortingEnum;
 import com.outwork.accountingapiapp.constants.ReceiptStatusEnum;
-import com.outwork.accountingapiapp.models.entity.CustomerCardEntity;
-import com.outwork.accountingapiapp.models.entity.ReceiptEntity;
-import com.outwork.accountingapiapp.models.entity.UserEntity;
+import com.outwork.accountingapiapp.models.entity.*;
 import com.outwork.accountingapiapp.utils.MapBuilder;
 import jakarta.annotation.Nullable;
 import jakarta.persistence.criteria.CriteriaBuilder;
@@ -89,6 +87,9 @@ public class GetReceiptTableItemRequest extends SortedPagination<ReceiptSortingE
 
     @Nullable
     private List<ReceiptStatusEnum> receiptStatusList;
+
+    @Nullable
+    private List<String> branchCodes;
 
     @Override
     public Predicate toPredicate(@NotNull Root<ReceiptEntity> root, @NotNull CriteriaQuery<?> query, @NotNull CriteriaBuilder criteriaBuilder) {
@@ -202,6 +203,10 @@ public class GetReceiptTableItemRequest extends SortedPagination<ReceiptSortingE
 
         if (!CollectionUtils.isEmpty(receiptStatusList)) {
             predicates.add(root.get(ReceiptEntity.FIELD_RECEIPT_STATUS).in(receiptStatusList));
+        }
+
+        if (!ObjectUtils.isEmpty(branchCodes)) {
+            predicates.add(root.get(ReceiptEntity.FIELD_BRANCH).get(BranchEntity.FIELD_CODE).in(branchCodes));
         }
 
         // return a conjunction of all predicates
