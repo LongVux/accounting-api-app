@@ -84,15 +84,17 @@ public class GeneralAccountEntryService {
     public void generateGeneralAccountEntryFromMatchedBills(MatchingBillRequest request, List<BillEntity> matchedBills) {
         GeneralAccountEntryEntity savedEntry = new GeneralAccountEntryEntity();
 
+        double moneyAmount = matchedBills.stream().mapToDouble(BillEntity::getReturnedProfit).sum();
+
         savedEntry.setEntryType(ENTRY_TYPE_BANK_RETURN);
-        savedEntry.setTransactionType(TransactionTypeEnum.INTAKE);
+        savedEntry.setTransactionType(moneyAmount < 0 ? TransactionTypeEnum.PAYOUT : TransactionTypeEnum.INTAKE);
         savedEntry.setEntryCode(getNewGeneralEntryCode(savedEntry));
         savedEntry.setEntryStatus(AccountEntryStatusEnum.APPROVED);
         savedEntry.setImageId(request.getImageId());
 
         String joinedBillCodes = String.join(DataFormat.NEW_LINE_SEPARATOR, matchedBills.stream().map(BillEntity::getCode).toList());
         savedEntry.setExplanation(String.join(DataFormat.NEW_LINE_SEPARATOR, joinedBillCodes, request.getExplanation()));
-        savedEntry.setMoneyAmount(matchedBills.stream().mapToDouble(BillEntity::getReturnedProfit).sum());
+        savedEntry.setMoneyAmount(Math.abs(moneyAmount));
 
         generalAccountEntryRepository.save(savedEntry);
     }

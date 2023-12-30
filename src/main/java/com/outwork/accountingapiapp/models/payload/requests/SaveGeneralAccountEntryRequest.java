@@ -16,9 +16,9 @@ public class SaveGeneralAccountEntryRequest {
     @Min(value = 1000, message = "{msg.err.double.min}")
     private double moneyAmount;
 
-    @NotNull
+    @NotNull(message = "{msg.err.string.blank}")
     private String explanation;
 
-    @NotNull
+    @NotNull(message = "{msg.err.string.blank}")
     private String imageId;
 }
