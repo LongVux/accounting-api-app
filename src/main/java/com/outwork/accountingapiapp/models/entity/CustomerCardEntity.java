@@ -31,7 +31,7 @@ public class CustomerCardEntity extends Auditable<String> {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @Column(nullable = false, updatable = false, length = DataConstraint.ID_STRING_MAX_LENGTH)
+    @Column(nullable = false, length = DataConstraint.ID_STRING_MAX_LENGTH)
     private String name;
 
     @ManyToOne(optional = false, cascade = CascadeType.ALL)
@@ -53,7 +53,7 @@ public class CustomerCardEntity extends Auditable<String> {
     private Date paymentDueDate;
 
     @ManyToOne(optional = false, cascade = CascadeType.ALL)
-    @JoinColumn(name = "customerId", nullable = false, updatable = false)
+    @JoinColumn(name = "customerId", nullable = false)
     private CustomerEntity customer;
 
     @JsonIgnore

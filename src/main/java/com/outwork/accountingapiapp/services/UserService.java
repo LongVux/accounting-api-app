@@ -43,6 +43,10 @@ public class UserService {
     }
 
     public UserEntity saveUserEntity (UserEntity userEntity) {
+        UserEntity updatedUser = getUserEntityById(userEntity.getId());
+
+        userEntity.setPassword(updatedUser.getPassword());
+
         return userRepository.save(userEntity);
     }
 }

@@ -45,21 +45,20 @@ public class BranchAccountEntryEntity extends Auditable<String> {
     @Column(unique = true)
     private String entryCode;
 
-    @Column(updatable = false)
     @Enumerated(EnumType.STRING)
     private TransactionTypeEnum transactionType;
 
     @Column(nullable = false)
     private String entryType;
 
-    @Column(nullable = false, updatable = false)
+    @Column(nullable = false)
     private double moneyAmount;
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private AccountEntryStatusEnum entryStatus;
 
-    @Column(nullable = false, updatable = false)
+    @Column(nullable = false)
     private String explanation;
 
     @ManyToOne(optional = false)

@@ -21,6 +21,7 @@ public class UserEntity {
     public static final String FIELD_PHONE_NUMBER = "phoneNumber";
     public static final String FIELD_BRANCHES = "branches";
     public static final String FIELD_ROLES = "roles";
+    public static final String SALARY = "salary";
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -37,6 +38,9 @@ public class UserEntity {
 
     @Column(nullable = false, unique = true)
     private String phoneNumber;
+
+    @Column
+    private double salary;
 
     @JsonIgnore
     @Column(nullable = false)

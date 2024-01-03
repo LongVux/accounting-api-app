@@ -29,7 +29,7 @@ public class PosEntity {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @Column(unique = true, nullable = false, updatable = false, length = DataConstraint.ENTITY_CODE_MAX_LENGTH)
+    @Column(unique = true, nullable = false, length = DataConstraint.ENTITY_CODE_MAX_LENGTH)
     private String code;
 
     @Column(unique = true, nullable = false, length = DataConstraint.SHORT_STRING_MAX_LENGTH)
