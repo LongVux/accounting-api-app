@@ -29,11 +29,12 @@ import java.util.stream.Collectors;
 
 @Service
 public class BillService {
-    public static final String ERROR_MSG_NO_POS_FEE_FOUND_FOR_THE_BILL = "Không tìm thấy phí POS cho loại thẻ của bill";
     public static final String ERROR_MSG_BILL_ALREADY_HAS_CODE = "Bill đã được tạo mã. Không thể xử lý";
     public static final String ERROR_MSG_SOME_BILL_INVALID_TO_APPROVE = "Một số bill không hợp lệ để tạo bút toán";
     public static final String ERROR_MSG_NO_BILL_TO_APPROVE = "Không có bill để tạo bút toán";
-    public static final String ERROR_MSG_BILL_VALUE_EXCEED_POS_LIMIT = "Giá trị Bill vượt quá giới hạn của POS";
+    public static final String ERROR_MSG_BILL_VALUE_EXCEED_POS_LIMIT = "Giá trị Bill %.2f vượt quá giới hạn của POS %.2f";
+    public static final String ERROR_MSG_BILL_FEE_EXCEED_TOTAL_MONEY = "Phí Bill %.2f vượt quá tổng giá trị cua Bill %.2f";
+    public static final String ERROR_MSG_BILL_PROFIT_LOSES = "Lọi nhuân bill bị lỗ vì phí POS %s %.2f lớn hơn phí Bill %.2f";
     public static final String ERROR_MSG_SOME_BILL_IDS_NOT_FOUND = "Một số bill không tồn tại";
     public static final String ERROR_MSG_SOME_BILL_INVALID_TO_MATCH = "Một số bill không hợp lệ để kết toán";
 
@@ -69,21 +70,6 @@ public class BillService {
         return sumUpInfo;
     }
 
-    public void estimateBillProfit(BillEntity bill) {
-        double posFee = getPosFeeFromBillByCardTypeId(bill);
-        bill.setEstimatedProfit(bill.getFee() - bill.getMoneyAmount()*posFee/100);
-    }
-
-    public double getPosFeeFromBillByCardTypeId (@NotNull BillEntity bill) {
-        for (PosCardFeeEntity cardFee : bill.getPos().getSupportedCardTypes()) {
-            if (cardFee.getCardType().getId().equals(bill.getReceipt().getCustomerCard().getCardType().getId())) {
-                return cardFee.getPosCardFee();
-            }
-        }
-
-        throw new EntityNotFoundException(ERROR_MSG_NO_POS_FEE_FOUND_FOR_THE_BILL);
-    }
-
     public void buildBillsForReceipt (List<ReceiptBill> billRequests, @NotNull ReceiptEntity savedReceipt) {
         if (CollectionUtils.isEmpty(billRequests)) {
             return;
@@ -105,21 +91,23 @@ public class BillService {
         billRequests.forEach(request -> {
             BillEntity savedBill = billMap.getOrDefault(request.getBillId(), BillEntity.buildNewBill(savedReceipt));
 
-            if (posMap.get(request.getPosId()).getMaxBillAmount() < request.getMoneyAmount()) {
-                throw new InvalidDataException(ERROR_MSG_BILL_VALUE_EXCEED_POS_LIMIT);
-            }
-
             savedBill.setMoneyAmount(request.getMoneyAmount());
             savedBill.setFee(request.getFee());
-            savedBill.setEstimatedProfit(request.getEstimatedProfit());
+
             savedBill.setPos(posMap.get(request.getPosId()));
+            savedBill.setPosFeeStamp(posService.getPosFeeByCardType(
+                    savedBill.getPos(),
+                    savedReceipt.getCustomerCard().getCardType()
+            ));
+
+            validateReceiptBillForSave(savedBill);
 
             savedBills.add(savedBill);
         });
 
         long currentTimeStamp = (new Date()).getTime();
 
-        for (BillEntity savedBill: savedBills) {
+        for (BillEntity savedBill : savedBills) {
             savedBill.setTimeStampSeq(currentTimeStamp);
             currentTimeStamp += 1;
         }
@@ -144,7 +132,7 @@ public class BillService {
         List<BillEntity> bills = billRepository.findByPos_IdAndCreatedDateBetweenAndCodeNotNullOrderByCreatedDateAsc(request.getPosId(), request.getFromCreatedDate(), request.getToCreatedDate());
 
         List<BillEntity> responseList = new ArrayList<>();
-        double moneyAmount = 0.0;
+        double moneyAmount = 0d;
 
         for (BillEntity bill : bills) {
             moneyAmount += bill.getMoneyAmount() - bill.getFee();
@@ -172,7 +160,7 @@ public class BillService {
         }
 
         bills.forEach(bill -> {
-           bill.setReturnedProfit(bill.getEstimatedProfit());
+           bill.setReturnFromBank(bill.getMoneyAmount()*(1 - bill.getPosFeeStamp() / 100));
            bill.setReturnedTime(new Date());
         });
 
@@ -200,6 +188,39 @@ public class BillService {
             billCodeMap.put(
                     bill.getPos().getId(),
                     newBillCode
+            );
+        }
+    }
+
+    private void validateReceiptBillForSave (BillEntity bill) {
+        if (bill.getFee() > bill.getMoneyAmount()) {
+            throw new InvalidDataException(
+                    String.format(
+                            ERROR_MSG_BILL_FEE_EXCEED_TOTAL_MONEY,
+                            bill.getFee(),
+                            bill.getMoneyAmount()
+                    )
+            );
+        }
+
+        if (bill.getPos().getMaxBillAmount() < bill.getMoneyAmount()) {
+            throw new InvalidDataException(
+                    String.format(
+                            ERROR_MSG_BILL_VALUE_EXCEED_POS_LIMIT,
+                            bill.getMoneyAmount(),
+                            bill.getPos().getMaxBillAmount()
+                    )
+            );
+        }
+
+        if (bill.getFee() < bill.getMoneyAmount() * bill.getPosFeeStamp() / 100) {
+            throw new InvalidDataException(
+                    String.format(
+                            ERROR_MSG_BILL_PROFIT_LOSES,
+                            bill.getPos().getCode(),
+                            bill.getPosFeeStamp() / 100 * bill.getMoneyAmount(),
+                            bill.getFee()
+                    )
             );
         }
     }

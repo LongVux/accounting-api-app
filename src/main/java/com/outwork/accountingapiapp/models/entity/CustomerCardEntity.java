@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.outwork.accountingapiapp.constants.DataConstraint;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Min;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -44,13 +45,9 @@ public class CustomerCardEntity extends Auditable<String> {
     @Column(nullable = false, length = DataConstraint.ID_STRING_MAX_LENGTH)
     private String bank;
 
-//    @Column(nullable = false, length = DataConstraint.ID_STRING_MAX_LENGTH)
-//    private String nationalId;
-
     private int paymentLimit;
 
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date paymentDueDate;
+    private int paymentDueDate;
 
     @ManyToOne(optional = false, cascade = CascadeType.ALL)
     @JoinColumn(name = "customerId", nullable = false)

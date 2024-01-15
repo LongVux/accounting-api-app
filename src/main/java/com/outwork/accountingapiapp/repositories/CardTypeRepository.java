@@ -9,5 +9,4 @@ import java.util.UUID;
 @Repository
 public interface CardTypeRepository extends JpaRepository<CardTypeEntity, UUID> {
     boolean existsByNameIgnoreCaseAndIdNot(String name, UUID id);
-    boolean existsByNameIgnoreCase(String name);
 }

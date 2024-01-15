@@ -28,18 +28,11 @@ public class AuthService implements UserDetailsService {
     private String ERROR_MSG_USER_CODE_EXISTED = "Mã người dùng đã tồn tại";
     private String ERROR_MSG_EMAIL_EXISTED = "Email đã tồn tại";
     private String ERROR_MSG_PHONE_NUMBER_EXISTED = "Số điện thoại đã tồn tại";
-    private String ERROR_MSG_SOME_ROLE_NOT_EXISTED = "Một số chức danh không tồn tại";
-    private String ERROR_MSG_SOME_BRANCH_NOT_EXISTED = "Một số chi nhánh không tồn tại";
+
     private String SUCCESS_MSG_REGISTRATION_SUCCESSFULLY = "Đăng ký tài khoản thành công";
 
     @Autowired
     private UserService userService;
-
-    @Autowired
-    private RoleService roleService;
-
-    @Autowired
-    private BranchService branchService;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -52,19 +45,12 @@ public class AuthService implements UserDetailsService {
 
     @Override
     public SecuredUserDetails loadUserByUsername(String userCode) throws UsernameNotFoundException {
-        UserEntity userEntity = userService.findUserEntityByCode(userCode);
+        UserEntity userEntity = userService.getUserEntityByCode(userCode);
         return new SecuredUserDetails(userEntity);
     }
 
     public String registerUser (@Valid SignupRequest signUpRequest) {
-        List<RoleEntity> roleEntities = roleService.findRolesByIds(signUpRequest.getRoleIds());
-        List<BranchEntity> branchEntities = branchService.findBranchEntitiesByIds(signUpRequest.getBranchIds());
-
-        validateSignupRequest(signUpRequest, roleEntities, branchEntities);
-
-        UserEntity userEntity = SignupRequest.castToUserEntity(signUpRequest, roleEntities, branchEntities, passwordEncoder);
-
-        userService.saveUserEntity(userEntity);
+        userService.createUser(signUpRequest, passwordEncoder.encode(signUpRequest.getPassword()));
 
         return SUCCESS_MSG_REGISTRATION_SUCCESSFULLY;
     }
@@ -82,28 +68,5 @@ public class AuthService implements UserDetailsService {
         SecuredUserDetails securedUserDetails = (SecuredUserDetails) authentication.getPrincipal();
 
         return UserDetail.toUserDetail(securedUserDetails.getUserEntity(), jwt);
-    }
-
-    private void validateSignupRequest (SignupRequest signUpRequest, List<RoleEntity> roleEntities, List<BranchEntity> branchEntities) {
-
-        if (signUpRequest.getRoleIds().size() > roleEntities.size()) {
-            throw new EntityNotFoundException(ERROR_MSG_SOME_ROLE_NOT_EXISTED);
-        }
-
-        if (signUpRequest.getBranchIds().size() > branchEntities.size()) {
-            throw new EntityNotFoundException(ERROR_MSG_SOME_BRANCH_NOT_EXISTED);
-        }
-
-        else if (userService.isUserCodeExisted(signUpRequest.getCode())) {
-            throw new DuplicatedValueException(ERROR_MSG_USER_CODE_EXISTED);
-        }
-
-        else if (userService.isEmailExisted(signUpRequest.getEmail())) {
-            throw new DuplicatedValueException(ERROR_MSG_EMAIL_EXISTED);
-        }
-
-        else if (userService.isPhoneNumberExisted(signUpRequest.getPhoneNumber())) {
-            throw new DuplicatedValueException(ERROR_MSG_PHONE_NUMBER_EXISTED);
-        }
     }
 }

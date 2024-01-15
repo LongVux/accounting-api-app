@@ -18,6 +18,7 @@ public class BranchAccountEntryTableItem {
     private double moneyAmount;
     private AccountEntryStatusEnum entryStatus;
     private String branchCode;
+    private String lastModifiedBy;
 
     public BranchAccountEntryTableItem (BranchAccountEntryEntity entry) {
         this.id = entry.getId();
@@ -28,5 +29,6 @@ public class BranchAccountEntryTableItem {
         this.moneyAmount = entry.getMoneyAmount();
         this.entryStatus = entry.getEntryStatus();
         this.branchCode = entry.getBranch().getCode();
+        this.lastModifiedBy = entry.getLastModifiedBy();
     }
 }

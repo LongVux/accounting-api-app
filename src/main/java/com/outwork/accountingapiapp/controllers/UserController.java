@@ -2,8 +2,10 @@ package com.outwork.accountingapiapp.controllers;
 
 import com.outwork.accountingapiapp.models.entity.UserEntity;
 import com.outwork.accountingapiapp.models.payload.requests.GetUserTableItemRequest;
+import com.outwork.accountingapiapp.models.payload.requests.UpdateUserRequest;
 import com.outwork.accountingapiapp.models.payload.responses.UserTableItem;
 import com.outwork.accountingapiapp.services.UserService;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -20,7 +22,7 @@ public class UserController {
     private UserService userService;
 
     @GetMapping
-    public ResponseEntity<Page<UserTableItem>> getUserTableItems (@ModelAttribute GetUserTableItemRequest request) {
+    public ResponseEntity<Page<UserTableItem>> getUserTableItems (@ModelAttribute @Valid GetUserTableItemRequest request) {
         return ResponseEntity.ok(userService.getUserTableItems(request));
     }
 
@@ -30,8 +32,7 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<UserEntity> updateUserById (@PathVariable @NotNull UUID id, @RequestBody UserEntity user) {
-        user.setId(id);
-        return ResponseEntity.ok(userService.saveUserEntity(user));
+    public ResponseEntity<UserEntity> updateUserById (@PathVariable @NotNull UUID id, @RequestBody @Valid UpdateUserRequest request) {
+        return ResponseEntity.ok(userService.updateUser(request, id));
     }
 }

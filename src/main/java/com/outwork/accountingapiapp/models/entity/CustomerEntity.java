@@ -36,7 +36,7 @@ public class CustomerEntity extends Auditable<String> {
     private String nationalId;
 
     @Column(nullable = false)
-    private int percentageFee;
+    private double percentageFee;
 
     @JsonIgnore
     @OneToMany(mappedBy = "customer", fetch = FetchType.LAZY)

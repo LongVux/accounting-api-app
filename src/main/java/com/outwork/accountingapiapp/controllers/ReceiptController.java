@@ -30,12 +30,12 @@ public class ReceiptController {
     private BranchAccountEntryService branchAccountEntryService;
 
     @GetMapping
-    public ResponseEntity<Page<ReceiptTableItem>> getReceiptTableItems (@ModelAttribute GetReceiptTableItemRequest request) {
+    public ResponseEntity<Page<ReceiptTableItem>> getReceiptTableItems (@ModelAttribute @Valid GetReceiptTableItemRequest request) {
         return ResponseEntity.ok(receiptService.getReceiptTableItems(request));
     }
 
     @GetMapping("/sumUp")
-    public ResponseEntity<ReceiptSumUpInfo> getReceiptSumUpInfo (@ModelAttribute GetReceiptTableItemRequest request) {
+    public ResponseEntity<ReceiptSumUpInfo> getReceiptSumUpInfo (@ModelAttribute @Valid GetReceiptTableItemRequest request) {
         return ResponseEntity.ok(receiptService.getReceiptSumUpInfo(request));
     }
 
@@ -55,12 +55,12 @@ public class ReceiptController {
     }
 
     @PutMapping("/confirmReceipt")
-    public ResponseEntity<ReceiptEntity> confirmReceipt (@RequestBody SaveReceiptEntryRequest request) {
+    public ResponseEntity<ReceiptEntity> confirmReceipt (@RequestBody @Valid SaveReceiptEntryRequest request) {
         return ResponseEntity.ok(branchAccountEntryService.confirmReceiptEntry(request));
     }
 
     @PutMapping("/repayReceipt")
-    public ResponseEntity<ReceiptEntity> repayReceipt (@RequestBody SaveReceiptRepaymentEntryRequest request) {
+    public ResponseEntity<ReceiptEntity> repayReceipt (@RequestBody @Valid SaveReceiptRepaymentEntryRequest request) {
         return ResponseEntity.ok(branchAccountEntryService.confirmRepayReceipt(request));
     }
 

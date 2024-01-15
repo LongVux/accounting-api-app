@@ -1,6 +1,8 @@
 package com.outwork.accountingapiapp.models.payload.requests;
 
+import com.outwork.accountingapiapp.utils.validator.DoubleStep;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -13,7 +15,6 @@ import java.util.UUID;
 @Data
 public class SaveReceiptRequest {
 
-    @NotNull(message = "{msg.err.string.blank}")
     private String imageId;
 
     @NotNull(message = "{msg.err.string.blank}")
@@ -26,36 +27,45 @@ public class SaveReceiptRequest {
             value = 0,
             message = "{msg.err.double.min}"
     )
+    @Max(
+            value = 100,
+            message = "{msg.err.double.max}"
+    )
     private double percentageFee;
 
     @Min(
             value = 0,
             message = "{msg.err.double.min}"
     )
-    private double shipmentFee;
+    @DoubleStep(value = 1000)
+    private int shipmentFee;
 
     @Min(
             value = 0,
             message = "{msg.err.double.min}"
     )
+    @DoubleStep(value = 1000)
     private double intake;
 
     @Min(
             value = 0,
             message = "{msg.err.double.min}"
     )
+    @DoubleStep(value = 1000)
     private double payout;
 
     @Min(
             value = 0,
             message = "{msg.err.double.min}"
     )
+    @DoubleStep(value = 1000)
     private double loan;
 
     @Min(
             value = 0,
             message = "{msg.err.double.min}"
     )
+    @DoubleStep(value = 1000)
     private double repayment;
 
     @NotNull(message = "{msg.err.string.blank}")

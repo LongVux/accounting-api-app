@@ -19,6 +19,5 @@ public class SaveGeneralAccountEntryRequest {
     @NotNull(message = "{msg.err.string.blank}")
     private String explanation;
 
-    @NotNull(message = "{msg.err.string.blank}")
     private String imageId;
 }

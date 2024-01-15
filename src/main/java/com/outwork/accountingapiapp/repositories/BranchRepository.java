@@ -12,14 +12,11 @@ import java.util.UUID;
 
 @Repository
 public interface BranchRepository extends JpaRepository<BranchEntity, UUID> {
-    boolean existsByAccountNumberAndBankIgnoreCaseAndIdNot(String accountNumber, String bank, UUID id);
-    boolean existsByAccountNumberAndBankIgnoreCase(String accountNumber, String bank);
+
     boolean existsByPhoneNumberAndIdNot(String phoneNumber, UUID id);
     boolean existsByCodeIgnoreCaseAndIdNot(String code, UUID id);
     boolean existsByNameIgnoreCaseAndIdNot(String name, UUID id);
-    boolean existsByPhoneNumberIgnoreCase(String phoneNumber);
-    boolean existsByCodeIgnoreCase(String code);
-    boolean existsByNameIgnoreCase(String name);
+
     List<BranchEntity> findByIdIn(Collection<UUID> ids);
 
     List<SuggestedBranch> findByCodeContainsIgnoreCase(String code);

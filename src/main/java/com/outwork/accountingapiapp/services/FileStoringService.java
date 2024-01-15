@@ -15,6 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -27,8 +28,8 @@ public class FileStoringService {
     private String appBucketPath;
 
     @Transactional(rollbackFor = {IOException.class})
-    public String uploadFile(MultipartFile file) throws IOException {
-        String fileName = UUID.randomUUID().toString();
+    public String uploadFile(MultipartFile file, Optional<String> imageId) throws IOException {
+        String fileName = imageId.orElse(UUID.randomUUID().toString());
 
         FileDataEntity imageData = fileDataRepository.save(FileDataEntity.builder()
                 .fileName(fileName)

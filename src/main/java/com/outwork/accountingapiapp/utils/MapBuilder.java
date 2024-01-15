@@ -78,6 +78,7 @@ public class MapBuilder {
         sorterMap.put(BranchAccountEntrySortingEnum.entryCode, BranchAccountEntryEntity.FIELD_ENTRY_CODE);
         sorterMap.put(BranchAccountEntrySortingEnum.entryType, BranchAccountEntryEntity.FIELD_ENTRY_TYPE);
         sorterMap.put(BranchAccountEntrySortingEnum.branchCode, String.join(DataFormat.DOT_SEPARATOR, BranchAccountEntryEntity.FIELD_BRANCH, BranchEntity.FIELD_CODE));
+        sorterMap.put(BranchAccountEntrySortingEnum.lastModifiedBy, BranchAccountEntryEntity.FIELD_LAST_MODIFIED_BY);
 
         return sorterMap;
     }

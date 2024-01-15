@@ -3,10 +3,7 @@ package com.outwork.accountingapiapp.models.payload.requests;
 import com.outwork.accountingapiapp.constants.DataConstraint;
 import com.outwork.accountingapiapp.constants.PosStatusEnum;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 import lombok.Data;
 
 import java.util.List;
@@ -44,6 +41,10 @@ public class SavePosRequest {
     @NotBlank(message = "{msg.err.string.blank}")
     private String bank;
 
+    @Min(
+            value = 1000,
+            message = "{msg.err.double.min}"
+    )
     private int maxBillAmount;
 
     private List<@Valid SupportedCardType> supportedCardTypes;

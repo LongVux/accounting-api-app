@@ -1,6 +1,7 @@
 package com.outwork.accountingapiapp.models.entity;
 
 import com.outwork.accountingapiapp.constants.DataConstraint;
+import com.outwork.accountingapiapp.constants.TransactionTypeEnum;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -19,4 +20,7 @@ public class AccountEntryTypeEntity {
 
     @Column(nullable = false, unique = true, length = DataConstraint.ID_STRING_MAX_LENGTH)
     private String title;
+
+    @Column(nullable = false)
+    private TransactionTypeEnum transactionType;
 }

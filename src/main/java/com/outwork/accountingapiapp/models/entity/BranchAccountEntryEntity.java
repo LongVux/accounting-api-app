@@ -27,12 +27,13 @@ public class BranchAccountEntryEntity extends Auditable<String> {
             ReceiptEntity receipt,
             String explanation,
             TransactionTypeEnum transactionType,
-            double moneyAmount
+            double moneyAmount,
+            String imageId
     ) {
         this.setEntryType(receipt.getCode());
         this.setBranch(receipt.getBranch());
         this.setReceipt(receipt);
-        this.setImageId(receipt.getImageId());
+        this.setImageId(imageId);
         this.setExplanation(explanation);
         this.setTransactionType(transactionType);
         this.setMoneyAmount(moneyAmount);
@@ -70,6 +71,5 @@ public class BranchAccountEntryEntity extends Auditable<String> {
     @JoinColumn(name = "receiptId", updatable = false)
     private ReceiptEntity receipt;
 
-    @Column(nullable = false)
     private String imageId;
 }

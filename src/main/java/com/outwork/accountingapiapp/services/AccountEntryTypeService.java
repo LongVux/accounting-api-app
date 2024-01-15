@@ -1,13 +1,19 @@
 package com.outwork.accountingapiapp.services;
 
+import com.outwork.accountingapiapp.constants.TransactionTypeEnum;
 import com.outwork.accountingapiapp.models.entity.AccountEntryTypeEntity;
+import com.outwork.accountingapiapp.models.payload.requests.SaveAccountEntryType;
 import com.outwork.accountingapiapp.models.payload.responses.AccountEntryTypeRepository;
+import com.outwork.accountingapiapp.models.payload.responses.SuggestedBranch;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ObjectUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -15,6 +21,9 @@ import java.util.UUID;
 public class AccountEntryTypeService {
     @Autowired
     private AccountEntryTypeRepository accountEntryTypeRepository;
+
+    @Autowired
+    private BranchService branchService;
 
     public List<AccountEntryTypeEntity> getAll () {
         return accountEntryTypeRepository.findAll();
@@ -24,19 +33,24 @@ public class AccountEntryTypeService {
         return accountEntryTypeRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(id.toString()));
     }
 
-    public List<AccountEntryTypeEntity> findEntryType (@Size(min = 2) String searchKey) {
-        return accountEntryTypeRepository.findByTitleContainsIgnoreCase(searchKey);
+    public List<String> findEntryType (@Size(min = 2) String searchKey, TransactionTypeEnum transactionType) {
+        List<String> result = new ArrayList<>(branchService.findBranchesByKeyCode(searchKey).stream().map(SuggestedBranch::getCode).toList());
+
+        if (ObjectUtils.isEmpty(transactionType)) {
+            result.addAll(accountEntryTypeRepository.findByTitleContainsIgnoreCase(searchKey).stream().map(AccountEntryTypeEntity::getTitle).toList());
+        } else {
+            result.addAll(accountEntryTypeRepository.findByTitleContainsIgnoreCaseAndTransactionType(searchKey, transactionType).stream().map(AccountEntryTypeEntity::getTitle).toList());
+        }
+
+        return result;
     }
 
-    public AccountEntryTypeEntity createEntryType (@Size(min = 2) String title) {
+    public AccountEntryTypeEntity createEntryType (@Valid SaveAccountEntryType request) {
         AccountEntryTypeEntity newEntryType = new AccountEntryTypeEntity();
-        newEntryType.setTitle(title);
+        newEntryType.setTitle(request.getTitle());
+        newEntryType.setTransactionType(request.getTransactionType());
 
         return accountEntryTypeRepository.save(newEntryType);
-    }
-
-    public AccountEntryTypeEntity updateEntryType (@NotNull AccountEntryTypeEntity entryType) {
-        return accountEntryTypeRepository.save(entryType);
     }
 
     public void deleteEntryType (@NotNull UUID id) {

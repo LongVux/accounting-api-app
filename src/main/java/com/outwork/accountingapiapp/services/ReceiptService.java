@@ -29,9 +29,11 @@ import java.util.*;
 @Service
 public class ReceiptService {
     public static final String ERROR_MSG_IMBALANCED_RECEIPT = "Hóa đơn cân đối kế toán không hợp lệ";
+    public static final String ERROR_MSG_RECEIPT_OVER_CARD_LIMIT = "Hóa đơn vượt quá hạn mức giao dịch của thẻ";
     public static final String ERROR_MSG_RECEIPT_ALREADY_HAS_CODE = "Hóa đơn đã được tạo mã. Không thể xử lý";
     public static final String ERROR_MSG_RECEIPT_HAS_NO_BILL = "Hóa đơn phải chứa tối thiểu một bill";
     public static final String ERROR_MSG_RECEIPT_NOT_HAVE_CODE = "Hóa đơn chưa được tạo mã. Không thể xử lý";
+    public static final String ERROR_MSG_IMAGE_IS_REQUIRED = "Hóa đơn muốn xác nhận thì phải có ảnh chứng từ";
 
     @Autowired
     private ReceiptRepository receiptRepository;
@@ -74,7 +76,7 @@ public class ReceiptService {
     }
 
     @Transactional(rollbackFor = {Exception.class, Throwable.class})
-    public ReceiptEntity saveReceipt (@Valid SaveReceiptRequest request, UUID id) {
+    public ReceiptEntity saveReceipt (SaveReceiptRequest request, UUID id) {
         ReceiptEntity savedReceipt = ObjectUtils.isEmpty(id) ? new ReceiptEntity() : getReceipt(id);
 
         savedReceipt.setPercentageFee(request.getPercentageFee());
@@ -113,6 +115,8 @@ public class ReceiptService {
         ReceiptEntity receipt = getReceipt(id);
 
         validateReceiptForModify(receipt);
+
+        validateReceiptForApproval(receipt);
 
         assignReceiptStatus(receipt);
         assignNewReceiptCode(receipt);
@@ -155,13 +159,27 @@ public class ReceiptService {
             throw new InvalidDataException(ERROR_MSG_RECEIPT_HAS_NO_BILL);
         }
 
+        if (receipt.getIntake() + receipt.getPayout() > receipt.getCustomerCard().getPaymentLimit()) {
+            throw new InvalidDataException(ERROR_MSG_RECEIPT_OVER_CARD_LIMIT);
+        }
+
         validateReceiptBalance(receipt);
+    }
+
+    private void validateReceiptForApproval (ReceiptEntity receipt) {
+        if (ObjectUtils.isEmpty(receipt.getImageId())) {
+            throw new InvalidDataException(ERROR_MSG_IMAGE_IS_REQUIRED);
+        }
     }
 
     private void validateReceiptBalance (ReceiptEntity receipt) {
         double totalFee = receipt.getBills().stream().mapToDouble(BillEntity::getFee).sum() + receipt.getShipmentFee();
 
         if (receipt.getTransactionTotal() < totalFee + receipt.getPayout() - receipt.getIntake() - receipt.getLoan()) {
+            throw new InvalidDataException(ERROR_MSG_IMBALANCED_RECEIPT);
+        }
+
+        if (totalFee > receipt.getIntake() + receipt.getLoan()) {
             throw new InvalidDataException(ERROR_MSG_IMBALANCED_RECEIPT);
         }
     }
@@ -177,10 +195,8 @@ public class ReceiptService {
     }
 
     private void estimateReceiptProfit (ReceiptEntity receipt) {
-        receipt.getBills().forEach(bill -> billService.estimateBillProfit(bill));
-
         double estimatedProfit = receipt.getBills().stream()
-                .map(BillEntity::getEstimatedProfit)
+                .map(bill -> bill.getFee() - bill.getMoneyAmount()*(1 - bill.getPosFeeStamp() / 100))
                 .mapToDouble(Double::doubleValue)
                 .sum()
                 + receipt.getShipmentFee();
@@ -190,7 +206,7 @@ public class ReceiptService {
 
     private void calculateReceiptProfit (ReceiptEntity receipt) {
         double billProfitSum = receipt.getBills().stream()
-                .map(BillEntity::getReturnedProfit)
+                .map(BillEntity::getReturnFromBank)
                 .mapToDouble(Double::doubleValue)
                 .sum();
 

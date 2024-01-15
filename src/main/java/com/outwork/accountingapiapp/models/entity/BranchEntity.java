@@ -12,9 +12,7 @@ import java.util.UUID;
 @Getter
 @Setter
 @Entity
-@Table(name = "branches",
-        uniqueConstraints = {@UniqueConstraint(columnNames = {"accountNumber", "bank"})}
-)
+@Table(name = "branches")
 public class BranchEntity {
     public static final String FIELD_CODE = "code";
     @Id
@@ -30,12 +28,6 @@ public class BranchEntity {
 
     @Column(nullable = false, unique = true)
     private String phoneNumber;
-
-    @Column(nullable = false, length = DataConstraint.ID_STRING_MAX_LENGTH)
-    private String accountNumber;
-
-    @Column(nullable = false, length = DataConstraint.ID_STRING_MAX_LENGTH)
-    private String bank;
 
     @JsonIgnore
     @OneToMany(mappedBy = "branch", fetch = FetchType.LAZY)

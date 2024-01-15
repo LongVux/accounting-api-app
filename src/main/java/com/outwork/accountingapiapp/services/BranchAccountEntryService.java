@@ -1,10 +1,12 @@
 package com.outwork.accountingapiapp.services;
 
+import com.outwork.accountingapiapp.configs.audit.AuditorAwareImpl;
 import com.outwork.accountingapiapp.constants.AccountEntryStatusEnum;
 import com.outwork.accountingapiapp.constants.TransactionTypeEnum;
 import com.outwork.accountingapiapp.exceptions.InvalidDataException;
 import com.outwork.accountingapiapp.models.entity.BranchAccountEntryEntity;
 import com.outwork.accountingapiapp.models.entity.ReceiptEntity;
+import com.outwork.accountingapiapp.models.entity.UserEntity;
 import com.outwork.accountingapiapp.models.payload.requests.GetBranchAccountEntryTableItemRequest;
 import com.outwork.accountingapiapp.models.payload.requests.SaveBranchAccountEntryRequest;
 import com.outwork.accountingapiapp.models.payload.requests.SaveReceiptEntryRequest;
@@ -30,7 +32,7 @@ import java.util.*;
 @Service
 public class BranchAccountEntryService {
     public static final String ERROR_MSG_INVALID_ACTION_ON_ENTRY = "Không thể thực hiện hành động này trên bút toán được chọn";
-
+    public static final String ERROR_MSG_IMAGE_IS_REQUIRED = "Bút toán muốn xác nhận thì phải có ảnh chứng từ";
     @Autowired
     private BranchAccountEntryRepository branchAccountEntryRepository;
 
@@ -42,13 +44,22 @@ public class BranchAccountEntryService {
     private BranchService branchService;
 
     @Autowired
+    private UserService userService;
+
+    @Autowired
     private Util util;
 
     @Transactional(rollbackFor = {Exception.class, Throwable.class})
     public ReceiptEntity confirmReceiptEntry (@Valid SaveReceiptEntryRequest request) {
         ReceiptEntity receipt = receiptService.approveReceiptForEntry(request.getReceiptId());
 
-        List<BranchAccountEntryEntity> entities = generateBranchAccountEntriesFromReceipt(receipt, request.getExplanation());
+        List<BranchAccountEntryEntity> entities = generateBranchAccountEntriesFromReceipt(receipt, request);
+
+        UserEntity approver = AuditorAwareImpl.getUserFromSecurityContext();
+
+        approver.setAccountBalance(approver.getAccountBalance() + receipt.getIntake() - receipt.getPayout() - receipt.getLoan() + receipt.getRepayment());
+
+        userService.saveUserEntity(approver);
 
         branchAccountEntryRepository.saveAll(entities);
 
@@ -63,11 +74,18 @@ public class BranchAccountEntryService {
                 receipt,
                 request.getExplanation(),
                 TransactionTypeEnum.REPAYMENT,
-                request.getRepaidAmount()
+                request.getRepaidAmount(),
+                request.getImageId()
         );
 
         repaidEntry.setEntryCode(getNewBranchEntryCode(repaidEntry));
         repaidEntry.setEntryStatus(AccountEntryStatusEnum.APPROVED);
+
+        UserEntity approver = AuditorAwareImpl.getUserFromSecurityContext();
+
+        approver.setAccountBalance(approver.getAccountBalance() + repaidEntry.getMoneyAmount());
+
+        userService.saveUserEntity(approver);
 
         branchAccountEntryRepository.save(repaidEntry);
 
@@ -117,9 +135,21 @@ public class BranchAccountEntryService {
 
         validateAccountEntryForModification(approvedEntry);
 
+        validateAccountEntryForApproval(approvedEntry);
+
         approvedEntry.setEntryCode(getNewBranchEntryCode(approvedEntry));
         approvedEntry.setEntryStatus(AccountEntryStatusEnum.APPROVED);
         approvedEntry.setCreatedDate(new Date());
+
+        UserEntity approver = AuditorAwareImpl.getUserFromSecurityContext();
+
+        if (List.of(TransactionTypeEnum.INTAKE, TransactionTypeEnum.REPAYMENT).contains(approvedEntry.getTransactionType())) {
+            approver.setAccountBalance(approver.getAccountBalance() + approvedEntry.getMoneyAmount());
+        } else {
+            approver.setAccountBalance(approver.getAccountBalance() - approvedEntry.getMoneyAmount());
+        }
+
+        userService.saveUserEntity(approver);
 
         return branchAccountEntryRepository.save(approvedEntry);
     }
@@ -138,7 +168,13 @@ public class BranchAccountEntryService {
         }
     }
 
-    private List<BranchAccountEntryEntity> generateBranchAccountEntriesFromReceipt (ReceiptEntity receipt, String explanation) {
+    private void validateAccountEntryForApproval(BranchAccountEntryEntity entry) {
+        if (!ObjectUtils.isEmpty(entry.getImageId())) {
+            throw new InvalidDataException(ERROR_MSG_IMAGE_IS_REQUIRED);
+        }
+    }
+
+    private List<BranchAccountEntryEntity> generateBranchAccountEntriesFromReceipt (ReceiptEntity receipt, SaveReceiptEntryRequest request) {
         Map<TransactionTypeEnum, Double> receiptEntryMap = new HashMap<>();
 
         receiptEntryMap.put(TransactionTypeEnum.INTAKE, receipt.getIntake());
@@ -150,9 +186,10 @@ public class BranchAccountEntryService {
                 .filter(key -> Optional.ofNullable(receiptEntryMap.get(key)).orElse(0d) != 0d)
                 .map(key -> new BranchAccountEntryEntity(
                         receipt,
-                        explanation,
+                        request.getExplanation(),
                         key,
-                        receiptEntryMap.get(key)
+                        receiptEntryMap.get(key),
+                        request.getImageId()
                 ))
                 .peek(entry -> {
                     entry.setEntryCode(getNewBranchEntryCode(entry));

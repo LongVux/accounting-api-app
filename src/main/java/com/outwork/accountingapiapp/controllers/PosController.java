@@ -26,7 +26,7 @@ public class PosController {
     private PosService posService;
 
     @GetMapping
-    public ResponseEntity<Page<PosTableItem>> getPosTableItems (@ModelAttribute GetPosTableItemRequest request) {
+    public ResponseEntity<Page<PosTableItem>> getPosTableItems (@ModelAttribute @Valid GetPosTableItemRequest request) {
         return ResponseEntity.ok(posService.getPosTableItems(request));
     }
 

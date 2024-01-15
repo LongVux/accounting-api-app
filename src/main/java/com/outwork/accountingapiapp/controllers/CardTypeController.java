@@ -31,7 +31,7 @@ public class CardTypeController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<CardTypeEntity> updateCardType (@RequestBody SaveCardTypeRequest request, @PathVariable @NotNull UUID id) {
+    public ResponseEntity<CardTypeEntity> updateCardType (@RequestBody @Valid SaveCardTypeRequest request, @PathVariable @NotNull UUID id) {
         return ResponseEntity.ok(cardTypeService.saveCardType(request, id));
     }
 

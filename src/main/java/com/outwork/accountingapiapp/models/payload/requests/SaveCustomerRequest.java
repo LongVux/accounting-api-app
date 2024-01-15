@@ -1,6 +1,8 @@
 package com.outwork.accountingapiapp.models.payload.requests;
 
 import com.outwork.accountingapiapp.constants.DataConstraint;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
@@ -40,5 +42,13 @@ public class SaveCustomerRequest {
     )
     private String nationalId;
 
-    private int percentageFee;
+    @Min(
+            value = 0,
+            message = "{msg.err.double.min}"
+    )
+    @Max(
+            value = 100,
+            message = "{msg.err.double.max}"
+    )
+    private double percentageFee;
 }

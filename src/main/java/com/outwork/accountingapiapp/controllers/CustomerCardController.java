@@ -24,7 +24,7 @@ public class CustomerCardController {
     private CustomerCardService customerCardService;
 
     @GetMapping
-    public ResponseEntity<Page<CustomerCardTableItem>> getCustomerCardTableItems (@ModelAttribute GetCustomerCardTableItemRequest request) {
+    public ResponseEntity<Page<CustomerCardTableItem>> getCustomerCardTableItems (@ModelAttribute @Valid GetCustomerCardTableItemRequest request) {
         return ResponseEntity.ok(customerCardService.getCustomerCardTableItems(request));
     }
 

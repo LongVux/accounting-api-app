@@ -43,6 +43,5 @@ public class GeneralAccountEntryEntity extends Auditable<String> {
     @Column(nullable = false, updatable = false)
     private String explanation;
 
-    @Column(nullable = false)
     private String imageId;
 }

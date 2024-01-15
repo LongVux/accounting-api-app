@@ -1,6 +1,7 @@
 package com.outwork.accountingapiapp.models.payload.requests;
 
 import com.outwork.accountingapiapp.constants.TransactionTypeEnum;
+import com.outwork.accountingapiapp.utils.validator.DoubleStep;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -22,7 +23,6 @@ public class SaveBranchAccountEntryRequest {
     @NotNull(message = "{msg.err.string.blank}")
     private String explanation;
 
-    @NotNull(message = "{msg.err.string.blank}")
     private String imageId;
 
     @NotNull(message = "{msg.err.string.blank}")

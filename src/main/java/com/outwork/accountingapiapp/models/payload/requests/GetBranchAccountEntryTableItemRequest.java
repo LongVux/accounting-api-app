@@ -6,7 +6,6 @@ import com.outwork.accountingapiapp.constants.DataFormat;
 import com.outwork.accountingapiapp.constants.TransactionTypeEnum;
 import com.outwork.accountingapiapp.models.entity.BranchAccountEntryEntity;
 import com.outwork.accountingapiapp.models.entity.BranchEntity;
-import com.outwork.accountingapiapp.models.payload.responses.BranchAccountEntryTableItem;
 import com.outwork.accountingapiapp.utils.MapBuilder;
 import jakarta.annotation.Nullable;
 import jakarta.persistence.criteria.CriteriaBuilder;
@@ -52,6 +51,9 @@ public class GetBranchAccountEntryTableItemRequest extends SortedPagination<Bran
 
     @Nullable
     private List<String> branchCodes;
+
+    @Nullable
+    private String lastModifiedBy;
 
 
     @Override
@@ -100,6 +102,13 @@ public class GetBranchAccountEntryTableItemRequest extends SortedPagination<Bran
 
         if (!ObjectUtils.isEmpty(branchCodes)) {
             predicates.add(root.get(BranchAccountEntryEntity.FIELD_BRANCH).get(BranchEntity.FIELD_CODE).in(branchCodes));
+        }
+
+        if (!ObjectUtils.isEmpty(lastModifiedBy)) {
+            predicates.add(criteriaBuilder.like(
+                    root.get(BranchAccountEntryEntity.FIELD_LAST_MODIFIED_BY),
+                    String.format(DataFormat.LIKE_QUERY_FORMAT, lastModifiedBy)
+            ));
         }
 
         return criteriaBuilder.and(predicates.toArray(new Predicate[0]));

@@ -21,11 +21,10 @@ public class BillTableItem {
     private long timeStampSeq;
     private double moneyAmount;
     private double fee;
-    private double estimatedProfit;
-    private double returnedProfit;
+    private double posFeeStamp;
+    private double returnFromBank;
     private Date returnedTime;
     private String posCode;
-    private double posCardFee;
     private String receiptCode;
 
     public BillTableItem (BillEntity bill) {
@@ -37,19 +36,10 @@ public class BillTableItem {
         this.timeStampSeq = bill.getTimeStampSeq();
         this.moneyAmount = bill.getMoneyAmount();
         this.fee = bill.getFee();
-        this.estimatedProfit = bill.getEstimatedProfit();
-        this.returnedProfit = bill.getReturnedProfit();
+        this.posFeeStamp = bill.getPosFeeStamp();
+        this.returnFromBank = bill.getReturnFromBank();
         this.returnedTime = bill.getReturnedTime();
         this.posCode = bill.getPos().getCode();
         this.receiptCode = bill.getReceipt().getCode();
-
-        for (PosCardFeeEntity cardType : bill.getPos().getSupportedCardTypes()) {
-            if (bill.getReceipt().getCustomerCard().getCardType().getId().equals(cardType.getId())) {
-                this.posCardFee = cardType.getPosCardFee();
-                break;
-            }
-        }
-
-
     }
 }

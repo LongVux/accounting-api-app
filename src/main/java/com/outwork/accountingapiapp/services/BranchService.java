@@ -22,7 +22,6 @@ public class BranchService {
     public static final String ERROR_MSG_BRANCH_NAME_EXISTED = "Tên chi nhánh đã tồn tại";
     public static final String ERROR_MSG_BRANCH_CODE_EXISTED = "Mã chi nhánh đã tồn tại";
     public static final String ERROR_MSG_BRANCH_PHONE_NUMBER_EXISTED = "Số điện thoại chi nhánh đã tồn tại";
-    public static final String ERROR_MSG_BRANCH_BANK_ACCOUNT_EXISTED = "Tài khoản ngân hàng của chi nhánh đã tồn tại";
 
     @Autowired
     private BranchRepository branchRepository;
@@ -60,8 +59,6 @@ public class BranchService {
         branch.setName(request.getName());
         branch.setCode(request.getCode());
         branch.setPhoneNumber(request.getPhoneNumber());
-        branch.setAccountNumber(request.getAccountNumber());
-        branch.setBank(request.getBank());
     }
 
     private void validateSaveBranchRequest (SaveBranchRequest request, UUID id) {
@@ -75,10 +72,6 @@ public class BranchService {
 
         if (branchRepository.existsByPhoneNumberAndIdNot(request.getPhoneNumber(), Optional.ofNullable(id).orElse(UUID.randomUUID()))) {
             throw new DuplicatedValueException(ERROR_MSG_BRANCH_PHONE_NUMBER_EXISTED);
-        }
-
-        if (branchRepository.existsByAccountNumberAndBankIgnoreCaseAndIdNot(request.getAccountNumber(), request.getBank(), Optional.ofNullable(id).orElse(UUID.randomUUID()))) {
-            throw new DuplicatedValueException(ERROR_MSG_BRANCH_BANK_ACCOUNT_EXISTED);
         }
     }
 }

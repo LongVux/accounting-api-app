@@ -12,10 +12,12 @@ import java.util.UUID;
 
 @Repository
 public interface UserRepository extends JpaRepository<UserEntity, UUID> {
-    boolean existsByPhoneNumber(String phoneNumber);
-    boolean existsByEmail(String email);
-    boolean existsByCode(String code);
+    boolean existsByPhoneNumberAndIdNot(String phoneNumber, UUID id);
+    boolean existsByEmailAndIdNot(String email, UUID id);
+    boolean existsByCodeAndIdNot(String code, UUID id);
     Optional<UserEntity> findByCode(String code);
 
     Page<UserEntity> findAll (Specification<UserEntity> userEntitySpecification, Pageable pageable);
+
+    boolean existsByAccountNumberAndBankIgnoreCaseAndIdNot(String accountNumber, String bank, UUID id);
 }

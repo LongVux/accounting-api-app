@@ -47,10 +47,10 @@ public class BillEntity extends Auditable<String> {
     private double fee;
 
     @Column(nullable = false)
-    private double estimatedProfit;
+    private double posFeeStamp;
 
     @Column(nullable = false)
-    private double returnedProfit;
+    private double returnFromBank;
 
     @Temporal(TemporalType.TIMESTAMP)
     private Date returnedTime;

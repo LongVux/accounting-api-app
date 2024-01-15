@@ -1,8 +1,11 @@
 package com.outwork.accountingapiapp.services;
 
+import com.outwork.accountingapiapp.constants.DataFormat;
 import com.outwork.accountingapiapp.constants.PosStatusEnum;
 import com.outwork.accountingapiapp.exceptions.DuplicatedValueException;
 import com.outwork.accountingapiapp.exceptions.InvalidDataException;
+import com.outwork.accountingapiapp.models.entity.CardTypeEntity;
+import com.outwork.accountingapiapp.models.entity.PosCardFeeEntity;
 import com.outwork.accountingapiapp.models.entity.PosEntity;
 import com.outwork.accountingapiapp.models.payload.requests.GetPosTableItemRequest;
 import com.outwork.accountingapiapp.models.payload.requests.ReceiptBill;
@@ -27,7 +30,8 @@ public class PosService {
 
     public static final String ERROR_MSG_POS_CODE_EXISTED = "Mã POS đã tồn tại";
     public static final String ERROR_MSG_POS_BANK_ACCOUNT_EXISTED = "Tài khoản ngân hàng của POS đã tồn tại";
-    public static final String ERROR_MSG_SOME_POS_NOT_SUPPORT_CARD = "Một số POS không hỗ trợ loại thẻ này";
+    public static final String ERROR_MSG_THE_POS_NOT_SUPPORT_CARD = "POS %s không hỗ trợ loại thẻ này";
+    public static final String ERROR_MSG_ONLY_POSES_SUPPORT_GIVEN_CARD = "Trong bill, chỉ có các POS sau hỗ trợ loại thẻ này: %s";
     public static final String ERROR_MSG_POS_HAS_NO_CARD_TYPE = "POS phải hỗ trợ ít nhất một loại thẻ";
 
     @Autowired
@@ -53,7 +57,12 @@ public class PosService {
         List<PosEntity> poses = findPosesByIdsAndSupportedCardId(requestedPosIds.stream().toList(), cardTypeId);
 
         if (poses.size() < requestedPosIds.size()) {
-            throw new EntityNotFoundException(ERROR_MSG_SOME_POS_NOT_SUPPORT_CARD);
+            throw new EntityNotFoundException(
+                    String.format(
+                            ERROR_MSG_ONLY_POSES_SUPPORT_GIVEN_CARD,
+                            String.join(DataFormat.COMMA_SEPARATOR, poses.stream().map(PosEntity::getCode).toList())
+                    )
+            );
         }
 
         return poses;
@@ -73,6 +82,21 @@ public class PosService {
 
     public void deletePos (@NotNull UUID id) {
         posRepository.deleteById(id);
+    }
+
+    public double getPosFeeByCardType (PosEntity pos, CardTypeEntity cardType) {
+        for (PosCardFeeEntity posCardFee : pos.getSupportedCardTypes()) {
+            if (posCardFee.getCardType().getId().equals(cardType.getId())) {
+                return posCardFee.getPosCardFee();
+            }
+        }
+
+        throw new EntityNotFoundException(
+                String.format(
+                        ERROR_MSG_THE_POS_NOT_SUPPORT_CARD,
+                        pos.getCode()
+                )
+        );
     }
 
     private void validateSavePosRequest (SavePosRequest request, UUID id) {

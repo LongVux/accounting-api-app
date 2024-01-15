@@ -1,14 +1,11 @@
 package com.outwork.accountingapiapp.services;
 
+import com.outwork.accountingapiapp.configs.audit.AuditorAwareImpl;
 import com.outwork.accountingapiapp.constants.AccountEntryStatusEnum;
 import com.outwork.accountingapiapp.constants.DataFormat;
-import com.outwork.accountingapiapp.constants.StringConstant;
 import com.outwork.accountingapiapp.constants.TransactionTypeEnum;
 import com.outwork.accountingapiapp.exceptions.InvalidDataException;
-import com.outwork.accountingapiapp.models.entity.BillEntity;
-import com.outwork.accountingapiapp.models.entity.BranchAccountEntryEntity;
-import com.outwork.accountingapiapp.models.entity.BranchEntity;
-import com.outwork.accountingapiapp.models.entity.GeneralAccountEntryEntity;
+import com.outwork.accountingapiapp.models.entity.*;
 import com.outwork.accountingapiapp.models.payload.requests.*;
 import com.outwork.accountingapiapp.models.payload.responses.AccountEntrySumUpInfo;
 import com.outwork.accountingapiapp.models.payload.responses.GeneralAccountEntryTableItem;
@@ -24,6 +21,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
+import org.springframework.util.StringUtils;
 
 import java.util.*;
 
@@ -39,7 +37,7 @@ public class GeneralAccountEntryService {
     private BranchAccountEntryService branchAccountEntryService;
 
     @Autowired
-    private BranchService branchService;
+    private UserService userService;
 
     @Autowired
     private Util util;
@@ -84,7 +82,7 @@ public class GeneralAccountEntryService {
     public void generateGeneralAccountEntryFromMatchedBills(MatchingBillRequest request, List<BillEntity> matchedBills) {
         GeneralAccountEntryEntity savedEntry = new GeneralAccountEntryEntity();
 
-        double moneyAmount = matchedBills.stream().mapToDouble(BillEntity::getReturnedProfit).sum();
+        double moneyAmount = matchedBills.stream().mapToDouble(BillEntity::getReturnFromBank).sum();
 
         savedEntry.setEntryType(ENTRY_TYPE_BANK_RETURN);
         savedEntry.setTransactionType(moneyAmount < 0 ? TransactionTypeEnum.PAYOUT : TransactionTypeEnum.INTAKE);
@@ -95,6 +93,12 @@ public class GeneralAccountEntryService {
         String joinedBillCodes = String.join(DataFormat.NEW_LINE_SEPARATOR, matchedBills.stream().map(BillEntity::getCode).toList());
         savedEntry.setExplanation(String.join(DataFormat.NEW_LINE_SEPARATOR, joinedBillCodes, request.getExplanation()));
         savedEntry.setMoneyAmount(Math.abs(moneyAmount));
+
+        UserEntity approver = AuditorAwareImpl.getUserFromSecurityContext();
+
+        approver.setAccountBalance(approver.getAccountBalance() + savedEntry.getMoneyAmount());
+
+        userService.saveUserEntity(approver);
 
         generalAccountEntryRepository.save(savedEntry);
     }
@@ -109,32 +113,43 @@ public class GeneralAccountEntryService {
         approvedEntry.setEntryStatus(AccountEntryStatusEnum.APPROVED);
         approvedEntry.setCreatedDate(new Date());
 
-        branchService.getBranchByCode(approvedEntry.getEntryType())
-                .ifPresent(branchEntity -> handleApprovingEntryRelatedToBranch(approvedEntry, branchEntity));
+        Optional<UserEntity> user = userService.findUserEntityByCode(approvedEntry.getEntryType());
+        UserEntity approver = AuditorAwareImpl.getUserFromSecurityContext();
+
+        if (user.isPresent()) {
+            handleApprovingEntryRelatedToUser(approvedEntry, user.get());
+        } else {
+            if (List.of(TransactionTypeEnum.INTAKE, TransactionTypeEnum.REPAYMENT).contains(approvedEntry.getTransactionType())) {
+                approver.setAccountBalance(approver.getAccountBalance() + approvedEntry.getMoneyAmount());
+            } else {
+                approver.setAccountBalance(approver.getAccountBalance() - approvedEntry.getMoneyAmount());
+            }
+        }
+
+        userService.saveUserEntity(approver);
 
         return generalAccountEntryRepository.save(approvedEntry);
     }
 
-    public void handleApprovingEntryRelatedToBranch (GeneralAccountEntryEntity entry, BranchEntity branch) {
-        SaveBranchAccountEntryRequest request = new SaveBranchAccountEntryRequest();
+    public void handleApprovingEntryRelatedToUser (GeneralAccountEntryEntity entry, UserEntity user) {
+        UserEntity approver = AuditorAwareImpl.getUserFromSecurityContext();
+
+        if (approver.getCode().equals(user.getCode())) {
+            return;
+        }
 
         if (TransactionTypeEnum.PAYOUT.equals(entry.getTransactionType())) {
-            request.setTransactionType(TransactionTypeEnum.INTAKE);
-            request.setEntryType(StringConstant.ENTRY_TYPE_ADVANCED_PAYOUT);
+            approver.setAccountBalance(approver.getAccountBalance() - entry.getMoneyAmount());
+            user.setAccountBalance(user.getAccountBalance() + entry.getMoneyAmount());
         } else if (TransactionTypeEnum.INTAKE.equals(entry.getTransactionType())) {
-            request.setTransactionType(TransactionTypeEnum.PAYOUT);
-            request.setEntryType(StringConstant.ENTRY_TYPE_REPAYMENT);
+            approver.setAccountBalance(approver.getAccountBalance() + entry.getMoneyAmount());
+            user.setAccountBalance(user.getAccountBalance() - entry.getMoneyAmount());
         } else {
             throw new InvalidDataException(ERROR_UNSUPPORTED_TRANSACTION_TYPE);
         }
 
-        request.setBranchId(branch.getId());
-        request.setExplanation(entry.getExplanation());
-        request.setImageId(entry.getImageId());
-        request.setMoneyAmount(entry.getMoneyAmount());
-
-        BranchAccountEntryEntity branchEntry = branchAccountEntryService.saveEntry(request, null);
-        branchAccountEntryService.approveEntry(branchEntry.getId());
+        userService.saveUserEntity(approver);
+        userService.saveUserEntity(user);
     }
 
     public void deleteBranchAccountEntry (@NotNull UUID id) {

@@ -2,7 +2,9 @@ package com.outwork.accountingapiapp.models.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.outwork.accountingapiapp.constants.DataConstraint;
+import com.outwork.accountingapiapp.exceptions.InvalidDataException;
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -12,7 +14,7 @@ import java.util.UUID;
 @Getter
 @Setter
 @Entity
-@Table(name = "users")
+@Table(name = "users", uniqueConstraints = {@UniqueConstraint(columnNames = {"accountNumber", "bank"})})
 public class UserEntity {
     public static final String FIELD_ID = "id";
     public static final String FIELD_CODE = "code";
@@ -22,6 +24,8 @@ public class UserEntity {
     public static final String FIELD_BRANCHES = "branches";
     public static final String FIELD_ROLES = "roles";
     public static final String SALARY = "salary";
+
+    public static final String ERROR_MSG_ACCOUNT_BALANCE_NOT_ENOUGH = "Số dư tài khoản không đủ để thực hiện hành động này";
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -40,7 +44,16 @@ public class UserEntity {
     private String phoneNumber;
 
     @Column
-    private double salary;
+    private Double salary;
+
+    @Column(nullable = false, length = DataConstraint.ID_STRING_MAX_LENGTH)
+    private String accountNumber;
+
+    @Column(nullable = false, length = DataConstraint.ID_STRING_MAX_LENGTH)
+    private String bank;
+
+    @Setter(AccessLevel.NONE)
+    private double accountBalance;
 
     @JsonIgnore
     @Column(nullable = false)
@@ -57,4 +70,12 @@ public class UserEntity {
             joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"),
             inverseJoinColumns = @JoinColumn(name = "branch_id", referencedColumnName = "id"))
     private List<BranchEntity> branches;
+
+    public void setAccountBalance (double accountBalance) {
+        if (accountBalance < 0) {
+            throw new InvalidDataException(ERROR_MSG_ACCOUNT_BALANCE_NOT_ENOUGH);
+        } else {
+            this.accountBalance = accountBalance;
+        }
+    }
 }

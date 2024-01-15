@@ -7,6 +7,7 @@ import com.outwork.accountingapiapp.models.payload.requests.MatchingBillRequest;
 import com.outwork.accountingapiapp.models.payload.responses.BillSumUpInfo;
 import com.outwork.accountingapiapp.models.payload.responses.BillTableItem;
 import com.outwork.accountingapiapp.services.BillService;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -23,22 +24,22 @@ public class BillController {
     private BillService billService;
 
     @GetMapping
-    public ResponseEntity<Page<BillTableItem>> getBillTableItems (@ModelAttribute GetBillTableItemRequest request) {
+    public ResponseEntity<Page<BillTableItem>> getBillTableItems (@ModelAttribute @Valid GetBillTableItemRequest request) {
         return ResponseEntity.ok(billService.getBillTableItems(request));
     }
 
     @GetMapping("/sumUp")
-    public ResponseEntity<BillSumUpInfo> getBillSumUpInfo (@ModelAttribute GetBillTableItemRequest request) {
+    public ResponseEntity<BillSumUpInfo> getBillSumUpInfo (@ModelAttribute @Valid GetBillTableItemRequest request) {
         return ResponseEntity.ok(billService.getBillSumUpInfo(request));
     }
 
     @GetMapping("/matchBills")
-    public ResponseEntity<List<BillEntity>> getMatchingBills (@ModelAttribute GetMatchingBillsRequest request) {
+    public ResponseEntity<List<BillEntity>> getMatchingBills (@ModelAttribute @Valid GetMatchingBillsRequest request) {
         return ResponseEntity.ok(billService.getMatchingBills(request));
     }
 
     @PutMapping("/matchBill")
-    public ResponseEntity<List<BillEntity>> matchBills (@RequestBody @NotNull MatchingBillRequest request) {
+    public ResponseEntity<List<BillEntity>> matchBills (@RequestBody @Valid MatchingBillRequest request) {
         return ResponseEntity.ok(billService.matchBill(request));
     }
 }

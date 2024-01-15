@@ -1,7 +1,10 @@
 package com.outwork.accountingapiapp.controllers;
 
+import com.outwork.accountingapiapp.constants.TransactionTypeEnum;
 import com.outwork.accountingapiapp.models.entity.AccountEntryTypeEntity;
+import com.outwork.accountingapiapp.models.payload.requests.SaveAccountEntryType;
 import com.outwork.accountingapiapp.services.AccountEntryTypeService;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,18 +27,13 @@ public class AccountEntryTypeController {
     }
 
     @GetMapping("/findByTitle/{title}")
-    public ResponseEntity<List<AccountEntryTypeEntity>> findEntryTypeByTitle (@PathVariable @Size(min = 2) String title) {
-        return ResponseEntity.ok(accountEntryTypeService.findEntryType(title));
+    public ResponseEntity<List<String>> findEntryTypeByTitle (@PathVariable @Size(min = 2) String title, @RequestParam TransactionTypeEnum transactionType) {
+        return ResponseEntity.ok(accountEntryTypeService.findEntryType(title, transactionType));
     }
 
     @PostMapping
-    public ResponseEntity<AccountEntryTypeEntity> createEntryType (AccountEntryTypeEntity entryType) {
-        return new ResponseEntity<>(accountEntryTypeService.createEntryType(entryType.getTitle()), HttpStatus.CREATED);
-    }
-
-    @PutMapping
-    public ResponseEntity<AccountEntryTypeEntity> updateEntryType (@RequestBody @NotNull AccountEntryTypeEntity entryType) {
-        return ResponseEntity.ok(accountEntryTypeService.updateEntryType(entryType));
+    public ResponseEntity<AccountEntryTypeEntity> createEntryType (@RequestBody @Valid SaveAccountEntryType request) {
+        return new ResponseEntity<>(accountEntryTypeService.createEntryType(request), HttpStatus.CREATED);
     }
 
     @DeleteMapping("/{id}")
