@@ -50,7 +50,7 @@ public class GetUserTableItemRequest extends SortedPagination<UserSortingEnum> i
     }
 
     @Override
-    public Predicate toPredicate(@NotNull Root<UserEntity> root, @NotNull CriteriaQuery<?> query, @NotNull CriteriaBuilder criteriaBuilder) {
+    public Predicate toPredicate(Root<UserEntity> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder) {
         List<Predicate> predicates = new ArrayList<>();
 
         if (!ObjectUtils.isEmpty(id)) {

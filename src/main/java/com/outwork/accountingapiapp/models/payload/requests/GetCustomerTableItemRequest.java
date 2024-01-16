@@ -39,7 +39,7 @@ public class GetCustomerTableItemRequest extends SortedPagination<CustomerSortin
     }
 
     @Override
-    public Predicate toPredicate(@NotNull Root<CustomerTableItem> root, @NotNull CriteriaQuery<?> query, @NotNull CriteriaBuilder criteriaBuilder) {
+    public Predicate toPredicate(Root<CustomerTableItem> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder) {
         List<Predicate> predicates = new ArrayList<>();
 
         if (!ObjectUtils.isEmpty(name)) {

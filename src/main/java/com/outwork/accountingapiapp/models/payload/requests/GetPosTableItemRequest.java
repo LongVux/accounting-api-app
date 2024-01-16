@@ -48,7 +48,7 @@ public class GetPosTableItemRequest extends SortedPagination<PosSortingEnum> imp
     }
 
     @Override
-    public Predicate toPredicate(@NotNull Root<PosTableItem> root, @NotNull CriteriaQuery<?> query, @NotNull CriteriaBuilder criteriaBuilder) {
+    public Predicate toPredicate(Root<PosTableItem> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder) {
         List<Predicate> predicates = new ArrayList<>();
 
         if (!ObjectUtils.isEmpty(code)) {

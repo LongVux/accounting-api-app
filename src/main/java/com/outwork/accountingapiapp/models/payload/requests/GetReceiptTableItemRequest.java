@@ -92,7 +92,7 @@ public class GetReceiptTableItemRequest extends SortedPagination<ReceiptSortingE
     private List<String> branchCodes;
 
     @Override
-    public Predicate toPredicate(@NotNull Root<ReceiptEntity> root, @NotNull CriteriaQuery<?> query, @NotNull CriteriaBuilder criteriaBuilder) {
+    public Predicate toPredicate(Root<ReceiptEntity> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder) {
         List<Predicate> predicates = new ArrayList<>();
 
         if (!ObjectUtils.isEmpty(employeeId)) {
