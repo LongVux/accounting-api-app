@@ -61,6 +61,8 @@ public class SignupRequest {
     )
     private String bank;
 
+    private double salary;
+
     @NotBlank
     @Size(
             min = DataConstraint.SHORT_STRING_MIN_LENGTH,

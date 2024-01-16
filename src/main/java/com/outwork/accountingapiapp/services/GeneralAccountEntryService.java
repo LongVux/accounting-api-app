@@ -135,6 +135,15 @@ public class GeneralAccountEntryService {
         UserEntity approver = AuditorAwareImpl.getUserFromSecurityContext();
 
         if (approver.getCode().equals(user.getCode())) {
+            if (TransactionTypeEnum.PAYOUT.equals(entry.getTransactionType())) {
+                approver.setAccountBalance(approver.getAccountBalance() - entry.getMoneyAmount());
+            } else if (TransactionTypeEnum.INTAKE.equals(entry.getTransactionType())) {
+                approver.setAccountBalance(approver.getAccountBalance() + entry.getMoneyAmount());
+            } else {
+                throw new InvalidDataException(ERROR_UNSUPPORTED_TRANSACTION_TYPE);
+            }
+
+            userService.saveUserEntity(approver);
             return;
         }
 

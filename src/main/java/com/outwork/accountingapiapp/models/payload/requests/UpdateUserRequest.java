@@ -45,6 +45,8 @@ public class UpdateUserRequest {
     )
     private String bank;
 
+    private double salary;
+
     @NotEmpty(message = "{msg.err.list.empty}")
     private List<UUID> roleIds;
 

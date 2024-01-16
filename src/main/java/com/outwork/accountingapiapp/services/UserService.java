@@ -71,6 +71,7 @@ public class UserService {
         newUser.setPassword(encodedPassword);
         newUser.setBranches(branchEntities);
         newUser.setRoles(roleEntities);
+        newUser.setSalary(request.getSalary());
 
         validateSaveUserRequest(newUser, request.getRoleIds(), request.getBranchIds());
 
@@ -90,6 +91,7 @@ public class UserService {
         savedUser.setBank(request.getBank());
         savedUser.setBranches(branchEntities);
         savedUser.setRoles(roleEntities);
+        savedUser.setSalary(request.getSalary());
 
         validateSaveUserRequest(savedUser, request.getRoleIds(), request.getBranchIds());
 
