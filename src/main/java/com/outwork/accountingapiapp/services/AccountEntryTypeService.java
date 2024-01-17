@@ -9,6 +9,7 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import org.apache.catalina.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
@@ -23,7 +24,7 @@ public class AccountEntryTypeService {
     private AccountEntryTypeRepository accountEntryTypeRepository;
 
     @Autowired
-    private BranchService branchService;
+    private UserService userService;
 
     public List<AccountEntryTypeEntity> getAll () {
         return accountEntryTypeRepository.findAll();
@@ -34,7 +35,7 @@ public class AccountEntryTypeService {
     }
 
     public List<String> findEntryType (@Size(min = 2) String searchKey, TransactionTypeEnum transactionType) {
-        List<String> result = new ArrayList<>(branchService.findBranchesByKeyCode(searchKey).stream().map(SuggestedBranch::getCode).toList());
+        List<String> result = userService.searchUserCode(searchKey);
 
         if (ObjectUtils.isEmpty(transactionType)) {
             result.addAll(accountEntryTypeRepository.findByTitleContainsIgnoreCase(searchKey).stream().map(AccountEntryTypeEntity::getTitle).toList());

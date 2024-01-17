@@ -20,14 +20,14 @@ public class BillEntity extends Auditable<String> {
     public static final String FIELD_CODE = "code";
     public static final String FIELD_MONEY_AMOUNT = "moneyAmount";
     public static final String FIELD_FEE = "fee";
-    public static final String FIELD_ESTIMATED_PROFIT = "estimatedProfit";
-    public static final String FIELD_RETURNED_PROFIT = "returnedProfit";
+    public static final String FIELD_POS_FEE_STAMP = "posFeeStamp";
+    public static final String FIELD_RETURN_FROM_BANK = "returnFromBank";
     public static final String FIELD_RETURNED_TIME = "returnedTime";
     public static final String FIELD_POS = "pos";
     public static final String FIELD_RECEIPT = "receipt";
 
     public static List<String> getSumUpFields () {
-        return Arrays.asList(FIELD_MONEY_AMOUNT, FIELD_ESTIMATED_PROFIT, FIELD_RETURNED_PROFIT);
+        return Arrays.asList(FIELD_MONEY_AMOUNT, FIELD_POS_FEE_STAMP, FIELD_RETURN_FROM_BANK);
     }
 
     @Id

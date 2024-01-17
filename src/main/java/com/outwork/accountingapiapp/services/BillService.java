@@ -2,7 +2,6 @@ package com.outwork.accountingapiapp.services;
 
 import com.outwork.accountingapiapp.exceptions.InvalidDataException;
 import com.outwork.accountingapiapp.models.entity.BillEntity;
-import com.outwork.accountingapiapp.models.entity.PosCardFeeEntity;
 import com.outwork.accountingapiapp.models.entity.PosEntity;
 import com.outwork.accountingapiapp.models.entity.ReceiptEntity;
 import com.outwork.accountingapiapp.models.payload.requests.GetBillTableItemRequest;
@@ -135,7 +134,7 @@ public class BillService {
         double moneyAmount = 0d;
 
         for (BillEntity bill : bills) {
-            moneyAmount += bill.getMoneyAmount() - bill.getFee();
+            moneyAmount += bill.getMoneyAmount()*(1 - bill.getPosFeeStamp() / 100);
 
             if (moneyAmount > request.getMoneyAmount() + request.getDelta()) {
                 break;

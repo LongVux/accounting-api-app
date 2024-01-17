@@ -6,8 +6,8 @@ public enum BillSortingEnum {
     posCode,
     moneyAmount,
     fee,
-    estimatedProfit,
-    returnedProfit,
+    posFeeStamp,
+    returnFromBank,
     returnedTime,
     receiptCode
 }

@@ -44,6 +44,10 @@ public class UserService {
         return userRepository.findByCode(userCode);
     }
 
+    public List<String> searchUserCode (String searchKey) {
+        return userRepository.findByCodeContainsIgnoreCase(searchKey).stream().map(UserEntity::getCode).toList();
+    }
+
     public UserEntity getUserEntityByCode(String userCode) {
         return userRepository.findByCode(userCode).orElseThrow(() -> new EntityNotFoundException(userCode));
     }

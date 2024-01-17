@@ -169,7 +169,7 @@ public class BranchAccountEntryService {
     }
 
     private void validateAccountEntryForApproval(BranchAccountEntryEntity entry) {
-        if (!ObjectUtils.isEmpty(entry.getImageId())) {
+        if (ObjectUtils.isEmpty(entry.getImageId())) {
             throw new InvalidDataException(ERROR_MSG_IMAGE_IS_REQUIRED);
         }
     }

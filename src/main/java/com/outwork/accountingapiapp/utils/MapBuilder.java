@@ -101,8 +101,8 @@ public class MapBuilder {
         sorterMap.put(BillSortingEnum.posCode, String.join(DataFormat.DOT_SEPARATOR, BillEntity.FIELD_POS, PosEntity.FIELD_CODE));
         sorterMap.put(BillSortingEnum.moneyAmount, BillEntity.FIELD_MONEY_AMOUNT);
         sorterMap.put(BillSortingEnum.fee, BillEntity.FIELD_FEE);
-        sorterMap.put(BillSortingEnum.estimatedProfit, BillEntity.FIELD_ESTIMATED_PROFIT);
-        sorterMap.put(BillSortingEnum.returnedProfit, BillEntity.FIELD_RETURNED_PROFIT);
+        sorterMap.put(BillSortingEnum.posFeeStamp, BillEntity.FIELD_POS_FEE_STAMP);
+        sorterMap.put(BillSortingEnum.returnFromBank, BillEntity.FIELD_RETURN_FROM_BANK);
         sorterMap.put(BillSortingEnum.returnedTime, BillEntity.FIELD_RETURNED_TIME);
         sorterMap.put(BillSortingEnum.receiptCode, String.join(DataFormat.DOT_SEPARATOR, BillEntity.FIELD_RECEIPT, ReceiptEntity.FIELD_CODE));
 

@@ -22,6 +22,7 @@ public class BillTableItem {
     private double moneyAmount;
     private double fee;
     private double posFeeStamp;
+    private double estimateReturnFromBank;
     private double returnFromBank;
     private Date returnedTime;
     private String posCode;
@@ -37,6 +38,7 @@ public class BillTableItem {
         this.moneyAmount = bill.getMoneyAmount();
         this.fee = bill.getFee();
         this.posFeeStamp = bill.getPosFeeStamp();
+        this.estimateReturnFromBank = bill.getMoneyAmount()*(1 - bill.getPosFeeStamp() / 100);
         this.returnFromBank = bill.getReturnFromBank();
         this.returnedTime = bill.getReturnedTime();
         this.posCode = bill.getPos().getCode();

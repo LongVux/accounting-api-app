@@ -56,16 +56,16 @@ public class GetBillTableItemRequest extends SortedPagination<BillSortingEnum> i
     private Double toFee;
 
     @Nullable
-    private Double fromEstimatedProfit;
+    private Double fromPosFeeStamp;
 
     @Nullable
-    private Double toEstimatedProfit;
+    private Double toPosFeeStamp;
 
     @Nullable
-    private Double fromReturnedProfit;
+    private Double fromReturnFromBank;
 
     @Nullable
-    private Double toReturnedProfit;
+    private Double toReturnFromBank;
 
     @Nullable
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
@@ -129,19 +129,19 @@ public class GetBillTableItemRequest extends SortedPagination<BillSortingEnum> i
             ));
         }
 
-        if (!ObjectUtils.isEmpty(fromEstimatedProfit) && !ObjectUtils.isEmpty(toEstimatedProfit)) {
+        if (!ObjectUtils.isEmpty(fromPosFeeStamp) && !ObjectUtils.isEmpty(toPosFeeStamp)) {
             predicates.add(criteriaBuilder.between(
-                    root.get(BillEntity.FIELD_ESTIMATED_PROFIT),
-                    fromEstimatedProfit,
-                    toEstimatedProfit
+                    root.get(BillEntity.FIELD_POS_FEE_STAMP),
+                    fromPosFeeStamp,
+                    toPosFeeStamp
             ));
         }
 
-        if (!ObjectUtils.isEmpty(fromReturnedProfit) && !ObjectUtils.isEmpty(toReturnedProfit)) {
+        if (!ObjectUtils.isEmpty(fromReturnFromBank) && !ObjectUtils.isEmpty(toReturnFromBank)) {
             predicates.add(criteriaBuilder.between(
-                    root.get(BillEntity.FIELD_RETURNED_PROFIT),
-                    fromReturnedProfit,
-                    toReturnedProfit
+                    root.get(BillEntity.FIELD_RETURN_FROM_BANK),
+                    fromReturnFromBank,
+                    toReturnFromBank
             ));
         }
 
