@@ -27,7 +27,7 @@ public class BillEntity extends Auditable<String> {
     public static final String FIELD_RECEIPT = "receipt";
 
     public static List<String> getSumUpFields () {
-        return Arrays.asList(FIELD_MONEY_AMOUNT, FIELD_POS_FEE_STAMP, FIELD_RETURN_FROM_BANK);
+        return Arrays.asList(FIELD_MONEY_AMOUNT, FIELD_RETURN_FROM_BANK);
     }
 
     @Id
