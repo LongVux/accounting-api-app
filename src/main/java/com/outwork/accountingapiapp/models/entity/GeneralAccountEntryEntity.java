@@ -33,7 +33,7 @@ public class GeneralAccountEntryEntity extends Auditable<String> {
     @Column(nullable = false)
     private String entryType;
 
-    @Column(nullable = false, updatable = false)
+    @Column(nullable = false)
     private double moneyAmount;
 
     @Column(nullable = false)
