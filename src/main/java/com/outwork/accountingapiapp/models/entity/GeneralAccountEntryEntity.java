@@ -40,7 +40,7 @@ public class GeneralAccountEntryEntity extends Auditable<String> {
     @Enumerated(EnumType.STRING)
     private AccountEntryStatusEnum entryStatus;
 
-    @Column(nullable = false, updatable = false)
+    @Column(nullable = false)
     private String explanation;
 
     private String imageId;
