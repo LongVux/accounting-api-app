@@ -51,6 +51,10 @@ public class BranchAccountEntryService {
 
     @Transactional(rollbackFor = {Exception.class, Throwable.class})
     public ReceiptEntity confirmReceiptEntry (@Valid SaveReceiptEntryRequest request) {
+        if (ObjectUtils.isEmpty(request.getReceiptId())) {
+            throw new InvalidDataException(ERROR_MSG_IMAGE_IS_REQUIRED);
+        }
+
         ReceiptEntity receipt = receiptService.approveReceiptForEntry(request.getReceiptId());
 
         List<BranchAccountEntryEntity> entities = generateBranchAccountEntriesFromReceipt(receipt, request);
