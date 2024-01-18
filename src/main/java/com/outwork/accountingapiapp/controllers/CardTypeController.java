@@ -1,5 +1,6 @@
 package com.outwork.accountingapiapp.controllers;
 
+import com.outwork.accountingapiapp.exceptions.InvalidDataException;
 import com.outwork.accountingapiapp.models.entity.CardTypeEntity;
 import com.outwork.accountingapiapp.models.payload.requests.SaveCardTypeRequest;
 import com.outwork.accountingapiapp.services.CardTypeService;
@@ -16,6 +17,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/cardTypes")
 public class CardTypeController {
+    public static final String ERROR_MSG_CANNOT_DELETE = "Dữ liệu này đã được sử dụng trong hệ thống, không thể xóa!";
 
     @Autowired
     private CardTypeService cardTypeService;
@@ -37,6 +39,10 @@ public class CardTypeController {
 
     @DeleteMapping("/{id}")
     public void deleteCardType (@PathVariable @NotNull UUID id) {
-        cardTypeService.deleteCardTypeById(id);
+        try {
+            cardTypeService.deleteCardTypeById(id);
+        } catch (Exception e) {
+            throw new InvalidDataException(ERROR_MSG_CANNOT_DELETE);
+        }
     }
 }

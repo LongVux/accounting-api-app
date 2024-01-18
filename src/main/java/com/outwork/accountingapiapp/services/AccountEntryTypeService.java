@@ -1,6 +1,7 @@
 package com.outwork.accountingapiapp.services;
 
 import com.outwork.accountingapiapp.constants.TransactionTypeEnum;
+import com.outwork.accountingapiapp.exceptions.InvalidDataException;
 import com.outwork.accountingapiapp.models.entity.AccountEntryTypeEntity;
 import com.outwork.accountingapiapp.models.payload.requests.SaveAccountEntryType;
 import com.outwork.accountingapiapp.models.payload.responses.AccountEntryTypeRepository;
@@ -20,6 +21,7 @@ import java.util.UUID;
 
 @Service
 public class AccountEntryTypeService {
+    public static final String ERROR_MSG_CANNOT_DELETE = "Dữ liệu này đã được sử dụng trong hệ thống, không thể xóa!";
     @Autowired
     private AccountEntryTypeRepository accountEntryTypeRepository;
 
@@ -35,7 +37,7 @@ public class AccountEntryTypeService {
     }
 
     public List<String> findEntryType (@Size(min = 2) String searchKey, TransactionTypeEnum transactionType) {
-        List<String> result = userService.searchUserCode(searchKey);
+        List<String> result = new ArrayList<>(userService.searchUserCode(searchKey));
 
         if (ObjectUtils.isEmpty(transactionType)) {
             result.addAll(accountEntryTypeRepository.findByTitleContainsIgnoreCase(searchKey).stream().map(AccountEntryTypeEntity::getTitle).toList());
@@ -55,6 +57,11 @@ public class AccountEntryTypeService {
     }
 
     public void deleteEntryType (@NotNull UUID id) {
-        accountEntryTypeRepository.deleteById(id);
+        try {
+            accountEntryTypeRepository.deleteById(id);
+        } catch (Exception e) {
+            throw new InvalidDataException(ERROR_MSG_CANNOT_DELETE);
+        }
+
     }
 }

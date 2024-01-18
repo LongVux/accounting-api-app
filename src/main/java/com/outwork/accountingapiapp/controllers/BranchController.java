@@ -46,4 +46,9 @@ public class BranchController {
     public ResponseEntity<BranchEntity> updateBranch(@RequestBody @Valid SaveBranchRequest request, @PathVariable @NotNull UUID id) {
         return ResponseEntity.ok(branchService.saveBranch(request, id));
     }
+
+    @DeleteMapping("/{id}")
+    public void deleteBranch (@PathVariable @NotNull UUID id) {
+        branchService.deleteBranch(id);
+    }
 }

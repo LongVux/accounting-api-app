@@ -1,12 +1,15 @@
 package com.outwork.accountingapiapp.services;
 
 import com.outwork.accountingapiapp.constants.DataFormat;
+import com.outwork.accountingapiapp.exceptions.InvalidDataException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import javax.swing.text.StringContent;
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.sql.*;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -36,73 +39,40 @@ public class DataBackupService {
     private String fileDirectory;
 
     public void backupDatabase() {
-        try (Connection connection = DriverManager.getConnection(databaseUrl, databaseUsername, databasePassword)) {
-            DatabaseMetaData metaData = connection.getMetaData();
+        String backupFileName = String.format("db_backup_haha_%s.sql", LocalDate.now().format(DateTimeFormatter.ofPattern(DataFormat.DATE_FORMAT_ddMMyy)));
 
-            try (FileWriter fileWriter = new FileWriter(String.format("db_backup_%s.sql", LocalDate.now().format(DateTimeFormatter.ofPattern(DataFormat.DATE_FORMAT_ddMMyy))));
-                 PrintWriter printWriter = new PrintWriter(fileWriter)) {
+        String command = String.format("C:\\Users\\LongV\\my-stuffs\\accounting-system-v2\\accounting-api-app\\mysqldump.exe -u %s -p%s %s --result-file=%s\\%s --default-character-set=utf8",
+                databaseUsername, databasePassword, "accounting_app_db", backupDirectory, backupFileName);
 
-                // Get all table names in the database
-                ResultSet tableResultSet = metaData.getTables(null, connection.getCatalog(), "%accounting_app_db%", null);
-                while (tableResultSet.next()) {
-                    String tableName = tableResultSet.getString("TABLE_NAME");
-                    backupTable(connection, tableName, printWriter);
-                }
+        System.out.println(command);
 
-                log.info("Database backup completed successfully.");
-
-            } catch (Exception e) {
-                log.error("Cannot backup database", e);
-            }
-
-        } catch (Exception e) {
-            log.error("Cannot connect database", e);
-        }
-    }
-
-    private static void backupTable(Connection connection, String tableName, PrintWriter printWriter) {
         try {
-            Statement statement = connection.createStatement();
-            ResultSet resultSet = statement.executeQuery("SELECT * FROM " + tableName);
-
-            printWriter.println("-- Data for table: " + tableName);
-            printWriter.println("INSERT INTO " + tableName + " VALUES ");
-
-            int rowCount = 0;
-
-            while (resultSet.next()) {
-                if (rowCount > 0) {
-                    printWriter.print(", ");
-                }
-
-                printWriter.print("(");
-
-                for (int i = 1; i <= resultSet.getMetaData().getColumnCount(); i++) {
-                    printWriter.print("'" + resultSet.getString(i) + "'");
-                    if (i < resultSet.getMetaData().getColumnCount()) {
-                        printWriter.print(", ");
-                    }
-                }
-
-                printWriter.print(")");
-
-                rowCount++;
-
-                if (rowCount % 1000 == 0) {
-                    // Flush the batch to the file
-                    printWriter.println(";");
-                    printWriter.flush();
-                    rowCount = 0;
-                }
+            Process process = Runtime.getRuntime().exec(command);
+            // Capture and log the output stream
+            InputStream inputStream = process.getInputStream();
+            BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+            String line;
+            while ((line = reader.readLine()) != null) {
+                System.out.println(line);
             }
 
-            printWriter.println(";");
-            printWriter.flush();
+            // Capture and log the error stream
+            InputStream errorStream = process.getErrorStream();
+            BufferedReader errorReader = new BufferedReader(new InputStreamReader(errorStream));
+            while ((line = errorReader.readLine()) != null) {
+                System.err.println(line);
+            }
+            int exitCode = process.waitFor();
 
-            log.info("Table '" + tableName + "' backup completed.");
+            if (exitCode == 0) {
+                log.info("Database backup successful.");
+            } else {
+                throw new RuntimeException("Fail to backup");
+            }
 
         } catch (Exception e) {
-            log.error("Error backup table", e);
+            log.error("Error executing backup command: ", e);
+            throw new InvalidDataException("Hệ thống không thể thực hiện backup cơ sở dữ liệu");
         }
     }
 
@@ -123,6 +93,7 @@ public class DataBackupService {
             }
         } catch (Exception e) {
             log.error("Exception during delete old backup file", e);
+            throw new InvalidDataException("Hệ thống không thể thực hiện dọn dẹp backup cơ sở dữ liệu đã quá hạn");
         }
     }
 
@@ -130,10 +101,11 @@ public class DataBackupService {
         try {
             String zipFileName = "img_backup_" + LocalDate.now().format(DateTimeFormatter.ofPattern("ddMMyyyy")) + ".zip";
 
-            zipFolder(fileDirectory, backupDirectory);
-            System.out.println("Backup successful. Zip file created: " + backupDirectory);
+            zipFolder(fileDirectory, String.join(DataFormat.BACKSLASH_SEPARATOR, backupDirectory, zipFileName));
+            log.info("Backup successful. Zip file created: " + backupDirectory);
         } catch (IOException e) {
             log.error("Error during backup", e);
+            throw new InvalidDataException("Hệ thống không thể thực hiện backup tệp ảnh");
         }
     }
 
@@ -145,6 +117,9 @@ public class DataBackupService {
         ) {
             File sourceFolder = new File(sourceFolderPath);
             addFolderToZip(sourceFolder, sourceFolder.getName(), zos);
+        } catch (Exception e) {
+            log.error("Error during zip file", e);
+            throw new InvalidDataException("Hệ thống không thể nén backup tệp ảnh");
         }
     }
 
@@ -166,6 +141,9 @@ public class DataBackupService {
                     }
 
                     zos.closeEntry();
+                } catch (Exception e) {
+                    log.error("Error during zip file", e);
+                    throw new InvalidDataException("Hệ thống không thể nén backup tệp ảnh");
                 }
             }
         }

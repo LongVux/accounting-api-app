@@ -1,6 +1,7 @@
 package com.outwork.accountingapiapp.services;
 
 import com.outwork.accountingapiapp.exceptions.DuplicatedValueException;
+import com.outwork.accountingapiapp.exceptions.InvalidDataException;
 import com.outwork.accountingapiapp.models.entity.BranchEntity;
 import com.outwork.accountingapiapp.models.payload.requests.SaveBranchRequest;
 import com.outwork.accountingapiapp.models.payload.responses.SuggestedBranch;
@@ -22,6 +23,8 @@ public class BranchService {
     public static final String ERROR_MSG_BRANCH_NAME_EXISTED = "Tên chi nhánh đã tồn tại";
     public static final String ERROR_MSG_BRANCH_CODE_EXISTED = "Mã chi nhánh đã tồn tại";
     public static final String ERROR_MSG_BRANCH_PHONE_NUMBER_EXISTED = "Số điện thoại chi nhánh đã tồn tại";
+
+    public static final String ERROR_MSG_CANNOT_DELETE = "Dữ liệu này đã được sử dụng trong hệ thống, không thể xóa!";
 
     @Autowired
     private BranchRepository branchRepository;
@@ -54,6 +57,15 @@ public class BranchService {
 
         return branchRepository.save(savedBranch);
     }
+
+    public void deleteBranch (@NotNull UUID branchId) {
+        try {
+            branchRepository.deleteById(branchId);
+        } catch (Exception e) {
+            throw new InvalidDataException(ERROR_MSG_CANNOT_DELETE);
+        }
+    }
+
 
     public void mapSaveBranchRequestToEntity (SaveBranchRequest request, BranchEntity branch) {
         branch.setName(request.getName());

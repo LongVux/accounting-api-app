@@ -1,6 +1,7 @@
 package com.outwork.accountingapiapp.services;
 
 import com.outwork.accountingapiapp.exceptions.DuplicatedValueException;
+import com.outwork.accountingapiapp.exceptions.InvalidDataException;
 import com.outwork.accountingapiapp.models.entity.CardTypeEntity;
 import com.outwork.accountingapiapp.models.entity.CustomerCardEntity;
 import com.outwork.accountingapiapp.models.entity.CustomerEntity;
@@ -23,6 +24,7 @@ import java.util.UUID;
 @Service
 public class CustomerCardService {
     public static final String ERROR_MSG_CUSTOMER_CARD_NUMBER_EXISTED = "Số tài khoản thẻ đã tồn tại";
+    public static final String ERROR_MSG_CANNOT_DELETE = "Dữ liệu này đã được sử dụng trong hệ thống, không thể xóa!";
 
     @Autowired
     private CustomerCardRepository customerCardRepository;
@@ -55,7 +57,12 @@ public class CustomerCardService {
     }
 
     public void deleteCustomerCard (@NotNull UUID id) {
-        customerCardRepository.deleteById(id);
+        try {
+            customerCardRepository.deleteById(id);
+        } catch (Exception e) {
+            throw new InvalidDataException(ERROR_MSG_CANNOT_DELETE);
+        }
+
     }
 
     public void mapSaveCustomerCardRequestToEntity (SaveCustomerCardRequest request, CustomerCardEntity customerCard) {

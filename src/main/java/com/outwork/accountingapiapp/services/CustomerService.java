@@ -2,6 +2,7 @@ package com.outwork.accountingapiapp.services;
 
 import com.outwork.accountingapiapp.constants.DataFormat;
 import com.outwork.accountingapiapp.exceptions.DuplicatedValueException;
+import com.outwork.accountingapiapp.exceptions.InvalidDataException;
 import com.outwork.accountingapiapp.models.entity.CustomerEntity;
 import com.outwork.accountingapiapp.models.payload.requests.GetCustomerTableItemRequest;
 import com.outwork.accountingapiapp.models.payload.requests.SaveCustomerRequest;
@@ -25,6 +26,7 @@ import java.util.UUID;
 public class CustomerService {
     public static final String ERROR_MSG_CUSTOMER_PHONE_EXISTED = "Số điện thoại khách hàng đã tồn tại";
     public static final String ERROR_MSG_CUSTOMER_NATION_ID_EXISTED = "Số thẻ căn cước công dân đã tồn tại";
+    public static final String ERROR_MSG_CANNOT_DELETE = "Dữ liệu này đã được sử dụng trong hệ thống, không thể xóa!";
 
     @Autowired
     private CustomerRepository customerRepository;
@@ -51,7 +53,12 @@ public class CustomerService {
     }
 
     public void deleteCustomerEntity (@NotNull UUID id) {
-        customerRepository.deleteById(id);
+        try {
+            customerRepository.deleteById(id);
+        } catch (Exception e) {
+            throw new InvalidDataException(ERROR_MSG_CANNOT_DELETE);
+        }
+
     }
 
     public void mapSaveCustomerRequestToEntity (SaveCustomerRequest request, CustomerEntity customer) {

@@ -34,6 +34,8 @@ public class PosService {
     public static final String ERROR_MSG_ONLY_POSES_SUPPORT_GIVEN_CARD = "Trong bill, chỉ có các POS sau hỗ trợ loại thẻ này: %s";
     public static final String ERROR_MSG_POS_HAS_NO_CARD_TYPE = "POS phải hỗ trợ ít nhất một loại thẻ";
 
+    public static final String ERROR_MSG_CANNOT_DELETE = "Dữ liệu này đã được sử dụng trong hệ thống, không thể xóa!";
+
     @Autowired
     private PosRepository posRepository;
 
@@ -81,7 +83,11 @@ public class PosService {
     }
 
     public void deletePos (@NotNull UUID id) {
-        posRepository.deleteById(id);
+        try {
+            posRepository.deleteById(id);
+        } catch (Exception e) {
+            throw new InvalidDataException(ERROR_MSG_CANNOT_DELETE);
+        }
     }
 
     public double getPosFeeByCardType (PosEntity pos, CardTypeEntity cardType) {

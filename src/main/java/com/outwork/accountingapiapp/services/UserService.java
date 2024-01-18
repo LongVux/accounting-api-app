@@ -28,8 +28,10 @@ public class UserService {
     public static final String ERROR_MSG_EMAIL_EXISTED = "Email đã tồn tại";
     public static final String ERROR_MSG_PHONE_NAME_EXISTED = "Số điện thoại đã tồn tại";
     public static final String ERROR_MSG_BRANCH_BANK_ACCOUNT_EXISTED = "Tài khoản ngân hàng đã tồn tại";
-    private String ERROR_MSG_SOME_ROLE_NOT_EXISTED = "Một số chức danh không tồn tại";
-    private String ERROR_MSG_SOME_BRANCH_NOT_EXISTED = "Một số chi nhánh không tồn tại";
+    public static final String ERROR_MSG_SOME_ROLE_NOT_EXISTED = "Một số chức danh không tồn tại";
+    public static final String ERROR_MSG_SOME_BRANCH_NOT_EXISTED = "Một số chi nhánh không tồn tại";
+
+    public static final String ERROR_MSG_CANNOT_DELETE = "Dữ liệu này đã được sử dụng trong hệ thống, không thể xóa!";
 
     @Autowired
     private UserRepository userRepository;
@@ -110,6 +112,10 @@ public class UserService {
         );
 
         return userRepository.save(user);
+    }
+
+    public void deleteUser (@NotNull UUID id) {
+        userRepository.deleteById(id);
     }
 
     private void validateSaveUserRequest (UserEntity user, List<UUID> roleIds, List<UUID> branchIds) {
