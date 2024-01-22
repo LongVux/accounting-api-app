@@ -45,6 +45,7 @@ public class MapBuilder {
         sorterMap.put(UserSortingEnum.code, UserEntity.FIELD_CODE);
         sorterMap.put(UserSortingEnum.email, UserEntity.FIELD_EMAIL);
         sorterMap.put(UserSortingEnum.phoneNumber, UserEntity.FIELD_PHONE_NUMBER);
+        sorterMap.put(UserSortingEnum.accountBalance, UserEntity.FIELD_ACCOUNT_BALANCE);
 
         return sorterMap;
     }

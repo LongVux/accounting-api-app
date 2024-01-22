@@ -5,4 +5,5 @@ public enum UserSortingEnum {
     code,
     email,
     phoneNumber,
+    accountBalance,
 }

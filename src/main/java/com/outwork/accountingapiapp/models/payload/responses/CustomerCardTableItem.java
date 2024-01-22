@@ -24,7 +24,7 @@ public interface CustomerCardTableItem {
 
     int getPaymentLimit();
 
-    Date getPaymentDueDate();
+    int getPaymentDueDate();
 
     SuggestedCardType getCardType();
 

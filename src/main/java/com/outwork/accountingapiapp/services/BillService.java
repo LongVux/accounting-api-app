@@ -133,7 +133,7 @@ public class BillService {
         double moneyAmount = 0d;
 
         for (BillEntity bill : bills) {
-            moneyAmount += bill.getMoneyAmount()*(1 - bill.getPosFeeStamp() / 100);
+            moneyAmount += bill.getEstimatedReturnFromBank();
 
             if (moneyAmount > request.getMoneyAmount() + request.getDelta()) {
                 break;
@@ -158,7 +158,7 @@ public class BillService {
         }
 
         bills.forEach(bill -> {
-           bill.setReturnFromBank(bill.getMoneyAmount()*(1 - bill.getPosFeeStamp() / 100));
+           bill.setReturnFromBank(bill.getEstimatedReturnFromBank());
            bill.setReturnedTime(new Date());
         });
 

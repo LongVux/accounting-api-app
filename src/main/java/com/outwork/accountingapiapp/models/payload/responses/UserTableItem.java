@@ -17,6 +17,7 @@ public class UserTableItem {
     private String phoneNumber;
     private String branchCode;
     private String roleTitle;
+    private double accountBalance;
 
     public UserTableItem(UserEntity user) {
         this.id = user.getId();
@@ -26,5 +27,6 @@ public class UserTableItem {
         this.phoneNumber = user.getPhoneNumber();
         this.branchCode = String.join(DataFormat.DEFAULT_SEPARATOR, user.getBranches().stream().map(BranchEntity::getCode).toList());
         this.roleTitle = String.join(DataFormat.DEFAULT_SEPARATOR, user.getRoles().stream().map(RoleEntity::getTitle).toList());
+        this.accountBalance = user.getAccountBalance();
     }
 }

@@ -80,7 +80,7 @@ public class ReceiptService {
         ReceiptEntity savedReceipt = ObjectUtils.isEmpty(id) ? new ReceiptEntity() : getReceipt(id);
 
         savedReceipt.setPercentageFee(request.getPercentageFee());
-        savedReceipt.setShipmentFee(request.getShipmentFee());
+        savedReceipt.setShipmentFee(Optional.of(request.getShipmentFee()).orElse(0d));
         savedReceipt.setIntake(request.getIntake());
         savedReceipt.setPayout(request.getPayout());
         savedReceipt.setLoan(request.getLoan());
@@ -196,7 +196,7 @@ public class ReceiptService {
 
     private void estimateReceiptProfit (ReceiptEntity receipt) {
         double estimatedProfit = receipt.getBills().stream()
-                .map(bill -> bill.getFee() - bill.getMoneyAmount()*(1 - bill.getPosFeeStamp() / 100))
+                .map(bill -> bill.getFee() - bill.getEstimatedReturnFromBank())
                 .mapToDouble(Double::doubleValue)
                 .sum()
                 + receipt.getShipmentFee();

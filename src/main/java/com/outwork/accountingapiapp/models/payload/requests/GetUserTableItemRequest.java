@@ -8,7 +8,6 @@ import com.outwork.accountingapiapp.models.entity.UserEntity;
 import com.outwork.accountingapiapp.utils.MapBuilder;
 import jakarta.annotation.Nullable;
 import jakarta.persistence.criteria.*;
-import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.springframework.data.jpa.domain.Specification;
@@ -42,6 +41,12 @@ public class GetUserTableItemRequest extends SortedPagination<UserSortingEnum> i
 
     @Nullable
     private String roleTitle;
+
+    @Nullable
+    private Double fromAccountBalance;
+
+    @Nullable
+    private Double toAccountBalance;
 
 
     @Override
@@ -104,6 +109,15 @@ public class GetUserTableItemRequest extends SortedPagination<UserSortingEnum> i
             predicates.add(criteriaBuilder.like(
                     root.join (UserEntity.FIELD_ROLES).get(RoleEntity.FIELD_TITLE),
                     String.format(DataFormat.LIKE_QUERY_FORMAT, roleTitle)
+            ));
+        }
+
+        if (!ObjectUtils.isEmpty(fromAccountBalance) && !ObjectUtils.isEmpty(toAccountBalance)) {
+            predicates.add(criteriaBuilder.between(
+                    root
+                            .get(UserEntity.FIELD_ACCOUNT_BALANCE),
+                    fromAccountBalance,
+                    toAccountBalance
             ));
         }
 

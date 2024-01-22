@@ -2,7 +2,9 @@ package com.outwork.accountingapiapp.models.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.outwork.accountingapiapp.constants.DataConstraint;
+import com.outwork.accountingapiapp.utils.Util;
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.util.ObjectUtils;
@@ -50,6 +52,7 @@ public class BillEntity extends Auditable<String> {
     private double posFeeStamp;
 
     @Column(nullable = false)
+    @Setter(AccessLevel.NONE)
     private double returnFromBank;
 
     @Temporal(TemporalType.TIMESTAMP)
@@ -72,5 +75,13 @@ public class BillEntity extends Auditable<String> {
             bill.setReceipt(receipt);
         }
         return bill;
+    }
+
+    public void setReturnFromBank (double returnFromBank) {
+        this.returnFromBank = Util.numberStandardRound(returnFromBank);
+    }
+
+    public double getEstimatedReturnFromBank () {
+        return Util.numberStandardRound(this.getMoneyAmount()*(1 - this.getPosFeeStamp() / 100));
     }
 }

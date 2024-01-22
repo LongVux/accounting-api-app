@@ -45,12 +45,10 @@ public class GetCustomerCardTableItemRequest extends SortedPagination<CustomerCa
     private Integer toPaymentLimit;
 
     @Nullable
-    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-    private Date fromPaymentDueDate;
+    private int fromPaymentDueDate;
 
     @Nullable
-    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-    private Date toPaymentDueDate;
+    private int toPaymentDueDate;
 
 
     @Override

@@ -33,12 +33,8 @@ public class SaveReceiptRequest {
     )
     private double percentageFee;
 
-    @Min(
-            value = 0,
-            message = "{msg.err.double.min}"
-    )
     @DoubleStep(value = 1000)
-    private int shipmentFee;
+    private double shipmentFee;
 
     @Min(
             value = 0,

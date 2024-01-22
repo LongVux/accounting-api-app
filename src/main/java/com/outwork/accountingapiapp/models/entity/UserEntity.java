@@ -23,7 +23,8 @@ public class UserEntity {
     public static final String FIELD_PHONE_NUMBER = "phoneNumber";
     public static final String FIELD_BRANCHES = "branches";
     public static final String FIELD_ROLES = "roles";
-    public static final String SALARY = "salary";
+    public static final String FIELD_SALARY = "salary";
+    public static final String FIELD_ACCOUNT_BALANCE = "accountBalance";
 
     public static final String ERROR_MSG_ACCOUNT_BALANCE_NOT_ENOUGH = "Số dư tài khoản không đủ để thực hiện hành động này";
 
@@ -53,7 +54,7 @@ public class UserEntity {
     private String bank;
 
     @Setter(AccessLevel.NONE)
-    private double accountBalance;
+    private Double accountBalance;
 
     @JsonIgnore
     @Column(nullable = false)

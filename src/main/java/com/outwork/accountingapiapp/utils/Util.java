@@ -88,9 +88,9 @@ public class Util {
                 ));
     }
 
-//    public static double numberStandardRound (double number) {
-//        return Math.round(number);
-//    }
+    public static double numberStandardRound (double number) {
+        return Math.round(number);
+    }
 //
 //    public static double moneyStandardRound (double money) {
 //        return numberStandardRound(money / 1000)*1000;

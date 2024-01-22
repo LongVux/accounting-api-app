@@ -38,7 +38,7 @@ public class BillTableItem {
         this.moneyAmount = bill.getMoneyAmount();
         this.fee = bill.getFee();
         this.posFeeStamp = bill.getPosFeeStamp();
-        this.estimateReturnFromBank = bill.getMoneyAmount()*(1 - bill.getPosFeeStamp() / 100);
+        this.estimateReturnFromBank = bill.getEstimatedReturnFromBank();
         this.returnFromBank = bill.getReturnFromBank();
         this.returnedTime = bill.getReturnedTime();
         this.posCode = bill.getPos().getCode();
