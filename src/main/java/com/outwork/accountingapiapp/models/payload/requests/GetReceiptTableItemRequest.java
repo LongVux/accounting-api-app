@@ -4,6 +4,7 @@ import com.outwork.accountingapiapp.constants.DataFormat;
 import com.outwork.accountingapiapp.constants.ReceiptSortingEnum;
 import com.outwork.accountingapiapp.constants.ReceiptStatusEnum;
 import com.outwork.accountingapiapp.models.entity.*;
+import com.outwork.accountingapiapp.utils.DateTimeUtils;
 import com.outwork.accountingapiapp.utils.MapBuilder;
 import jakarta.annotation.Nullable;
 import jakarta.persistence.criteria.CriteriaBuilder;
@@ -117,8 +118,8 @@ public class GetReceiptTableItemRequest extends SortedPagination<ReceiptSortingE
             predicates.add(criteriaBuilder.between(
                     root
                             .get(ReceiptEntity.FIELD_CREATED_DATE),
-                    fromCreatedDate,
-                    toCreatedDate
+                    DateTimeUtils.atStartOfDay(fromCreatedDate),
+                    DateTimeUtils.atEndOfDay(toCreatedDate)
             ));
         }
 

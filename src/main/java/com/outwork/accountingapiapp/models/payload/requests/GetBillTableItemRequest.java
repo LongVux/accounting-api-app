@@ -6,6 +6,7 @@ import com.outwork.accountingapiapp.models.entity.BillEntity;
 import com.outwork.accountingapiapp.models.entity.PosEntity;
 import com.outwork.accountingapiapp.models.entity.ReceiptEntity;
 import com.outwork.accountingapiapp.models.payload.responses.BillTableItem;
+import com.outwork.accountingapiapp.utils.DateTimeUtils;
 import com.outwork.accountingapiapp.utils.MapBuilder;
 import jakarta.annotation.Nullable;
 import jakarta.persistence.criteria.CriteriaBuilder;
@@ -87,8 +88,8 @@ public class GetBillTableItemRequest extends SortedPagination<BillSortingEnum> i
         if (!ObjectUtils.isEmpty(fromCreatedDate) && !ObjectUtils.isEmpty(toCreatedDate)) {
             predicates.add(criteriaBuilder.between(
                     root.get(BillEntity.FIELD_CREATED_DATE),
-                    fromCreatedDate,
-                    toCreatedDate
+                    DateTimeUtils.atStartOfDay(fromCreatedDate),
+                    DateTimeUtils.atEndOfDay(toCreatedDate)
             ));
         }
 
@@ -148,8 +149,8 @@ public class GetBillTableItemRequest extends SortedPagination<BillSortingEnum> i
         if (!ObjectUtils.isEmpty(fromReturnedTime) && !ObjectUtils.isEmpty(toReturnedTime)) {
             predicates.add(criteriaBuilder.between(
                     root.get(BillEntity.FIELD_RETURNED_TIME),
-                    fromCreatedDate,
-                    toCreatedDate
+                    DateTimeUtils.atStartOfDay(fromReturnedTime),
+                    DateTimeUtils.atEndOfDay(toReturnedTime)
             ));
         }
 

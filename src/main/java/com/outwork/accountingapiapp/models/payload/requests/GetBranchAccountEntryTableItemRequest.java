@@ -6,6 +6,7 @@ import com.outwork.accountingapiapp.constants.DataFormat;
 import com.outwork.accountingapiapp.constants.TransactionTypeEnum;
 import com.outwork.accountingapiapp.models.entity.BranchAccountEntryEntity;
 import com.outwork.accountingapiapp.models.entity.BranchEntity;
+import com.outwork.accountingapiapp.utils.DateTimeUtils;
 import com.outwork.accountingapiapp.utils.MapBuilder;
 import jakarta.annotation.Nullable;
 import jakarta.persistence.criteria.CriteriaBuilder;
@@ -68,8 +69,8 @@ public class GetBranchAccountEntryTableItemRequest extends SortedPagination<Bran
         if (!ObjectUtils.isEmpty(fromCreatedDate) && !ObjectUtils.isEmpty(toCreatedDate)) {
             predicates.add(criteriaBuilder.between(
                     root.get(BranchAccountEntryEntity.FIELD_CREATED_DATE),
-                    fromCreatedDate,
-                    toCreatedDate
+                    DateTimeUtils.atStartOfDay(fromCreatedDate),
+                    DateTimeUtils.atEndOfDay(toCreatedDate)
             ));
         }
 

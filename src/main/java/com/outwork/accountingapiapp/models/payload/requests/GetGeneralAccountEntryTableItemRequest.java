@@ -3,6 +3,7 @@ package com.outwork.accountingapiapp.models.payload.requests;
 import com.outwork.accountingapiapp.constants.*;
 import com.outwork.accountingapiapp.models.entity.GeneralAccountEntryEntity;
 import com.outwork.accountingapiapp.models.payload.responses.GeneralAccountEntryTableItem;
+import com.outwork.accountingapiapp.utils.DateTimeUtils;
 import com.outwork.accountingapiapp.utils.MapBuilder;
 import jakarta.annotation.Nullable;
 import jakarta.persistence.criteria.CriteriaBuilder;
@@ -62,8 +63,8 @@ public class GetGeneralAccountEntryTableItemRequest extends SortedPagination<Gen
         if (!ObjectUtils.isEmpty(fromCreatedDate) && !ObjectUtils.isEmpty(toCreatedDate)) {
             predicates.add(criteriaBuilder.between(
                     root.get(GeneralAccountEntryEntity.FIELD_CREATED_DATE),
-                    fromCreatedDate,
-                    toCreatedDate
+                    DateTimeUtils.atStartOfDay(fromCreatedDate),
+                    DateTimeUtils.atEndOfDay(toCreatedDate)
             ));
         }
 

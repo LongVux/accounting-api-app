@@ -17,7 +17,7 @@ public class UserTableItem {
     private String phoneNumber;
     private String branchCode;
     private String roleTitle;
-    private double accountBalance;
+    private Double accountBalance;
 
     public UserTableItem(UserEntity user) {
         this.id = user.getId();
