@@ -45,10 +45,10 @@ public class GetCustomerCardTableItemRequest extends SortedPagination<CustomerCa
     private Integer toPaymentLimit;
 
     @Nullable
-    private int fromPaymentDueDate;
+    private Integer fromPaymentDueDate;
 
     @Nullable
-    private int toPaymentDueDate;
+    private Integer toPaymentDueDate;
 
 
     @Override
