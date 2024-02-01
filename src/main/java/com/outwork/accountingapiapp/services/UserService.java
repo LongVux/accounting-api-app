@@ -78,6 +78,7 @@ public class UserService {
         newUser.setBranches(branchEntities);
         newUser.setRoles(roleEntities);
         newUser.setSalary(request.getSalary());
+        newUser.setAccountBalance(0);
 
         validateSaveUserRequest(newUser, request.getRoleIds(), request.getBranchIds());
 
