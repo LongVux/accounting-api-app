@@ -36,6 +36,7 @@ public class BillService {
     public static final String ERROR_MSG_BILL_PROFIT_LOSES = "Lọi nhuân bill bị lỗ vì phí POS %s %.2f lớn hơn phí Bill %.2f";
     public static final String ERROR_MSG_SOME_BILL_IDS_NOT_FOUND = "Một số bill không tồn tại";
     public static final String ERROR_MSG_SOME_BILL_INVALID_TO_MATCH = "Một số bill không hợp lệ để kết toán";
+    public static final String ERROR_MSG_POS_DOES_NOT_SUPPORT_CARD = "Pos $s không hỗ trợ thanh toán thẻ loại này";
 
     @Autowired
     private BillRepository billRepository;
@@ -93,10 +94,17 @@ public class BillService {
             savedBill.setFee(request.getFee());
 
             savedBill.setPos(posMap.get(request.getPosId()));
-            savedBill.setPosFeeStamp(posService.getPosFeeByCardType(
+
+            double posFee = posService.getPosFeeByCardType(
                     savedBill.getPos(),
                     savedReceipt.getCustomerCard().getCardType()
-            ));
+            );
+
+            if (Double.isNaN(posFee) || posFee == 0) {
+                throw new InvalidDataException(String.format(ERROR_MSG_POS_DOES_NOT_SUPPORT_CARD, posMap.get(request.getPosId()).getCode()));
+            }
+
+            savedBill.setPosFeeStamp(posFee);
 
             validateReceiptBillForSave(savedBill);
 
@@ -133,11 +141,11 @@ public class BillService {
         double moneyAmount = 0d;
 
         for (BillEntity bill : bills) {
-            moneyAmount += bill.getEstimatedReturnFromBank();
-
-            if (moneyAmount > request.getMoneyAmount() + request.getDelta()) {
-                break;
+            if (bill.getEstimatedReturnFromBank() > request.getMoneyAmount() || moneyAmount + bill.getEstimatedReturnFromBank() > request.getMoneyAmount()) {
+                continue;
             }
+
+            moneyAmount += bill.getEstimatedReturnFromBank();
 
             responseList.add(bill);
         }

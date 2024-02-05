@@ -1,11 +1,13 @@
 package com.outwork.accountingapiapp.models.payload.requests;
 
 import com.outwork.accountingapiapp.constants.DataConstraint;
+import com.outwork.accountingapiapp.utils.validator.DoubleStep;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.util.Date;
 import java.util.UUID;
@@ -41,6 +43,7 @@ public class SaveCustomerCardRequest {
             value = 1000,
             message = "{msg.err.double.min}"
     )
+    @DoubleStep(value = 1000)
     private int paymentLimit;
 
     @Min(
@@ -52,6 +55,12 @@ public class SaveCustomerCardRequest {
             message = "{msg.err.double.max}"
     )
     private int paymentDueDate;
+
+    @NotNull(message = "{msg.err.string.blank}")
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+    private Date expiredDate;
+
+    private String note;
 
     @NotNull(message = "{msg.err.string.blank}")
     private UUID customerId;

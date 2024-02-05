@@ -1,6 +1,7 @@
 package com.outwork.accountingapiapp.controllers;
 
 import com.outwork.accountingapiapp.models.entity.CustomerCardEntity;
+import com.outwork.accountingapiapp.models.payload.requests.AdjustPrePaidFeeRequest;
 import com.outwork.accountingapiapp.models.payload.requests.GetCustomerCardTableItemRequest;
 import com.outwork.accountingapiapp.models.payload.requests.SaveCustomerCardRequest;
 import com.outwork.accountingapiapp.models.payload.responses.CustomerCardTableItem;
@@ -33,9 +34,9 @@ public class CustomerCardController {
         return ResponseEntity.ok(customerCardService.getCustomerCardById(id));
     }
 
-    @GetMapping("/findByCustomerId/{customerId}")
+    @GetMapping("/findNonExpiredByCustomerId/{customerId}")
     public ResponseEntity<List<CustomerCardEntity>> getCustomerCardByCustomerId (@PathVariable @NotNull UUID customerId) {
-        return ResponseEntity.ok(customerCardService.findCustomerCardByCustomerId(customerId));
+        return ResponseEntity.ok(customerCardService.findNonExpiredCustomerCardByCustomerId(customerId));
     }
 
     @PostMapping
@@ -46,6 +47,11 @@ public class CustomerCardController {
     @PutMapping("/{id}")
     public ResponseEntity<CustomerCardEntity> updateCustomerCard (@RequestBody @Valid SaveCustomerCardRequest request, @PathVariable @NotNull UUID id) {
         return ResponseEntity.ok(customerCardService.saveCustomerCard(request, id));
+    }
+
+    @PutMapping("/adjustPrePaidFee")
+    public ResponseEntity<CustomerCardEntity> updatePrePaidFee (@RequestBody @Valid AdjustPrePaidFeeRequest request) {
+        return ResponseEntity.ok(customerCardService.adjustPrePaidFee(request));
     }
 
     @DeleteMapping("/{id}")

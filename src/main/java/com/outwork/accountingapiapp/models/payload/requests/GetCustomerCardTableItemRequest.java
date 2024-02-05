@@ -2,10 +2,12 @@ package com.outwork.accountingapiapp.models.payload.requests;
 
 import com.outwork.accountingapiapp.constants.CustomerCardSortingEnum;
 import com.outwork.accountingapiapp.constants.DataFormat;
+import com.outwork.accountingapiapp.models.entity.BranchAccountEntryEntity;
 import com.outwork.accountingapiapp.models.entity.CardTypeEntity;
 import com.outwork.accountingapiapp.models.entity.CustomerCardEntity;
 import com.outwork.accountingapiapp.models.entity.CustomerEntity;
 import com.outwork.accountingapiapp.models.payload.responses.CustomerCardTableItem;
+import com.outwork.accountingapiapp.utils.DateTimeUtils;
 import com.outwork.accountingapiapp.utils.MapBuilder;
 import jakarta.annotation.Nullable;
 import jakarta.persistence.criteria.CriteriaBuilder;
@@ -33,6 +35,9 @@ public class GetCustomerCardTableItemRequest extends SortedPagination<CustomerCa
     private List<UUID> cardTypeIds;
 
     @Nullable
+    private String accountNumber;
+
+    @Nullable
     private String bank;
 
     @Nullable
@@ -50,6 +55,13 @@ public class GetCustomerCardTableItemRequest extends SortedPagination<CustomerCa
     @Nullable
     private Integer toPaymentDueDate;
 
+    @Nullable
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+    private Date fromCreatedDate;
+
+    @Nullable
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+    private Date toCreatedDate;
 
     @Override
     Map<CustomerCardSortingEnum, String> getSorterMap() {
@@ -83,6 +95,13 @@ public class GetCustomerCardTableItemRequest extends SortedPagination<CustomerCa
             ));
         }
 
+        if (!ObjectUtils.isEmpty(accountNumber)) {
+            predicates.add(criteriaBuilder.like(
+                    root.get(CustomerCardEntity.FIELD_ACCOUNT_NUMBER),
+                    String.format(DataFormat.LIKE_QUERY_FORMAT, accountNumber)
+            ));
+        }
+
         if (!ObjectUtils.isEmpty(nationalId)) {
             predicates.add(criteriaBuilder.like(
                     root.get(CustomerCardEntity.FIELD_NATIONAL_ID),
@@ -110,6 +129,14 @@ public class GetCustomerCardTableItemRequest extends SortedPagination<CustomerCa
             predicates.add(
                     root.get(CustomerCardEntity.FIELD_CARD_TYPE).get(CardTypeEntity.FIELD_ID).in(cardTypeIds)
             );
+        }
+
+        if (!ObjectUtils.isEmpty(fromCreatedDate) && !ObjectUtils.isEmpty(toCreatedDate)) {
+            predicates.add(criteriaBuilder.between(
+                    root.get(CustomerCardEntity.FIELD_CREATED_DATE),
+                    DateTimeUtils.atStartOfDay(fromCreatedDate),
+                    DateTimeUtils.atEndOfDay(toCreatedDate)
+            ));
         }
 
         return criteriaBuilder.and(predicates.toArray(new Predicate[0]));

@@ -129,6 +129,7 @@ public class PosService {
         pos.setAccountNumber(request.getAccountNumber());
         pos.setBank(request.getBank());
         pos.setMaxBillAmount(request.getMaxBillAmount());
+        pos.setNote(request.getNote());
 
         posCardFeeService.buildPosCardFeesForPos(request.getSupportedCardTypes(), pos);
 

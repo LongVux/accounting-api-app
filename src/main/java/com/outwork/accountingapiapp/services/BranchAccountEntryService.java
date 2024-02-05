@@ -5,12 +5,10 @@ import com.outwork.accountingapiapp.constants.AccountEntryStatusEnum;
 import com.outwork.accountingapiapp.constants.TransactionTypeEnum;
 import com.outwork.accountingapiapp.exceptions.InvalidDataException;
 import com.outwork.accountingapiapp.models.entity.BranchAccountEntryEntity;
+import com.outwork.accountingapiapp.models.entity.CustomerCardEntity;
 import com.outwork.accountingapiapp.models.entity.ReceiptEntity;
 import com.outwork.accountingapiapp.models.entity.UserEntity;
-import com.outwork.accountingapiapp.models.payload.requests.GetBranchAccountEntryTableItemRequest;
-import com.outwork.accountingapiapp.models.payload.requests.SaveBranchAccountEntryRequest;
-import com.outwork.accountingapiapp.models.payload.requests.SaveReceiptEntryRequest;
-import com.outwork.accountingapiapp.models.payload.requests.SaveReceiptRepaymentEntryRequest;
+import com.outwork.accountingapiapp.models.payload.requests.*;
 import com.outwork.accountingapiapp.models.payload.responses.AccountEntrySumUpInfo;
 import com.outwork.accountingapiapp.models.payload.responses.BranchAccountEntryTableItem;
 import com.outwork.accountingapiapp.repositories.BillRepository;
@@ -31,8 +29,13 @@ import java.util.*;
 
 @Service
 public class BranchAccountEntryService {
-    public static final String ERROR_MSG_INVALID_ACTION_ON_ENTRY = "Không thể thực hiện hành động này trên bút toán được chọn";
+    public static final String ERROR_MSG_INVALID_ACTION_ON_ENTRY = "Không thể thực hiện hành động này trên bút toán " +
+            "được chọn";
     public static final String ERROR_MSG_IMAGE_IS_REQUIRED = "Bút toán muốn xác nhận thì phải có ảnh chứng từ";
+    public static final String ENTRY_TYPE_USING_PRE_PAID_FEE_FOR_RECEIPT = "HPU_%s";
+    public static final String ENTRY_TYPE_RETURN_PRE_PAID_FEE = "Hoàn phí đã ứng";
+    public static final String ENTRY_TYPE_COLLECT_PRE_PAID_FEE = "Thu phí muốn ứng";
+    public static final String EXPLANATION_ADJUST_PREPAID_FEE_FOR_CARD = "Thay đổi phí ứng trước của thẻ %s - %s - $s";
     @Autowired
     private BranchAccountEntryRepository branchAccountEntryRepository;
 
@@ -47,31 +50,57 @@ public class BranchAccountEntryService {
     private UserService userService;
 
     @Autowired
+    private CustomerCardService customerCardService;
+
+    @Autowired
     private Util util;
 
     @Transactional(rollbackFor = {Exception.class, Throwable.class})
-    public ReceiptEntity confirmReceiptEntry (@Valid SaveReceiptEntryRequest request) {
-        if (ObjectUtils.isEmpty(request.getReceiptId())) {
-            throw new InvalidDataException(ERROR_MSG_IMAGE_IS_REQUIRED);
-        }
-
+    public ReceiptEntity confirmReceiptEntry(@Valid SaveReceiptEntryRequest request) {
         ReceiptEntity receipt = receiptService.approveReceiptForEntry(request.getReceiptId());
 
-        List<BranchAccountEntryEntity> entities = generateBranchAccountEntriesFromReceipt(receipt, request);
+        handleCreateEntriesForReceipt(receipt, request);
 
-        UserEntity approver = AuditorAwareImpl.getUserFromSecurityContext();
+        handleAdjustBalanceForApprover(receipt);
 
-        approver.setAccountBalance(approver.getAccountBalance() + receipt.getIntake() - receipt.getPayout() - receipt.getLoan() + receipt.getRepayment());
-
-        userService.saveUserEntity(approver);
-
-        branchAccountEntryRepository.saveAll(entities);
+        if (receipt.isUsingCardPrePayFee()) {
+            handleAdjustBalanceForCard(receipt);
+        }
 
         return receipt;
     }
 
+    private void handleCreateEntriesForReceipt (ReceiptEntity receipt, SaveReceiptEntryRequest request) {
+        List<BranchAccountEntryEntity> entities = generateBranchAccountEntriesFromReceipt(receipt, request);
+        branchAccountEntryRepository.saveAll(entities);
+    }
+
+    private void handleAdjustBalanceForApprover (ReceiptEntity receipt) {
+        UserEntity approver = AuditorAwareImpl.getUserFromSecurityContext();
+
+        Double adjustedBalanceAmount = !receipt.isAcceptExceededFee() ? 0 :
+            !receipt.isUsingCardPrePayFee()? receipt.getIntake() :
+            receipt.getCustomerCard().getPrePaidFee();
+
+        adjustedBalanceAmount += - receipt.getPayout() - receipt.getLoan() + receipt.getRepayment();
+
+        approver.setAccountBalance(approver.getAccountBalance() + adjustedBalanceAmount);
+
+        userService.saveUserEntity(approver);
+    }
+
+    private void handleAdjustBalanceForCard (ReceiptEntity receipt) {
+        double adjustedBalanceAmount = !receipt.isAcceptExceededFee() ? 0 :
+                !receipt.isUsingCardPrePayFee()? receipt.getIntake() :
+                        receipt.getCustomerCard().getPrePaidFee();
+
+        receipt.getCustomerCard().setPrePaidFee(receipt.getCustomerCard().getPrePaidFee() - adjustedBalanceAmount);
+
+        customerCardService.saveCustomerCardEntity(receipt.getCustomerCard());
+    }
+
     @Transactional(rollbackFor = {Exception.class, Throwable.class})
-    public ReceiptEntity confirmRepayReceipt (@Valid SaveReceiptRepaymentEntryRequest request) {
+    public ReceiptEntity confirmRepayReceipt(@Valid SaveReceiptRepaymentEntryRequest request) {
         ReceiptEntity receipt = receiptService.repayReceiptForEntry(request);
 
         BranchAccountEntryEntity repaidEntry = new BranchAccountEntryEntity(
@@ -96,16 +125,47 @@ public class BranchAccountEntryService {
         return receipt;
     }
 
-    public BranchAccountEntryEntity getEntryById (@NotNull UUID id) {
+    public BranchAccountEntryEntity createCardAdjustPrePaidFeeEntry (CustomerCardEntity customerCard, AdjustPrePaidFeeRequest request) {
+        UserEntity editor = AuditorAwareImpl.getUserFromSecurityContext();
+        double adjustment = customerCard.getPrePaidFee() - request.getPrePaidFee();
+
+        if (adjustment == 0) {
+            return null;
+        }
+
+        BranchAccountEntryEntity entry = new BranchAccountEntryEntity();
+        entry.setEntryStatus(AccountEntryStatusEnum.APPROVED);
+        entry.setMoneyAmount(Math.abs(adjustment));
+        entry.setExplanation(String.format(EXPLANATION_ADJUST_PREPAID_FEE_FOR_CARD, customerCard.getName(), customerCard.getBank(), customerCard.getAccountNumber()));
+        entry.setImageId(request.getImageId());
+
+        if (adjustment < 0) {
+            entry.setEntryType(ENTRY_TYPE_RETURN_PRE_PAID_FEE);
+        }
+
+        if (adjustment > 0) {
+            entry.setEntryType(ENTRY_TYPE_COLLECT_PRE_PAID_FEE);
+        }
+
+        editor.setAccountBalance(editor.getAccountBalance() + adjustment);
+
+        userService.saveUserEntity(editor);
+
+        return branchAccountEntryRepository.save(entry);
+    }
+
+    public BranchAccountEntryEntity getEntryById(@NotNull UUID id) {
         return branchAccountEntryRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(id.toString()));
     }
 
-    public Page<BranchAccountEntryTableItem> getBranchAccountEntryTableItems (GetBranchAccountEntryTableItemRequest request) {
+    public Page<BranchAccountEntryTableItem> getBranchAccountEntryTableItems(GetBranchAccountEntryTableItemRequest request) {
         return branchAccountEntryRepository.findAll(request, request.retrievePageConfig()).map(BranchAccountEntryTableItem::new);
     }
 
-    public AccountEntrySumUpInfo getBranchAccountEntrySumUpInfo (GetBranchAccountEntryTableItemRequest request) {
-        Map<Object, Double> queryResult = util.getGroupedSumsBySpecification(request, BranchAccountEntryEntity.FIELD_TRANSACTION_TYPE, BranchAccountEntryEntity.FIELD_MONEY_AMOUNT, BranchAccountEntryEntity.class);
+    public AccountEntrySumUpInfo getBranchAccountEntrySumUpInfo(GetBranchAccountEntryTableItemRequest request) {
+        Map<Object, Double> queryResult = util.getGroupedSumsBySpecification(request,
+                BranchAccountEntryEntity.FIELD_TRANSACTION_TYPE, BranchAccountEntryEntity.FIELD_MONEY_AMOUNT,
+                BranchAccountEntryEntity.class);
 
         AccountEntrySumUpInfo response = new AccountEntrySumUpInfo();
 
@@ -118,8 +178,9 @@ public class BranchAccountEntryService {
         return response;
     }
 
-    public BranchAccountEntryEntity saveEntry (@Valid SaveBranchAccountEntryRequest request, UUID id) {
-        BranchAccountEntryEntity savedEntry = ObjectUtils.isEmpty(id) ? new BranchAccountEntryEntity() : getEntryById(id);
+    public BranchAccountEntryEntity saveEntry(@Valid SaveBranchAccountEntryRequest request, UUID id) {
+        BranchAccountEntryEntity savedEntry = ObjectUtils.isEmpty(id) ? new BranchAccountEntryEntity() :
+                getEntryById(id);
 
         savedEntry.setEntryType(request.getEntryType());
         savedEntry.setMoneyAmount(request.getMoneyAmount());
@@ -134,7 +195,7 @@ public class BranchAccountEntryService {
         return branchAccountEntryRepository.save(savedEntry);
     }
 
-    public BranchAccountEntryEntity approveEntry (@NotNull UUID id) {
+    public BranchAccountEntryEntity approveEntry(@NotNull UUID id) {
         BranchAccountEntryEntity approvedEntry = getEntryById(id);
 
         validateAccountEntryForModification(approvedEntry);
@@ -158,7 +219,7 @@ public class BranchAccountEntryService {
         return branchAccountEntryRepository.save(approvedEntry);
     }
 
-    public void deleteBranchAccountEntry (@NotNull UUID id) {
+    public void deleteBranchAccountEntry(@NotNull UUID id) {
         BranchAccountEntryEntity entry = getEntryById(id);
 
         validateAccountEntryForModification(entry);
@@ -178,7 +239,8 @@ public class BranchAccountEntryService {
         }
     }
 
-    private List<BranchAccountEntryEntity> generateBranchAccountEntriesFromReceipt (ReceiptEntity receipt, SaveReceiptEntryRequest request) {
+    private List<BranchAccountEntryEntity> generateBranchAccountEntriesFromReceipt(ReceiptEntity receipt,
+                                                                                   SaveReceiptEntryRequest request) {
         Map<TransactionTypeEnum, Double> receiptEntryMap = new HashMap<>();
 
         receiptEntryMap.put(TransactionTypeEnum.INTAKE, receipt.getIntake());
@@ -186,29 +248,52 @@ public class BranchAccountEntryService {
         receiptEntryMap.put(TransactionTypeEnum.LOAN, receipt.getLoan());
         receiptEntryMap.put(TransactionTypeEnum.REPAYMENT, receipt.getRepayment());
 
-        return receiptEntryMap.keySet().stream()
-                .filter(key -> Optional.ofNullable(receiptEntryMap.get(key)).orElse(0d) != 0d)
-                .map(key -> new BranchAccountEntryEntity(
-                        receipt,
-                        request.getExplanation(),
-                        key,
-                        receiptEntryMap.get(key),
-                        request.getImageId()
-                ))
-                .peek(entry -> {
-                    entry.setEntryCode(getNewBranchEntryCode(entry));
-                    entry.setEntryStatus(AccountEntryStatusEnum.APPROVED);
-                })
-                .toList();
+        List<BranchAccountEntryEntity> entries = new ArrayList<>(receiptEntryMap.keySet().stream()
+            .filter(key -> Optional.ofNullable(receiptEntryMap.get(key)).orElse(0d) != 0d)
+            .map(key -> new BranchAccountEntryEntity(
+                    receipt,
+                    request.getExplanation(),
+                    key,
+                    receiptEntryMap.get(key),
+                    request.getImageId()
+            ))
+            .peek(entry -> {
+                entry.setEntryCode(getNewBranchEntryCode(entry));
+                entry.setEntryStatus(AccountEntryStatusEnum.APPROVED);
+            })
+            .toList());
+
+        if (receipt.isUsingCardPrePayFee() && receipt.getIntake() > 0) {
+            BranchAccountEntryEntity deductPrePaidFeeEntry = new BranchAccountEntryEntity(
+                    receipt,
+                    request.getExplanation(),
+                    TransactionTypeEnum.PAYOUT,
+                    0,
+                    request.getImageId()
+            );
+
+            deductPrePaidFeeEntry.setEntryType(String.format(ENTRY_TYPE_USING_PRE_PAID_FEE_FOR_RECEIPT, receipt.getCode()));
+
+            if (receipt.isAcceptExceededFee()) {
+                deductPrePaidFeeEntry.setMoneyAmount(receipt.getCustomerCard().getPrePaidFee());
+            } else {
+                deductPrePaidFeeEntry.setMoneyAmount(receipt.getIntake());
+            }
+
+            entries.add(deductPrePaidFeeEntry);
+        }
+
+        return entries;
     }
 
-    private String getNewBranchEntryCode (BranchAccountEntryEntity entry) {
-        Optional<BranchAccountEntryEntity> latestEntry = branchAccountEntryRepository.findFirstByEntryCodeNotNullAndBranchAndTransactionTypeAndCreatedDateBetweenOrderByCreatedDateDesc(
-                entry.getBranch(),
-                entry.getTransactionType(),
-                DateTimeUtils.atStartOfDay(new Date()),
-                DateTimeUtils.atEndOfDay(new Date())
-        );
+    private String getNewBranchEntryCode(BranchAccountEntryEntity entry) {
+        Optional<BranchAccountEntryEntity> latestEntry =
+                branchAccountEntryRepository.findFirstByEntryCodeNotNullAndBranchAndTransactionTypeAndCreatedDateBetweenOrderByCreatedDateDesc(
+                        entry.getBranch(),
+                        entry.getTransactionType(),
+                        DateTimeUtils.atStartOfDay(new Date()),
+                        DateTimeUtils.atEndOfDay(new Date())
+                );
 
         return BranchAccountEntryCodeHandler.generateAccountEntryCode(
                 entry.getBranch().getCode(),

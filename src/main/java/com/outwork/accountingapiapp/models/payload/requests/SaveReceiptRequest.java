@@ -69,4 +69,9 @@ public class SaveReceiptRequest {
 
     private List<@Valid ReceiptBill> receiptBills;
 
+    private String note;
+
+    private boolean usingCardPrePayFee;
+
+    private boolean acceptExceededFee;
 }

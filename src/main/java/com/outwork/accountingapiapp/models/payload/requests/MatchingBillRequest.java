@@ -16,6 +16,5 @@ public class MatchingBillRequest {
     @NotBlank(message = "{msg.err.string.blank}")
     private String explanation;
 
-    @NotBlank(message = "{msg.err.string.blank}")
     private String imageId;
 }

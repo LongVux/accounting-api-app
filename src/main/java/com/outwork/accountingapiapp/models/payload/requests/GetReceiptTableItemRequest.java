@@ -42,7 +42,10 @@ public class GetReceiptTableItemRequest extends SortedPagination<ReceiptSortingE
     private String receiptCode;
 
     @Nullable
-    private String cardName;
+    private String customerName;
+
+    @Nullable
+    private UUID customerCardId;
 
     @Nullable
     private Double fromTransactionTotal;
@@ -130,12 +133,22 @@ public class GetReceiptTableItemRequest extends SortedPagination<ReceiptSortingE
             ));
         }
 
-        if (!ObjectUtils.isEmpty(cardName)) {
+        if (!ObjectUtils.isEmpty(customerName)) {
             predicates.add(criteriaBuilder.like(
                     root
                             .get(ReceiptEntity.FIELD_CUSTOMER_CARD)
-                            .get(CustomerCardEntity.FIELD_NAME),
-                    String.format(DataFormat.LIKE_QUERY_FORMAT, cardName)
+                            .get(CustomerCardEntity.FIELD_CUSTOMER)
+                            .get(CustomerEntity.FIELD_NAME),
+                    String.format(DataFormat.LIKE_QUERY_FORMAT, customerName)
+            ));
+        }
+
+        if (!ObjectUtils.isEmpty(customerCardId)) {
+            predicates.add(criteriaBuilder.equal(
+                    root
+                            .get(ReceiptEntity.FIELD_CUSTOMER_CARD)
+                            .get(CustomerCardEntity.FIELD_ID),
+                    String.format(DataFormat.LIKE_QUERY_FORMAT, customerCardId)
             ));
         }
 

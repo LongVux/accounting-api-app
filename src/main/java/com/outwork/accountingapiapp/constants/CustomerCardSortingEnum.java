@@ -7,4 +7,6 @@ public enum CustomerCardSortingEnum {
     bank,
     paymentLimit,
     paymentDueDate,
+    accountNumber,
+    createdDate
 }

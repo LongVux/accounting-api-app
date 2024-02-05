@@ -34,7 +34,9 @@ public class ReceiptService {
     public static final String ERROR_MSG_RECEIPT_HAS_NO_BILL = "Hóa đơn phải chứa tối thiểu một bill";
     public static final String ERROR_MSG_RECEIPT_NOT_HAVE_CODE = "Hóa đơn chưa được tạo mã. Không thể xử lý";
     public static final String ERROR_MSG_IMAGE_IS_REQUIRED = "Hóa đơn muốn xác nhận thì phải có ảnh chứng từ";
-
+    public static final String ERROR_MSG_EXPIRED_CUSTOMER_CARD = "Thẻ khách đã hết hạn, không thể dùng cho hóa đơn này";
+    public static final String ERROR_MSG_INTAKE_EXCEED_PRE_PAID_FEE = "Số tiền phải thu của hóa đơn vượt quá phí đã ứng của thẻ khách";
+    public static final String ERROR_MSG_USER_CANNOT_USE_PRE_PAID_FEE = "Người xác nhận chi trả hóa đơn với tiền đã ứng phải là %s";
     @Autowired
     private ReceiptRepository receiptRepository;
 
@@ -89,6 +91,9 @@ public class ReceiptService {
         savedReceipt.setEmployee(AuditorAwareImpl.getUserFromSecurityContext());
         savedReceipt.setBranch(branchService.getBranchById(request.getBranchId()));
         savedReceipt.setCustomerCard(customerCardService.getCustomerCardById(request.getCustomerCardId()));
+        savedReceipt.setNote(request.getNote());
+        savedReceipt.setUsingCardPrePayFee(request.isUsingCardPrePayFee());
+        savedReceipt.setAcceptExceededFee(request.isAcceptExceededFee());
 
         billService.buildBillsForReceipt(request.getReceiptBills(), savedReceipt);
 
@@ -163,6 +168,10 @@ public class ReceiptService {
             throw new InvalidDataException(ERROR_MSG_RECEIPT_OVER_CARD_LIMIT);
         }
 
+        if (receipt.getCustomerCard().getExpiredDate().before(new Date())) {
+            throw new InvalidDataException(ERROR_MSG_EXPIRED_CUSTOMER_CARD);
+        }
+
         validateReceiptBalance(receipt);
     }
 
@@ -170,16 +179,27 @@ public class ReceiptService {
         if (ObjectUtils.isEmpty(receipt.getImageId())) {
             throw new InvalidDataException(ERROR_MSG_IMAGE_IS_REQUIRED);
         }
+
+        UserEntity approver = AuditorAwareImpl.getUserFromSecurityContext();
+
+        if (receipt.isUsingCardPrePayFee() && !Objects.equals(receipt.getCustomerCard().getPrePaidFeeReceiverCode(), approver.getCode())) {
+            throw new InvalidDataException(String.format(ERROR_MSG_USER_CANNOT_USE_PRE_PAID_FEE, receipt.getCustomerCard().getPrePaidFeeReceiverCode()));
+        }
+
+        if (receipt.isUsingCardPrePayFee() && !receipt.isAcceptExceededFee() && receipt.getIntake() < receipt.getCustomerCard().getPrePaidFee()) {
+            throw new InvalidDataException(ERROR_MSG_INTAKE_EXCEED_PRE_PAID_FEE);
+        }
     }
 
     private void validateReceiptBalance (ReceiptEntity receipt) {
-        double totalFee = receipt.getBills().stream().mapToDouble(BillEntity::getFee).sum() + receipt.getShipmentFee();
+        double totalBillFee = receipt.getBills().stream().mapToDouble(BillEntity::getFee).sum();
+        double totalBillAfterFee = receipt.getBills().stream().mapToDouble(bill -> bill.getMoneyAmount() - bill.getFee()).sum();
 
-        if (receipt.getTransactionTotal() < totalFee + receipt.getPayout() - receipt.getIntake() - receipt.getLoan()) {
+        if (receipt.getTransactionTotal() < totalBillFee + receipt.getShipmentFee() + receipt.getPayout() - receipt.getIntake() - receipt.getLoan()) {
             throw new InvalidDataException(ERROR_MSG_IMBALANCED_RECEIPT);
         }
 
-        if (totalFee > receipt.getIntake() + receipt.getLoan()) {
+        if (receipt.getPayout() < totalBillAfterFee - receipt.getShipmentFee()) {
             throw new InvalidDataException(ERROR_MSG_IMBALANCED_RECEIPT);
         }
     }
@@ -205,12 +225,13 @@ public class ReceiptService {
     }
 
     private void calculateReceiptProfit (ReceiptEntity receipt) {
-        double billProfitSum = receipt.getBills().stream()
+        double billReceiveSum = receipt.getBills().stream()
+                .filter(bill -> !ObjectUtils.isEmpty(bill.getReturnedTime()))
                 .map(BillEntity::getReturnFromBank)
                 .mapToDouble(Double::doubleValue)
                 .sum();
 
-        receipt.setCalculatedProfit(billProfitSum - receipt.getLoan() + receipt.getRepayment() + receipt.getShipmentFee());
+        receipt.setCalculatedProfit(billReceiveSum + receipt.getIntake() - receipt.getPayout() - receipt.getLoan() + receipt.getRepayment());
     }
 
     private void assignNewReceiptCode (ReceiptEntity receipt) {

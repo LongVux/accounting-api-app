@@ -48,4 +48,6 @@ public class SavePosRequest {
     private int maxBillAmount;
 
     private List<@Valid SupportedCardType> supportedCardTypes;
+
+    private String note;
 }

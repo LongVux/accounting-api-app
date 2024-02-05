@@ -68,6 +68,8 @@ public class MapBuilder {
         sorterMap.put(CustomerCardSortingEnum.customerName, String.join(DataFormat.DOT_SEPARATOR, CustomerCardEntity.FIELD_CUSTOMER, CustomerEntity.FIELD_NAME));
         sorterMap.put(CustomerCardSortingEnum.paymentLimit, CustomerCardEntity.FIELD_PAYMENT_LIMIT);
         sorterMap.put(CustomerCardSortingEnum.paymentDueDate, CustomerCardEntity.FIELD_PAYMENT_DUE_DATE);
+        sorterMap.put(CustomerCardSortingEnum.createdDate, CustomerCardEntity.FIELD_CREATED_DATE);
+        sorterMap.put(CustomerCardSortingEnum.accountNumber, CustomerCardEntity.FIELD_ACCOUNT_NUMBER);
 
         return sorterMap;
     }
