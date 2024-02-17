@@ -22,4 +22,7 @@ public class AdjustPrePaidFeeRequest {
 
     @NotNull(message = "{msg.err.string.blank}")
     private String imageId;
+
+    @NotNull(message = "{msg.err.string.blank}")
+    private UUID branchId;
 }

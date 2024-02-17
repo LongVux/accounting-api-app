@@ -148,7 +148,7 @@ public class GetReceiptTableItemRequest extends SortedPagination<ReceiptSortingE
                     root
                             .get(ReceiptEntity.FIELD_CUSTOMER_CARD)
                             .get(CustomerCardEntity.FIELD_ID),
-                    String.format(DataFormat.LIKE_QUERY_FORMAT, customerCardId)
+                    customerCardId
             ));
         }
 

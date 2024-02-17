@@ -32,10 +32,10 @@ public class BranchAccountEntryService {
     public static final String ERROR_MSG_INVALID_ACTION_ON_ENTRY = "Không thể thực hiện hành động này trên bút toán " +
             "được chọn";
     public static final String ERROR_MSG_IMAGE_IS_REQUIRED = "Bút toán muốn xác nhận thì phải có ảnh chứng từ";
-    public static final String ENTRY_TYPE_USING_PRE_PAID_FEE_FOR_RECEIPT = "HPU_%s";
+    public static final String ENTRY_TYPE_USING_PRE_PAID_FEE_FOR_RECEIPT = "HPU-%s";
     public static final String ENTRY_TYPE_RETURN_PRE_PAID_FEE = "Hoàn phí đã ứng";
     public static final String ENTRY_TYPE_COLLECT_PRE_PAID_FEE = "Thu phí muốn ứng";
-    public static final String EXPLANATION_ADJUST_PREPAID_FEE_FOR_CARD = "Thay đổi phí ứng trước của thẻ %s - %s - $s";
+    public static final String EXPLANATION_ADJUST_PREPAID_FEE_FOR_CARD = "Thay đổi phí ứng trước của thẻ %s - %s - %s";
     @Autowired
     private BranchAccountEntryRepository branchAccountEntryRepository;
 
@@ -103,7 +103,7 @@ public class BranchAccountEntryService {
     public ReceiptEntity confirmRepayReceipt(@Valid SaveReceiptRepaymentEntryRequest request) {
         ReceiptEntity receipt = receiptService.repayReceiptForEntry(request);
 
-        BranchAccountEntryEntity repaidEntry = new BranchAccountEntryEntity(
+        BranchAccountEntryEntity repaidEntry = BranchAccountEntryEntity.createSystemBranchAccountEntry(
                 receipt,
                 request.getExplanation(),
                 TransactionTypeEnum.REPAYMENT,
@@ -112,7 +112,6 @@ public class BranchAccountEntryService {
         );
 
         repaidEntry.setEntryCode(getNewBranchEntryCode(repaidEntry));
-        repaidEntry.setEntryStatus(AccountEntryStatusEnum.APPROVED);
 
         UserEntity approver = AuditorAwareImpl.getUserFromSecurityContext();
 
@@ -127,7 +126,7 @@ public class BranchAccountEntryService {
 
     public BranchAccountEntryEntity createCardAdjustPrePaidFeeEntry (CustomerCardEntity customerCard, AdjustPrePaidFeeRequest request) {
         UserEntity editor = AuditorAwareImpl.getUserFromSecurityContext();
-        double adjustment = customerCard.getPrePaidFee() - request.getPrePaidFee();
+        double adjustment = request.getPrePaidFee() - customerCard.getPrePaidFee();
 
         if (adjustment == 0) {
             return null;
@@ -138,6 +137,8 @@ public class BranchAccountEntryService {
         entry.setMoneyAmount(Math.abs(adjustment));
         entry.setExplanation(String.format(EXPLANATION_ADJUST_PREPAID_FEE_FOR_CARD, customerCard.getName(), customerCard.getBank(), customerCard.getAccountNumber()));
         entry.setImageId(request.getImageId());
+        entry.setBranch(branchService.getBranchById(request.getBranchId()));
+        entry.setEntryCode(getNewBranchEntryCode(entry));
 
         if (adjustment < 0) {
             entry.setEntryType(ENTRY_TYPE_RETURN_PRE_PAID_FEE);
@@ -250,21 +251,18 @@ public class BranchAccountEntryService {
 
         List<BranchAccountEntryEntity> entries = new ArrayList<>(receiptEntryMap.keySet().stream()
             .filter(key -> Optional.ofNullable(receiptEntryMap.get(key)).orElse(0d) != 0d)
-            .map(key -> new BranchAccountEntryEntity(
+            .map(key -> BranchAccountEntryEntity.createSystemBranchAccountEntry(
                     receipt,
                     request.getExplanation(),
                     key,
                     receiptEntryMap.get(key),
                     request.getImageId()
-            ))
-            .peek(entry -> {
-                entry.setEntryCode(getNewBranchEntryCode(entry));
-                entry.setEntryStatus(AccountEntryStatusEnum.APPROVED);
-            })
-            .toList());
+            )).peek(entry ->
+                entry.setEntryCode(getNewBranchEntryCode(entry))
+            ).toList());
 
         if (receipt.isUsingCardPrePayFee() && receipt.getIntake() > 0) {
-            BranchAccountEntryEntity deductPrePaidFeeEntry = new BranchAccountEntryEntity(
+            BranchAccountEntryEntity deductPrePaidFeeEntry = BranchAccountEntryEntity.createSystemBranchAccountEntry(
                     receipt,
                     request.getExplanation(),
                     TransactionTypeEnum.PAYOUT,
@@ -273,6 +271,15 @@ public class BranchAccountEntryService {
             );
 
             deductPrePaidFeeEntry.setEntryType(String.format(ENTRY_TYPE_USING_PRE_PAID_FEE_FOR_RECEIPT, receipt.getCode()));
+
+            entries.forEach(entry -> {
+                if (entry.getTransactionType() == TransactionTypeEnum.PAYOUT) {
+                    long currentTimeStamp = (new Date()).getTime();
+                    entry.setTimeStampSeq(currentTimeStamp);
+                    deductPrePaidFeeEntry.setEntryCode(getNewBranchEntryCode(entry));
+                    deductPrePaidFeeEntry.setTimeStampSeq(currentTimeStamp + 1);
+                }
+            });
 
             if (receipt.isAcceptExceededFee()) {
                 deductPrePaidFeeEntry.setMoneyAmount(receipt.getCustomerCard().getPrePaidFee());
@@ -288,12 +295,13 @@ public class BranchAccountEntryService {
 
     private String getNewBranchEntryCode(BranchAccountEntryEntity entry) {
         Optional<BranchAccountEntryEntity> latestEntry =
-                branchAccountEntryRepository.findFirstByEntryCodeNotNullAndBranchAndTransactionTypeAndCreatedDateBetweenOrderByCreatedDateDesc(
+                ObjectUtils.isEmpty(entry.getEntryCode()) ?
+                branchAccountEntryRepository.findFirstByEntryCodeNotNullAndBranchAndTransactionTypeAndCreatedDateBetweenOrderByCreatedDateDescTimeStampSeqDesc(
                         entry.getBranch(),
                         entry.getTransactionType(),
                         DateTimeUtils.atStartOfDay(new Date()),
                         DateTimeUtils.atEndOfDay(new Date())
-                );
+                ): Optional.of(entry);
 
         return BranchAccountEntryCodeHandler.generateAccountEntryCode(
                 entry.getBranch().getCode(),

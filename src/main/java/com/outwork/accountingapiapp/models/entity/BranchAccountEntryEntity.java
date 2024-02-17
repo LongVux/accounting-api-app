@@ -23,20 +23,24 @@ public class BranchAccountEntryEntity extends Auditable<String> {
     public static final String FIELD_TRANSACTION_TYPE = "transactionType";
     public static final String FIELD_MONEY_AMOUNT = "moneyAmount";
 
-    public BranchAccountEntryEntity (
+    public static BranchAccountEntryEntity createSystemBranchAccountEntry (
             ReceiptEntity receipt,
             String explanation,
             TransactionTypeEnum transactionType,
             double moneyAmount,
             String imageId
     ) {
-        this.setEntryType(receipt.getCode());
-        this.setBranch(receipt.getBranch());
-        this.setReceipt(receipt);
-        this.setImageId(imageId);
-        this.setExplanation(explanation);
-        this.setTransactionType(transactionType);
-        this.setMoneyAmount(moneyAmount);
+        BranchAccountEntryEntity entry = new BranchAccountEntryEntity();
+        entry.setEntryType(receipt.getCode());
+        entry.setBranch(receipt.getBranch());
+        entry.setReceipt(receipt);
+        entry.setImageId(imageId);
+        entry.setExplanation(explanation);
+        entry.setTransactionType(transactionType);
+        entry.setMoneyAmount(moneyAmount);
+        entry.setEntryStatus(AccountEntryStatusEnum.APPROVED);
+
+        return entry;
     }
 
     @Id
@@ -66,9 +70,12 @@ public class BranchAccountEntryEntity extends Auditable<String> {
     @JoinColumn(name = "branchId", nullable = false)
     private BranchEntity branch;
 
+    @Column(updatable = false)
+    private Long timeStampSeq;
+
     @JsonIgnore
     @ManyToOne
-    @JoinColumn(name = "receiptId", updatable = false)
+    @JoinColumn(name = "receiptId")
     private ReceiptEntity receipt;
 
     private String imageId;

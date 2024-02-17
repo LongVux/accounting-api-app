@@ -37,6 +37,7 @@ public class ReceiptService {
     public static final String ERROR_MSG_EXPIRED_CUSTOMER_CARD = "Thẻ khách đã hết hạn, không thể dùng cho hóa đơn này";
     public static final String ERROR_MSG_INTAKE_EXCEED_PRE_PAID_FEE = "Số tiền phải thu của hóa đơn vượt quá phí đã ứng của thẻ khách";
     public static final String ERROR_MSG_USER_CANNOT_USE_PRE_PAID_FEE = "Người xác nhận chi trả hóa đơn với tiền đã ứng phải là %s";
+    public static final String ERROR_MSG_CAN_NOT_DETERMINE_PRE_PAID_FEE_HOLDER = "Hệ thống không xác định được người đang giữ số tiền đã ứng";
     @Autowired
     private ReceiptRepository receiptRepository;
 
@@ -183,10 +184,14 @@ public class ReceiptService {
         UserEntity approver = AuditorAwareImpl.getUserFromSecurityContext();
 
         if (receipt.isUsingCardPrePayFee() && !Objects.equals(receipt.getCustomerCard().getPrePaidFeeReceiverCode(), approver.getCode())) {
-            throw new InvalidDataException(String.format(ERROR_MSG_USER_CANNOT_USE_PRE_PAID_FEE, receipt.getCustomerCard().getPrePaidFeeReceiverCode()));
+            if (ObjectUtils.isEmpty(receipt.getCustomerCard().getPrePaidFeeReceiverCode())) {
+                throw new InvalidDataException(ERROR_MSG_CAN_NOT_DETERMINE_PRE_PAID_FEE_HOLDER);
+            } else {
+                throw new InvalidDataException(String.format(ERROR_MSG_USER_CANNOT_USE_PRE_PAID_FEE, receipt.getCustomerCard().getPrePaidFeeReceiverCode()));
+            }
         }
 
-        if (receipt.isUsingCardPrePayFee() && !receipt.isAcceptExceededFee() && receipt.getIntake() < receipt.getCustomerCard().getPrePaidFee()) {
+        if (receipt.isUsingCardPrePayFee() && !receipt.isAcceptExceededFee() && receipt.getIntake() > receipt.getCustomerCard().getPrePaidFee()) {
             throw new InvalidDataException(ERROR_MSG_INTAKE_EXCEED_PRE_PAID_FEE);
         }
     }
@@ -216,7 +221,7 @@ public class ReceiptService {
 
     private void estimateReceiptProfit (ReceiptEntity receipt) {
         double estimatedProfit = receipt.getBills().stream()
-                .map(bill -> bill.getFee() - bill.getEstimatedReturnFromBank())
+                .map(bill -> bill.getFee() - (bill.getMoneyAmount() - bill.getEstimatedReturnFromBank()))
                 .mapToDouble(Double::doubleValue)
                 .sum()
                 + receipt.getShipmentFee();
@@ -227,7 +232,7 @@ public class ReceiptService {
     private void calculateReceiptProfit (ReceiptEntity receipt) {
         double billReceiveSum = receipt.getBills().stream()
                 .filter(bill -> !ObjectUtils.isEmpty(bill.getReturnedTime()))
-                .map(BillEntity::getReturnFromBank)
+                .map(bill -> bill.getFee() - (bill.getMoneyAmount() - bill.getReturnFromBank()))
                 .mapToDouble(Double::doubleValue)
                 .sum();
 

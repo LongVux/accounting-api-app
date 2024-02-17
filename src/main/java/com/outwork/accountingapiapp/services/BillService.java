@@ -36,7 +36,7 @@ public class BillService {
     public static final String ERROR_MSG_BILL_PROFIT_LOSES = "Lọi nhuân bill bị lỗ vì phí POS %s %.2f lớn hơn phí Bill %.2f";
     public static final String ERROR_MSG_SOME_BILL_IDS_NOT_FOUND = "Một số bill không tồn tại";
     public static final String ERROR_MSG_SOME_BILL_INVALID_TO_MATCH = "Một số bill không hợp lệ để kết toán";
-    public static final String ERROR_MSG_POS_DOES_NOT_SUPPORT_CARD = "Pos $s không hỗ trợ thanh toán thẻ loại này";
+    public static final String ERROR_MSG_POS_DOES_NOT_SUPPORT_CARD = "Pos %s không hỗ trợ thanh toán thẻ loại này";
 
     @Autowired
     private BillRepository billRepository;
@@ -244,7 +244,7 @@ public class BillService {
     private String getNewBillCode(BillEntity bill, String latestBillCode) {
         if (latestBillCode == null) {
             Optional<BillEntity> latestBill =
-                    billRepository.findFirstByCodeNotNullAndPosAndCreatedDateBetweenOrderByTimeStampSeqDesc(
+                    billRepository.findFirstByCodeNotNullAndPosAndCreatedDateBetweenOrderByCreatedDateDescTimeStampSeqDesc(
                             bill.getPos(),
                             DateTimeUtils.atStartOfDay(new Date()),
                             DateTimeUtils.atEndOfDay(new Date())

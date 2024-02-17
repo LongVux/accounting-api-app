@@ -23,12 +23,12 @@ public class GeneralAccountEntryController {
     private GeneralAccountEntryService generalAccountEntryService;
 
     @GetMapping
-    public ResponseEntity<Page<GeneralAccountEntryTableItem>> getBranchAccountEntryTableItems (@ModelAttribute @Valid GetGeneralAccountEntryTableItemRequest request) {
+    public ResponseEntity<Page<GeneralAccountEntryTableItem>> getGeneralAccountEntryTableItems (@ModelAttribute @Valid GetGeneralAccountEntryTableItemRequest request) {
         return ResponseEntity.ok(generalAccountEntryService.getBranchAccountEntryTableItems(request));
     }
 
     @GetMapping("/sumUp")
-    public ResponseEntity<AccountEntrySumUpInfo> getBranchAccountEntrySumUpInfo (@ModelAttribute @Valid GetGeneralAccountEntryTableItemRequest request) {
+    public ResponseEntity<AccountEntrySumUpInfo> getGeneralAccountEntrySumUpInfo (@ModelAttribute @Valid GetGeneralAccountEntryTableItemRequest request) {
         return ResponseEntity.ok(generalAccountEntryService.getGeneralAccountEntrySumUpInfo(request));
     }
 
