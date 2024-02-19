@@ -48,6 +48,9 @@ public class BillService {
     private GeneralAccountEntryService generalAccountEntryService;
 
     @Autowired
+    private ReceiptService receiptService;
+
+    @Autowired
     private Util util;
 
     public BillEntity getBillById (@NotNull UUID id) {
@@ -171,6 +174,7 @@ public class BillService {
         });
 
         generalAccountEntryService.generateGeneralAccountEntryFromMatchedBills(request, bills);
+        receiptService.remarkReCalculateReceiptsProfitFromBillsMatch(bills);
 
         return billRepository.saveAll(bills);
     }

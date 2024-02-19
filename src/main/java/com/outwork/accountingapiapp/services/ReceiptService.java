@@ -59,7 +59,20 @@ public class ReceiptService {
 
     public Page<ReceiptTableItem> getReceiptTableItems (GetReceiptTableItemRequest request) {
         Page<ReceiptEntity> results = receiptRepository.findAll(request, request.retrievePageConfig());
-        return results.map(ReceiptTableItem::new);
+
+        return reCalculateReceiptsProfit(results).map(ReceiptTableItem::new);
+    }
+
+    public Page<ReceiptEntity> reCalculateReceiptsProfit (Page<ReceiptEntity> receiptEntities) {
+        for (ReceiptEntity receipt: receiptEntities) {
+            if (!receipt.isSkipRecalculateProfit()) {
+                calculateReceiptProfit(receipt);
+                receipt.setSkipRecalculateProfit(true);
+            }
+        }
+
+        receiptRepository.saveAll(receiptEntities);
+        return receiptEntities;
     }
 
     public ReceiptSumUpInfo getReceiptSumUpInfo (GetReceiptTableItemRequest request) {
@@ -105,6 +118,20 @@ public class ReceiptService {
         validateReceiptForModify(savedReceipt);
 
         return receiptRepository.save(savedReceipt);
+    }
+
+    public void remarkReCalculateReceiptsProfitFromBillsMatch (List<BillEntity> bills) {
+        Map<UUID, ReceiptEntity> receiptMap = new HashMap<>();
+
+        for (BillEntity bill: bills) {
+            receiptMap.put(bill.getReceipt().getId(), bill.getReceipt());
+        }
+
+        for (ReceiptEntity receipt : receiptMap.values()) {
+            receipt.setSkipRecalculateProfit(false);
+        }
+
+        receiptRepository.saveAll(receiptMap.values());
     }
 
     public ReceiptEntity reCalculatedReceipt (UUID id) {
@@ -236,7 +263,7 @@ public class ReceiptService {
                 .mapToDouble(Double::doubleValue)
                 .sum();
 
-        receipt.setCalculatedProfit(billReceiveSum + receipt.getIntake() - receipt.getPayout() - receipt.getLoan() + receipt.getRepayment());
+        receipt.setCalculatedProfit(billReceiveSum - receipt.getLoan() + receipt.getRepayment() + receipt.getShipmentFee());
     }
 
     private void assignNewReceiptCode (ReceiptEntity receipt) {

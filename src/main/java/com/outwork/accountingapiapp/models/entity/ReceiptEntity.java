@@ -78,6 +78,8 @@ public class ReceiptEntity extends Auditable<String> {
 
     private boolean acceptExceededFee;
 
+    private boolean skipRecalculateProfit;
+
     @ManyToOne(optional = false)
     @JoinColumn(name = "customerCardId", nullable = false)
     private CustomerCardEntity customerCard;
