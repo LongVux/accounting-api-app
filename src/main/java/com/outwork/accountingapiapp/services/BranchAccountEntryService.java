@@ -144,10 +144,12 @@ public class BranchAccountEntryService {
 
         if (adjustment < 0) {
             entry.setEntryType(ENTRY_TYPE_RETURN_PRE_PAID_FEE);
+            entry.setTransactionType(TransactionTypeEnum.PAYOUT);
         }
 
         if (adjustment > 0) {
             entry.setEntryType(ENTRY_TYPE_COLLECT_PRE_PAID_FEE);
+            entry.setTransactionType(TransactionTypeEnum.INTAKE);
         }
 
         editor.setAccountBalance(editor.getAccountBalance() + adjustment);
