@@ -41,7 +41,7 @@ public class DataBackupService {
     public void backupDatabase() {
         String backupFileName = String.format("db_backup_haha_%s.sql", LocalDate.now().format(DateTimeFormatter.ofPattern(DataFormat.DATE_FORMAT_ddMMyy)));
 
-        String command = String.format("C:\\Users\\LongV\\my-stuffs\\accounting-system-v2\\accounting-api-app\\mysqldump.exe -u %s -p%s %s --result-file=%s\\%s --default-character-set=utf8",
+        String command = String.format("C:\\Program Files\\MySQL\\MySQL Workbench 8.0\\mysqldump.exe -u %s -p%s %s --result-file=%s\\%s --default-character-set=utf8",
                 databaseUsername, databasePassword, "accounting_app_db", backupDirectory, backupFileName);
 
         System.out.println(command);

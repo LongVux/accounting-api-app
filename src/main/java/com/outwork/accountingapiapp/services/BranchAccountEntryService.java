@@ -90,9 +90,11 @@ public class BranchAccountEntryService {
     }
 
     private void handleAdjustBalanceForCard (ReceiptEntity receipt) {
-        double adjustedBalanceAmount = !receipt.isAcceptExceededFee() ? 0 :
-                !receipt.isUsingCardPrePayFee()? receipt.getIntake() :
-                        receipt.getCustomerCard().getPrePaidFee();
+        double adjustedBalanceAmount =  receipt.getIntake();
+
+        if (adjustedBalanceAmount > receipt.getCustomerCard().getPrePaidFee() && receipt.isAcceptExceededFee()) {
+            adjustedBalanceAmount = receipt.getCustomerCard().getPrePaidFee();
+        }
 
         receipt.getCustomerCard().setPrePaidFee(receipt.getCustomerCard().getPrePaidFee() - adjustedBalanceAmount);
 

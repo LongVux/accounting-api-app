@@ -24,4 +24,6 @@ public interface PosRepository extends JpaRepository<PosEntity, UUID> {
     boolean existsByCodeIgnoreCaseAndIdNot(String code, UUID id);
 
     Page<PosTableItem> findAll (Specification<PosTableItem> posTableItemSpecification, Pageable pageable);
+
+    boolean existsByNameIgnoreCaseAndIdNot(String name, UUID id);
 }

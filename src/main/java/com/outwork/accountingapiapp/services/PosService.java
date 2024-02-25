@@ -29,6 +29,7 @@ import java.util.*;
 public class PosService {
 
     public static final String ERROR_MSG_POS_CODE_EXISTED = "Mã POS đã tồn tại";
+    public static final String ERROR_MSG_POS_NAME_EXISTED = "Tên POS đã tồn tại";
     public static final String ERROR_MSG_POS_BANK_ACCOUNT_EXISTED = "Tài khoản ngân hàng của POS đã tồn tại";
     public static final String ERROR_MSG_THE_POS_NOT_SUPPORT_CARD = "POS %s không hỗ trợ loại thẻ này";
     public static final String ERROR_MSG_ONLY_POSES_SUPPORT_GIVEN_CARD = "Trong bill, chỉ có các POS sau hỗ trợ loại thẻ này: %s";
@@ -108,6 +109,10 @@ public class PosService {
     private void validateSavePosRequest (SavePosRequest request, UUID id) {
         if (posRepository.existsByCodeIgnoreCaseAndIdNot(request.getCode(), Optional.ofNullable(id).orElse(UUID.randomUUID()))) {
             throw new DuplicatedValueException(ERROR_MSG_POS_CODE_EXISTED);
+        }
+
+        if (posRepository.existsByNameIgnoreCaseAndIdNot(request.getName(), Optional.ofNullable(id).orElse(UUID.randomUUID()))) {
+            throw new DuplicatedValueException(ERROR_MSG_POS_NAME_EXISTED);
         }
 
         if (posRepository.existsByAccountNumberAndBankIgnoreCaseAndIdNot(request.getAccountNumber(), request.getBank(), Optional.ofNullable(id).orElse(UUID.randomUUID()))) {
