@@ -128,7 +128,7 @@ public class BranchAccountEntryService {
 
     public BranchAccountEntryEntity createCardAdjustPrePaidFeeEntry (CustomerCardEntity customerCard, AdjustPrePaidFeeRequest request) {
         UserEntity editor = AuditorAwareImpl.getUserFromSecurityContext();
-        double adjustment = request.getPrePaidFee() - customerCard.getPrePaidFee();
+        double adjustment = request.getPrePaidFee() - Optional.of(customerCard.getPrePaidFee()).orElse(0d);
 
         if (adjustment == 0) {
             return null;
