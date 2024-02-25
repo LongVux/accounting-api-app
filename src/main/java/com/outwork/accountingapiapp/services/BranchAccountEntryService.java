@@ -140,7 +140,7 @@ public class BranchAccountEntryService {
         entry.setExplanation(String.format(EXPLANATION_ADJUST_PREPAID_FEE_FOR_CARD, customerCard.getName(), customerCard.getBank(), customerCard.getAccountNumber()));
         entry.setImageId(request.getImageId());
         entry.setBranch(branchService.getBranchById(request.getBranchId()));
-        entry.setEntryCode(getNewBranchEntryCode(entry));
+
 
         if (adjustment < 0) {
             entry.setEntryType(ENTRY_TYPE_RETURN_PRE_PAID_FEE);
@@ -151,6 +151,8 @@ public class BranchAccountEntryService {
             entry.setEntryType(ENTRY_TYPE_COLLECT_PRE_PAID_FEE);
             entry.setTransactionType(TransactionTypeEnum.INTAKE);
         }
+
+        entry.setEntryCode(getNewBranchEntryCode(entry));
 
         editor.setAccountBalance(editor.getAccountBalance() + adjustment);
 
