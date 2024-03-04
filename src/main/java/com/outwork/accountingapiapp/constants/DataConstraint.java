@@ -1,7 +1,7 @@
 package com.outwork.accountingapiapp.constants;
 
 public class DataConstraint {
-    public static final int ENTITY_CODE_MAX_LENGTH = 5;
+    public static final int ENTITY_CODE_MAX_LENGTH = 10;
     public static final int SHORT_STRING_MIN_LENGTH = 2;
     public static final int SHORT_STRING_MAX_LENGTH = 50;
     public static final int ID_STRING_MAX_LENGTH = 25;

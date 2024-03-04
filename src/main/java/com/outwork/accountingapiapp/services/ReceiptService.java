@@ -192,9 +192,9 @@ public class ReceiptService {
             throw new InvalidDataException(ERROR_MSG_RECEIPT_HAS_NO_BILL);
         }
 
-        if (receipt.getIntake() + receipt.getPayout() > receipt.getCustomerCard().getPaymentLimit()) {
-            throw new InvalidDataException(ERROR_MSG_RECEIPT_OVER_CARD_LIMIT);
-        }
+//        if (receipt.getIntake() + receipt.getPayout() > receipt.getCustomerCard().getPaymentLimit()) {
+//            throw new InvalidDataException(ERROR_MSG_RECEIPT_OVER_CARD_LIMIT);
+//        }
 
         if (receipt.getCustomerCard().getExpiredDate().before(new Date())) {
             throw new InvalidDataException(ERROR_MSG_EXPIRED_CUSTOMER_CARD);
@@ -224,13 +224,18 @@ public class ReceiptService {
     }
 
     private void validateReceiptBalance (ReceiptEntity receipt) {
+        // tổng phí
         double totalBillFee = receipt.getBills().stream().mapToDouble(BillEntity::getFee).sum();
+
+        // tổng tiền sau phí
         double totalBillAfterFee = receipt.getBills().stream().mapToDouble(bill -> bill.getMoneyAmount() - bill.getFee()).sum();
 
+        // nếu tổng giao dịch của hóa đơn nhỏ hơn (tổng phí + tiền phí ship + tiền chi - tiền thu - tiền nợ)
         if (receipt.getTransactionTotal() < totalBillFee + receipt.getShipmentFee() + receipt.getPayout() - receipt.getIntake() - receipt.getLoan()) {
             throw new InvalidDataException(ERROR_MSG_IMBALANCED_RECEIPT);
         }
 
+        // nếu tiền chi nhỏ hơn (tổng tiền sau phí - tiền phí ship)
         if (receipt.getPayout() < totalBillAfterFee - receipt.getShipmentFee()) {
             throw new InvalidDataException(ERROR_MSG_IMBALANCED_RECEIPT);
         }
