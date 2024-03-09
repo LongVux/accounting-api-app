@@ -24,12 +24,12 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 
+import java.io.IOException;
 import java.util.*;
 
 @Service
 public class ReceiptService {
     public static final String ERROR_MSG_IMBALANCED_RECEIPT = "Hóa đơn cân đối kế toán không hợp lệ";
-    public static final String ERROR_MSG_RECEIPT_OVER_CARD_LIMIT = "Hóa đơn vượt quá hạn mức giao dịch của thẻ";
     public static final String ERROR_MSG_RECEIPT_ALREADY_HAS_CODE = "Hóa đơn đã được tạo mã. Không thể xử lý";
     public static final String ERROR_MSG_RECEIPT_HAS_NO_BILL = "Hóa đơn phải chứa tối thiểu một bill";
     public static final String ERROR_MSG_RECEIPT_NOT_HAVE_CODE = "Hóa đơn chưa được tạo mã. Không thể xử lý";
@@ -49,6 +49,9 @@ public class ReceiptService {
 
     @Autowired
     private BillService billService;
+
+    @Autowired
+    private FileStoringService fileStoringService;
 
     @Autowired
     private Util util;
@@ -179,6 +182,7 @@ public class ReceiptService {
 
         validateReceiptForModify(receipt);
 
+        fileStoringService.deleteFile(receipt.getImageId());
         billService.deleteBills(receipt.getBills());
         receiptRepository.deleteById(id);
     }
@@ -191,10 +195,6 @@ public class ReceiptService {
         if (CollectionUtils.isEmpty(receipt.getBills())) {
             throw new InvalidDataException(ERROR_MSG_RECEIPT_HAS_NO_BILL);
         }
-
-//        if (receipt.getIntake() + receipt.getPayout() > receipt.getCustomerCard().getPaymentLimit()) {
-//            throw new InvalidDataException(ERROR_MSG_RECEIPT_OVER_CARD_LIMIT);
-//        }
 
         if (receipt.getCustomerCard().getExpiredDate().before(new Date())) {
             throw new InvalidDataException(ERROR_MSG_EXPIRED_CUSTOMER_CARD);

@@ -31,7 +31,7 @@ import java.util.*;
 public class BranchAccountEntryService {
     public static final String ERROR_MSG_INVALID_ACTION_ON_ENTRY = "Không thể thực hiện hành động này trên bút toán " +
             "được chọn";
-    public static final String ERROR_MSG_IMAGE_IS_REQUIRED = "Bút toán muốn xác nhận thì phải có ảnh chứng từ";
+
     public static final String ENTRY_TYPE_USING_PRE_PAID_FEE_FOR_RECEIPT = "HPU-%s";
     public static final String ENTRY_TYPE_RETURN_PRE_PAID_FEE = "Hoàn phí đã ứng";
     public static final String ENTRY_TYPE_COLLECT_PRE_PAID_FEE = "Thu phí muốn ứng";
@@ -207,8 +207,6 @@ public class BranchAccountEntryService {
 
         validateAccountEntryForModification(approvedEntry);
 
-        validateAccountEntryForApproval(approvedEntry);
-
         approvedEntry.setEntryCode(getNewBranchEntryCode(approvedEntry));
         approvedEntry.setEntryStatus(AccountEntryStatusEnum.APPROVED);
         approvedEntry.setCreatedDate(new Date());
@@ -237,12 +235,6 @@ public class BranchAccountEntryService {
     private void validateAccountEntryForModification(BranchAccountEntryEntity entry) {
         if (!ObjectUtils.isEmpty(entry.getEntryCode())) {
             throw new InvalidDataException(ERROR_MSG_INVALID_ACTION_ON_ENTRY);
-        }
-    }
-
-    private void validateAccountEntryForApproval(BranchAccountEntryEntity entry) {
-        if (ObjectUtils.isEmpty(entry.getImageId())) {
-            throw new InvalidDataException(ERROR_MSG_IMAGE_IS_REQUIRED);
         }
     }
 

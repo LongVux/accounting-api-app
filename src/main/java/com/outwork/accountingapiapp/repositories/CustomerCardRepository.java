@@ -19,4 +19,7 @@ public interface CustomerCardRepository extends JpaRepository<CustomerCardEntity
     Page<CustomerCardTableItem> findAll (Specification<CustomerCardTableItem> specification, Pageable pageable);
 
     List<CustomerCardEntity> findByCustomer_IdAndExpiredDateGreaterThanEqual(UUID id, Date expiredDate);
+
+    List<CustomerCardEntity> findByAccountNumberContainsAndExpiredDateGreaterThanEqual(String accountNumber,
+                                                                                       Date expiredDate);
 }

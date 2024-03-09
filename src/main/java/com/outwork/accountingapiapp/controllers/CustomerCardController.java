@@ -8,6 +8,7 @@ import com.outwork.accountingapiapp.models.payload.responses.CustomerCardTableIt
 import com.outwork.accountingapiapp.services.CustomerCardService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -37,6 +38,11 @@ public class CustomerCardController {
     @GetMapping("/findNonExpiredByCustomerId/{customerId}")
     public ResponseEntity<List<CustomerCardEntity>> getCustomerCardByCustomerId (@PathVariable @NotNull UUID customerId) {
         return ResponseEntity.ok(customerCardService.findNonExpiredCustomerCardByCustomerId(customerId));
+    }
+
+    @GetMapping("/findNonExpiredByCardNumber/{searchKey}")
+    public ResponseEntity<List<CustomerCardEntity>> getCustomerCardByCustomerId (@PathVariable @NotNull @Size(min = 4) String searchKey) {
+        return ResponseEntity.ok(customerCardService.findNonExpiredCustomerCardByCardNumber(searchKey));
     }
 
     @PostMapping

@@ -42,7 +42,7 @@ public class CustomerCardEntity extends Auditable<String> {
     @Column(nullable = false, length = DataConstraint.ID_STRING_MAX_LENGTH)
     private String name;
 
-    @ManyToOne(optional = false, cascade = CascadeType.ALL)
+    @ManyToOne(optional = false)
     @JoinColumn(name = "cardTypeId", nullable = false)
     private CardTypeEntity cardType;
 
@@ -66,7 +66,7 @@ public class CustomerCardEntity extends Auditable<String> {
 
     private String prePaidFeeReceiverCode;
 
-    @ManyToOne(optional = false, cascade = CascadeType.ALL)
+    @ManyToOne(optional = false)
     @JoinColumn(name = "customerId", nullable = false)
     private CustomerEntity customer;
 

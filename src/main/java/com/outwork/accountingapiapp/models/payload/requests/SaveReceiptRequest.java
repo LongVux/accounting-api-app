@@ -1,11 +1,9 @@
 package com.outwork.accountingapiapp.models.payload.requests;
 
+import com.outwork.accountingapiapp.constants.DataConstraint;
 import com.outwork.accountingapiapp.utils.validator.DoubleStep;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -69,6 +67,10 @@ public class SaveReceiptRequest {
 
     private List<@Valid ReceiptBill> receiptBills;
 
+    @Size(
+            max = 255,
+            message = "{msg.err.string.range}"
+    )
     private String note;
 
     private boolean usingCardPrePayFee;

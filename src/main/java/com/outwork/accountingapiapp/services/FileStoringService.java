@@ -6,6 +6,8 @@ import com.outwork.accountingapiapp.repositories.FileDataRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.util.Strings;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -20,6 +22,7 @@ import java.util.UUID;
 
 @Service
 public class FileStoringService {
+    private static final Logger logger = LoggerFactory.getLogger(MessageService.class);
 
     @Autowired
     private FileDataRepository fileDataRepository;
@@ -51,10 +54,14 @@ public class FileStoringService {
         return Files.readAllBytes(new File(String.join(DataFormat.BACKSLASH_SEPARATOR, appBucketPath, fileData.getFileName())).toPath());
     }
 
-    public void deleteFile(String fileName) throws IOException {
-        FileDataEntity fileData = fileDataRepository.findById(fileName).orElseThrow(() -> new EntityNotFoundException(
-               fileName));
+    public void deleteFile(String fileName) {
+        try {
+            FileDataEntity fileData = fileDataRepository.findById(fileName).orElseThrow(() -> new EntityNotFoundException(
+                    fileName));
 
-        Files.delete(new File(String.join(DataFormat.BACKSLASH_SEPARATOR, appBucketPath, fileData.getFileName())).toPath());
+            Files.delete(new File(String.join(DataFormat.BACKSLASH_SEPARATOR, appBucketPath, fileData.getFileName())).toPath());
+        } catch (Exception e) {
+            logger.error("Cannot delete the image '{}'", fileName, e);
+        }
     }
 }

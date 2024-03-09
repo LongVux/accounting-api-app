@@ -20,7 +20,6 @@ public class AdjustPrePaidFeeRequest {
     @DoubleStep(value = 1000)
     private int prePaidFee;
 
-    @NotNull(message = "{msg.err.string.blank}")
     private String imageId;
 
     @NotNull(message = "{msg.err.string.blank}")

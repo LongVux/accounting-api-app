@@ -51,4 +51,10 @@ public class SaveCustomerRequest {
             message = "{msg.err.double.max}"
     )
     private double percentageFee;
+
+    @Size(
+            max = 255,
+            message = "{msg.err.string.range}"
+    )
+    private String note;
 }

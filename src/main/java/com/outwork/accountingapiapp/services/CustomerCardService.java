@@ -13,6 +13,7 @@ import com.outwork.accountingapiapp.repositories.CustomerCardRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
@@ -52,6 +53,10 @@ public class CustomerCardService {
 
     public List<CustomerCardEntity> findNonExpiredCustomerCardByCustomerId (@NotNull UUID customerId) {
         return customerCardRepository.findByCustomer_IdAndExpiredDateGreaterThanEqual(customerId, new Date());
+    }
+
+    public List<CustomerCardEntity> findNonExpiredCustomerCardByCardNumber (@NotNull @Size(min = 4) String searchKey) {
+        return customerCardRepository.findByAccountNumberContainsAndExpiredDateGreaterThanEqual(searchKey, new Date());
     }
 
     public CustomerCardEntity saveCustomerCard (@Valid SaveCustomerCardRequest request, UUID id) {

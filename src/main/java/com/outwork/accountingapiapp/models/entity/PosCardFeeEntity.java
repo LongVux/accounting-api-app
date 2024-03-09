@@ -18,7 +18,7 @@ public class PosCardFeeEntity {
     private UUID id;
 
     @ManyToOne(optional = false)
-    @JoinColumn(name = "cartTypeId", nullable = false)
+    @JoinColumn(name = "cardTypeId", nullable = false)
     private CardTypeEntity cardType;
 
     @JsonIgnore

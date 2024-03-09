@@ -38,6 +38,8 @@ public class CustomerEntity extends Auditable<String> {
     @Column(nullable = false)
     private double percentageFee;
 
+    private String note;
+
     @JsonIgnore
     @OneToMany(mappedBy = "customer", fetch = FetchType.LAZY)
     private List<CustomerCardEntity> customerCards;

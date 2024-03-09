@@ -1,5 +1,6 @@
 package com.outwork.accountingapiapp.services;
 
+import com.outwork.accountingapiapp.constants.DataConstraint;
 import com.outwork.accountingapiapp.exceptions.InvalidDataException;
 import com.outwork.accountingapiapp.models.entity.BillEntity;
 import com.outwork.accountingapiapp.models.entity.PosEntity;
@@ -24,6 +25,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 
 import java.util.*;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Service
@@ -138,13 +140,13 @@ public class BillService {
     }
 
     public List<BillEntity> getMatchingBills (GetMatchingBillsRequest request) {
-        List<BillEntity> bills = billRepository.findByPos_IdAndCreatedDateBetweenAndCodeNotNullOrderByCreatedDateAsc(request.getPosId(), request.getFromCreatedDate(), request.getToCreatedDate());
+        List<BillEntity> bills = billRepository.findByPos_IdAndCreatedDateBetweenAndCodeNotNullOrderByCreatedDateAscTimeStampSeqAsc(request.getPosId(), request.getFromCreatedDate(), request.getToCreatedDate());
 
         List<BillEntity> responseList = new ArrayList<>();
         double moneyAmount = 0d;
 
         for (BillEntity bill : bills) {
-            if (bill.getEstimatedReturnFromBank() > request.getMoneyAmount() || moneyAmount + bill.getEstimatedReturnFromBank() > request.getMoneyAmount()) {
+            if (moneyAmount + bill.getEstimatedReturnFromBank() > request.getMoneyAmount()) {
                 continue;
             }
 
@@ -223,7 +225,7 @@ public class BillService {
             );
         }
 
-        if (bill.getFee() < bill.getMoneyAmount() * bill.getPosFeeStamp() / 100) {
+        if (bill.getFee() < bill.getMoneyAmount() * bill.getPosFeeStamp() / 100 && !Pattern.matches(DataConstraint.COMPANY_CARD_REGEX, bill.getReceipt().getCustomerCard().getName())) {
             throw new InvalidDataException(
                     String.format(
                             ERROR_MSG_BILL_PROFIT_LOSES,

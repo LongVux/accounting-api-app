@@ -24,6 +24,6 @@ public interface BillRepository extends JpaRepository<BillEntity, UUID> {
 
     Page<BillEntity> findAll(Specification<BillEntity> specification, Pageable pageable);
 
-    List<BillEntity> findByPos_IdAndCreatedDateBetweenAndCodeNotNullOrderByCreatedDateAsc(UUID id, Date createdDateStart,
+    List<BillEntity> findByPos_IdAndCreatedDateBetweenAndCodeNotNullOrderByCreatedDateAscTimeStampSeqAsc(UUID id, Date createdDateStart,
                                                                             Date createdDateEnd);
 }

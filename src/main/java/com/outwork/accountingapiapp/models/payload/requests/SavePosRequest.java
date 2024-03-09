@@ -49,5 +49,9 @@ public class SavePosRequest {
 
     private List<@Valid SupportedCardType> supportedCardTypes;
 
+    @Size(
+            max = 255,
+            message = "{msg.err.string.range}"
+    )
     private String note;
 }

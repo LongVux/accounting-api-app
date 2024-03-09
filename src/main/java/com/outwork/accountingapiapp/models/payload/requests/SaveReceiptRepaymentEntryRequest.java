@@ -16,6 +16,5 @@ public class SaveReceiptRepaymentEntryRequest extends SaveReceiptEntryRequest {
     @DoubleStep(value = 1000)
     private int repaidAmount;
 
-    @NotNull(message = "{msg.err.string.blank}")
     private String imageId;
 }

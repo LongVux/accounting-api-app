@@ -61,7 +61,7 @@ public class FileDataController {
     }
 
     @DeleteMapping("/{fileName}")
-    public void deleteFile(@PathVariable String fileName) throws IOException {
+    public void deleteFile(@PathVariable String fileName)  {
         fileStoringService.deleteFile(fileName);
     }
 }

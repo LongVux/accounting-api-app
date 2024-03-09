@@ -60,6 +60,10 @@ public class SaveCustomerCardRequest {
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private Date expiredDate;
 
+    @Size(
+            max = 255,
+            message = "{msg.err.string.range}"
+    )
     private String note;
 
     @NotNull(message = "{msg.err.string.blank}")
