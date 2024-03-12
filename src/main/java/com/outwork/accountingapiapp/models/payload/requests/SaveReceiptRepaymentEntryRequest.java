@@ -15,6 +15,4 @@ public class SaveReceiptRepaymentEntryRequest extends SaveReceiptEntryRequest {
     )
     @DoubleStep(value = 1000)
     private int repaidAmount;
-
-    private String imageId;
 }
