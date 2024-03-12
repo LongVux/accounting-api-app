@@ -23,10 +23,10 @@ public class ReceiptBill {
         @DoubleStep(value = 1000)
         private double moneyAmount;
 
-        @Min(
-                value = 1000,
-                message = "{msg.err.double.min}"
-        )
-        @DoubleStep(value = 1000)
+//        @Min(
+//                value = 1000,
+//                message = "{msg.err.double.min}"
+//        )
+//        @DoubleStep(value = 1000)
         private double fee;
 }
