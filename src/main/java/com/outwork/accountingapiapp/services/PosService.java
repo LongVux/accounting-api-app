@@ -43,6 +43,9 @@ public class PosService {
     @Autowired
     private PosCardFeeService posCardFeeService;
 
+    @Autowired
+    private BranchService branchService;
+
     public PosEntity getPosById (@NotNull UUID id) {
         return posRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(id.toString()));
     }
@@ -135,6 +138,7 @@ public class PosService {
         pos.setBank(request.getBank());
         pos.setMaxBillAmount(request.getMaxBillAmount());
         pos.setNote(request.getNote());
+        pos.setBranch(branchService.getBranchById(request.getBranchId()));
 
         posCardFeeService.buildPosCardFeesForPos(request.getSupportedCardTypes(), pos);
 

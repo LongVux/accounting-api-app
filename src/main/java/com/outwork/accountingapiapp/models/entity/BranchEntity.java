@@ -36,4 +36,8 @@ public class BranchEntity {
     @JsonIgnore
     @OneToMany(mappedBy = "branch", fetch = FetchType.LAZY)
     private Set<ReceiptEntity> receipts;
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "branch", fetch = FetchType.LAZY)
+    private Set<PosEntity> poses;
 }

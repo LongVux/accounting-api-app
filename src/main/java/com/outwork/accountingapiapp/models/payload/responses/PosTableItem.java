@@ -1,6 +1,7 @@
 package com.outwork.accountingapiapp.models.payload.responses;
 
 import com.outwork.accountingapiapp.constants.PosStatusEnum;
+import com.outwork.accountingapiapp.models.entity.BranchEntity;
 
 import java.util.UUID;
 
@@ -25,4 +26,6 @@ public interface PosTableItem {
     String getNote();
 
     int getMaxBillAmount();
+
+    BranchEntity getBranch();
 }

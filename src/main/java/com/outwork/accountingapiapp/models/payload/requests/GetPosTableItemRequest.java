@@ -2,7 +2,9 @@ package com.outwork.accountingapiapp.models.payload.requests;
 
 import com.outwork.accountingapiapp.constants.DataFormat;
 import com.outwork.accountingapiapp.constants.PosSortingEnum;
+import com.outwork.accountingapiapp.models.entity.BranchEntity;
 import com.outwork.accountingapiapp.models.entity.PosEntity;
+import com.outwork.accountingapiapp.models.entity.ReceiptEntity;
 import com.outwork.accountingapiapp.models.payload.responses.PosTableItem;
 import com.outwork.accountingapiapp.utils.MapBuilder;
 import jakarta.annotation.Nullable;
@@ -41,6 +43,8 @@ public class GetPosTableItemRequest extends SortedPagination<PosSortingEnum> imp
     @Nullable
     private Integer toMaxBillAmount;
 
+    @Nullable
+    private List<String> branchCodes;
 
     @Override
     Map<PosSortingEnum, String> getSorterMap() {
@@ -85,6 +89,10 @@ public class GetPosTableItemRequest extends SortedPagination<PosSortingEnum> imp
                     fromMaxBillAmount,
                     toMaxBillAmount
             ));
+        }
+
+        if (!ObjectUtils.isEmpty(branchCodes)) {
+            predicates.add(root.get(PosEntity.FIELD_BRANCH).get(BranchEntity.FIELD_CODE).in(branchCodes));
         }
 
         return criteriaBuilder.and(predicates.toArray(new Predicate[0]));

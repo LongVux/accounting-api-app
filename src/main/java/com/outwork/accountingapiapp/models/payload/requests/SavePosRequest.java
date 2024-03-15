@@ -7,6 +7,7 @@ import jakarta.validation.constraints.*;
 import lombok.Data;
 
 import java.util.List;
+import java.util.UUID;
 
 @Data
 public class SavePosRequest {
@@ -54,4 +55,7 @@ public class SavePosRequest {
             message = "{msg.err.string.range}"
     )
     private String note;
+
+    @NotNull(message = "{msg.err.string.blank}")
+    private UUID branchId;
 }

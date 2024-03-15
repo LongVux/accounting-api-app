@@ -24,6 +24,7 @@ public class PosEntity {
     public static final String FIELD_ACCOUNT_NUMBER = "accountNumber";
     public static final String FIELD_BANK = "bank";
     public static final String FIELD_MAX_BILL_AMOUNT = "maxBillAmount";
+    public static final String FIELD_BRANCH = "branch";
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -60,6 +61,10 @@ public class PosEntity {
     @JsonIgnore
     @OneToMany(mappedBy = "pos", fetch = FetchType.LAZY)
     private List<BillEntity> bills;
+
+    @ManyToOne
+    @JoinColumn(name = "branchId")
+    private BranchEntity branch;
 
     public void setSupportedCardTypes(@NotNull List<PosCardFeeEntity> posCardFees) {
         this.supportedCardTypes = posCardFees.stream().peek(fee -> fee.setPos(this)).toList();

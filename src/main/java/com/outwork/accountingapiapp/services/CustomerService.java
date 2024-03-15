@@ -67,6 +67,7 @@ public class CustomerService {
         customer.setPhoneNumber(request.getPhoneNumber());
         customer.setNationalId(request.getNationalId());
         customer.setPercentageFee(request.getPercentageFee());
+        customer.setNote(request.getNote());
     }
 
     private void validateSaveCustomerRequest (SaveCustomerRequest request, UUID id) {

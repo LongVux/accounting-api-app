@@ -3,6 +3,7 @@ package com.outwork.accountingapiapp.exceptions;
 import com.outwork.accountingapiapp.models.payload.responses.ApiError;
 import com.outwork.accountingapiapp.services.MessageService;
 import com.outwork.accountingapiapp.utils.Util;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -93,6 +94,21 @@ public class ControllerAdvisor extends ResponseEntityExceptionHandler {
     @ExceptionHandler(InvalidDataException.class)
     public ResponseEntity<ApiError> handleInvalidDataException(
             InvalidDataException ex,
+            WebRequest request
+    ) {
+
+        ApiError apiError = new ApiError(
+                HttpStatus.BAD_REQUEST,
+                ERROR_MSG_INVALID_DATA,
+                Collections.singletonList(ex.getMessage())
+        );
+
+        return new ResponseEntity<>(apiError, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(EntityNotFoundException.class)
+    public ResponseEntity<ApiError> handleEntityNotFoundException(
+            EntityNotFoundException ex,
             WebRequest request
     ) {
 
