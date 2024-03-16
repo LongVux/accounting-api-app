@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.lang.Nullable;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -36,7 +37,7 @@ public class PosController {
     }
 
     @GetMapping("/searchByCode")
-    public ResponseEntity<List<SuggestedPos>> searchPosByCode(@RequestParam @Size(min = 2) String searchKey, @RequestParam UUID branchId) {
+    public ResponseEntity<List<SuggestedPos>> searchPosByCode(@RequestParam @Size(min = 2) String searchKey, @RequestParam @Nullable UUID branchId) {
         return ResponseEntity.ok(posService.searchPosByCodeAndBranch(searchKey, branchId));
     }
 
