@@ -17,7 +17,6 @@ import java.util.UUID;
 
 @Repository
 public interface PosRepository extends JpaRepository<PosEntity, UUID> {
-    List<SuggestedPos> findByCodeContainsIgnoreCaseAndPosStatus(@NonNull String code, PosStatusEnum posStatus);
     List<PosEntity> findByIdInAndSupportedCardTypes_CardType_Id(Collection<UUID> ids, UUID id);
 
     boolean existsByAccountNumberAndBankIgnoreCaseAndIdNot(String accountNumber, String bank, UUID id);
@@ -26,4 +25,6 @@ public interface PosRepository extends JpaRepository<PosEntity, UUID> {
     Page<PosTableItem> findAll (Specification<PosTableItem> posTableItemSpecification, Pageable pageable);
 
     boolean existsByNameIgnoreCaseAndIdNot(String name, UUID id);
+
+    List<SuggestedPos> findByCodeContainsIgnoreCaseAndPosStatusAndBranch_Id(String code, PosStatusEnum posStatus, UUID id);
 }

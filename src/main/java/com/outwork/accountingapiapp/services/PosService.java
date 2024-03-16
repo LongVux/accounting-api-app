@@ -54,8 +54,8 @@ public class PosService {
         return posRepository.findAll(request, request.retrievePageConfig());
     }
 
-    public List<SuggestedPos> searchPosByCode (@Size(min = 2) String searchKey) {
-        return posRepository.findByCodeContainsIgnoreCaseAndPosStatus(searchKey, PosStatusEnum.AVAILABLE);
+    public List<SuggestedPos> searchPosByCodeAndBranch (@Size(min = 2) String searchKey, UUID branchId) {
+        return posRepository.findByCodeContainsIgnoreCaseAndPosStatusAndBranch_Id(searchKey, PosStatusEnum.AVAILABLE, branchId);
     }
 
     public List<PosEntity> getPosesFromReceiptBillsAndCardTypeId (List<ReceiptBill> receiptBills, @NotNull UUID cardTypeId) {

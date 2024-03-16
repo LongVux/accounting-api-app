@@ -35,9 +35,9 @@ public class PosController {
         return ResponseEntity.ok(posService.getPosById(id));
     }
 
-    @GetMapping("/searchByCode/{searchKey}")
-    public ResponseEntity<List<SuggestedPos>> searchPosByCode(@PathVariable @Size(min = 2) String searchKey) {
-        return ResponseEntity.ok(posService.searchPosByCode(searchKey));
+    @GetMapping("/searchByCode")
+    public ResponseEntity<List<SuggestedPos>> searchPosByCode(@RequestParam @Size(min = 2) String searchKey, @RequestParam UUID branchId) {
+        return ResponseEntity.ok(posService.searchPosByCodeAndBranch(searchKey, branchId));
     }
 
     @PostMapping

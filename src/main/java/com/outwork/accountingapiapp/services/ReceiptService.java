@@ -38,6 +38,8 @@ public class ReceiptService {
     public static final String ERROR_MSG_INTAKE_EXCEED_PRE_PAID_FEE = "Số tiền phải thu của hóa đơn vượt quá phí đã ứng của thẻ khách";
     public static final String ERROR_MSG_USER_CANNOT_USE_PRE_PAID_FEE = "Người xác nhận chi trả hóa đơn với tiền đã ứng phải là %s";
     public static final String ERROR_MSG_CAN_NOT_DETERMINE_PRE_PAID_FEE_HOLDER = "Hệ thống không xác định được người đang giữ số tiền đã ứng";
+
+    public static final String ERROR_MSG_SOME_POS_NOT_BELONG_TO_THE_RECEIPT_BRANCH = "Một số POS không thuộc về chi nhánh của hóa đơn này";
     @Autowired
     private ReceiptRepository receiptRepository;
 
@@ -198,6 +200,10 @@ public class ReceiptService {
 
         if (receipt.getCustomerCard().getExpiredDate().before(new Date())) {
             throw new InvalidDataException(ERROR_MSG_EXPIRED_CUSTOMER_CARD);
+        }
+
+        if (receipt.getBills().stream().anyMatch(bill -> !Objects.equals(bill.getPos().getBranch().getId(), receipt.getBranch().getId()))) {
+            throw new InvalidDataException(ERROR_MSG_SOME_POS_NOT_BELONG_TO_THE_RECEIPT_BRANCH);
         }
 
         validateReceiptBalance(receipt);
