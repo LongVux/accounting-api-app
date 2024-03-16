@@ -76,6 +76,9 @@ public class GetBillTableItemRequest extends SortedPagination<BillSortingEnum> i
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private Date toReturnedTime;
 
+    @Nullable
+    private Boolean onlyConfirmedBillsWithoutReturnFromBank;
+
     @Override
     Map<BillSortingEnum, String> getSorterMap() {
         return MapBuilder.buildBillTableItemSorter();
@@ -152,6 +155,11 @@ public class GetBillTableItemRequest extends SortedPagination<BillSortingEnum> i
                     DateTimeUtils.atStartOfDay(fromReturnedTime),
                     DateTimeUtils.atEndOfDay(toReturnedTime)
             ));
+        }
+
+        if (Boolean.TRUE.equals(onlyConfirmedBillsWithoutReturnFromBank)) {
+            predicates.add(criteriaBuilder.isNotNull(root.get(BillEntity.FIELD_CODE)));
+            predicates.add(criteriaBuilder.isNull(root.get(BillEntity.FIELD_RETURNED_TIME)));
         }
 
         return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
