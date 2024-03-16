@@ -27,4 +27,6 @@ public interface PosRepository extends JpaRepository<PosEntity, UUID> {
     boolean existsByNameIgnoreCaseAndIdNot(String name, UUID id);
 
     List<SuggestedPos> findByCodeContainsIgnoreCaseAndPosStatusAndBranch_Id(String code, PosStatusEnum posStatus, UUID id);
+
+    List<SuggestedPos> findByCodeContainsIgnoreCaseAndPosStatus(String code, PosStatusEnum posStatus);
 }

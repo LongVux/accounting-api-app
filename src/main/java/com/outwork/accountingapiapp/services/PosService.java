@@ -55,6 +55,10 @@ public class PosService {
     }
 
     public List<SuggestedPos> searchPosByCodeAndBranch (@Size(min = 2) String searchKey, UUID branchId) {
+        if (Objects.isNull(branchId)) {
+            return posRepository.findByCodeContainsIgnoreCaseAndPosStatus(searchKey, PosStatusEnum.AVAILABLE);
+        }
+
         return posRepository.findByCodeContainsIgnoreCaseAndPosStatusAndBranch_Id(searchKey, PosStatusEnum.AVAILABLE, branchId);
     }
 
