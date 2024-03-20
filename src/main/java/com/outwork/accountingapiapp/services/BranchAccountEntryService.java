@@ -82,7 +82,7 @@ public class BranchAccountEntryService {
             !receipt.isUsingCardPrePayFee()? receipt.getIntake() :
             receipt.getCustomerCard().getPrePaidFee();
 
-        adjustedBalanceAmount += - receipt.getPayout() - receipt.getLoan() + receipt.getRepayment();
+        adjustedBalanceAmount += receipt.getIntake() - receipt.getPayout() - receipt.getLoan() + receipt.getRepayment();
 
         approver.setAccountBalance(approver.getAccountBalance() + adjustedBalanceAmount);
 

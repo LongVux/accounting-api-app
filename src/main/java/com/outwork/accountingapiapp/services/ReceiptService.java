@@ -38,8 +38,8 @@ public class ReceiptService {
     public static final String ERROR_MSG_INTAKE_EXCEED_PRE_PAID_FEE = "Số tiền phải thu của hóa đơn vượt quá phí đã ứng của thẻ khách";
     public static final String ERROR_MSG_USER_CANNOT_USE_PRE_PAID_FEE = "Người xác nhận chi trả hóa đơn với tiền đã ứng phải là %s";
     public static final String ERROR_MSG_CAN_NOT_DETERMINE_PRE_PAID_FEE_HOLDER = "Hệ thống không xác định được người đang giữ số tiền đã ứng";
-
     public static final String ERROR_MSG_SOME_POS_NOT_BELONG_TO_THE_RECEIPT_BRANCH = "Một số POS không thuộc về chi nhánh của hóa đơn này";
+    public static final String ERROR_MSG_USER_DOES_NOT_HAVE_RIGHT_TO_SAVE_RECEIPT_IN_THIS_BRANCH = "Khách hàng không có quyền lưu hóa đơn trên chi nhánh này";
     @Autowired
     private ReceiptRepository receiptRepository;
 
@@ -190,6 +190,13 @@ public class ReceiptService {
     }
 
     private void validateReceiptForModify(ReceiptEntity receipt) {
+        UserEntity editor = AuditorAwareImpl.getUserFromSecurityContext();
+
+        if (!ObjectUtils.nullSafeEquals(receipt.getCreatedBy(), editor.getCode()) &&
+                editor.getBranches().stream().noneMatch(branch -> ObjectUtils.nullSafeEquals(branch.getId(), receipt.getBranch().getId()))) {
+            throw new InvalidDataException(ERROR_MSG_USER_DOES_NOT_HAVE_RIGHT_TO_SAVE_RECEIPT_IN_THIS_BRANCH);
+        }
+
         if (!ObjectUtils.isEmpty(receipt.getCode())) {
             throw new InvalidDataException(ERROR_MSG_RECEIPT_ALREADY_HAS_CODE);
         }
@@ -230,18 +237,14 @@ public class ReceiptService {
     }
 
     private void validateReceiptBalance (ReceiptEntity receipt) {
-        // tổng phí
         double totalBillFee = receipt.getBills().stream().mapToDouble(BillEntity::getFee).sum();
 
-        // tổng tiền sau phí
         double totalBillAfterFee = receipt.getBills().stream().mapToDouble(bill -> bill.getMoneyAmount() - bill.getFee()).sum();
 
-        // nếu tổng giao dịch của hóa đơn nhỏ hơn (tổng phí + tiền phí ship + tiền chi - tiền thu - tiền nợ)
         if (receipt.getTransactionTotal() < totalBillFee + receipt.getShipmentFee() + receipt.getPayout() - receipt.getIntake() - receipt.getLoan()) {
             throw new InvalidDataException(ERROR_MSG_IMBALANCED_RECEIPT);
         }
 
-        // nếu tiền chi nhỏ hơn (tổng tiền sau phí - tiền phí ship)
         if (receipt.getPayout() < totalBillAfterFee - receipt.getShipmentFee()) {
             throw new InvalidDataException(ERROR_MSG_IMBALANCED_RECEIPT);
         }
