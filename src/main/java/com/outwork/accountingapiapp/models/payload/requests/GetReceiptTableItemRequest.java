@@ -90,6 +90,9 @@ public class GetReceiptTableItemRequest extends SortedPagination<ReceiptSortingE
     private Double toCalculatedProfit;
 
     @Nullable
+    private String createdBy;
+
+    @Nullable
     private List<ReceiptStatusEnum> receiptStatusList;
 
     @Nullable
@@ -221,6 +224,14 @@ public class GetReceiptTableItemRequest extends SortedPagination<ReceiptSortingE
 
         if (!ObjectUtils.isEmpty(branchCodes)) {
             predicates.add(root.get(ReceiptEntity.FIELD_BRANCH).get(BranchEntity.FIELD_CODE).in(branchCodes));
+        }
+
+        if (!ObjectUtils.isEmpty(createdBy)) {
+            predicates.add(criteriaBuilder.equal(
+                    root
+                            .get(ReceiptEntity.FIELD_CREATED_BY),
+                    createdBy
+            ));
         }
 
         // return a conjunction of all predicates
