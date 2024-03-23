@@ -5,6 +5,7 @@ import com.outwork.accountingapiapp.constants.ReceiptStatusEnum;
 import com.outwork.accountingapiapp.exceptions.InvalidDataException;
 import com.outwork.accountingapiapp.models.entity.*;
 import com.outwork.accountingapiapp.models.payload.requests.GetReceiptTableItemRequest;
+import com.outwork.accountingapiapp.models.payload.requests.SaveNoteRequest;
 import com.outwork.accountingapiapp.models.payload.requests.SaveReceiptRepaymentEntryRequest;
 import com.outwork.accountingapiapp.models.payload.requests.SaveReceiptRequest;
 import com.outwork.accountingapiapp.models.payload.responses.ReceiptSumUpInfo;
@@ -24,6 +25,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 
 import java.io.IOException;
+import java.time.ZoneId;
 import java.util.*;
 
 @Service
@@ -109,7 +111,6 @@ public class ReceiptService {
         savedReceipt.setEmployee(AuditorAwareImpl.getUserFromSecurityContext());
         savedReceipt.setBranch(branchService.getBranchById(request.getBranchId()));
         savedReceipt.setCustomerCard(customerCardService.getCustomerCardById(request.getCustomerCardId()));
-        savedReceipt.setNote(request.getNote());
         savedReceipt.setUsingCardPrePayFee(request.isUsingCardPrePayFee());
         savedReceipt.setAcceptExceededFee(request.isAcceptExceededFee());
 
@@ -122,6 +123,13 @@ public class ReceiptService {
         validateReceiptForModify(savedReceipt);
 
         return receiptRepository.save(savedReceipt);
+    }
+
+    public void saveReceiptNote (SaveNoteRequest request) {
+        ReceiptEntity receipt = getReceipt(request.getId());
+        receipt.setNote(request.getNote());
+
+        receiptRepository.save(receipt);
     }
 
     public void remarkReCalculateReceiptsProfitFromBillsMatch (List<BillEntity> bills) {
@@ -158,7 +166,6 @@ public class ReceiptService {
         assignReceiptStatus(receipt);
         assignNewReceiptCode(receipt);
         billService.approveBills(receipt.getBills());
-        receipt.setCreatedDate(new Date());
 
         return receiptRepository.save(receipt);
     }
@@ -286,14 +293,15 @@ public class ReceiptService {
                 receiptRepository.findFirstByCodeNotNullAndBranchAndEmployeeAndCreatedDateBetweenOrderByCreatedDateDesc(
                         receipt.getBranch(),
                         receipt.getEmployee(),
-                        DateTimeUtils.atStartOfDay(new Date()),
-                        DateTimeUtils.atEndOfDay(new Date())
+                        DateTimeUtils.atStartOfDay(receipt.getCreatedDate()),
+                        DateTimeUtils.atEndOfDay(receipt.getCreatedDate())
                 );
 
         String newCode = ReceiptCodeHandler.generateReceiptCode(
                 receipt.getBranch().getCode(),
                 receipt.getEmployee().getCode(),
-                latestReceipt.map(ReceiptEntity::getCode).orElse(null)
+                latestReceipt.map(ReceiptEntity::getCode).orElse(null),
+                receipt.getCreatedDate()
         );
 
         receipt.setCode(newCode);

@@ -66,6 +66,8 @@ public class BranchAccountEntryEntity extends Auditable<String> {
     @Column(nullable = false)
     private String explanation;
 
+    private String note;
+
     @ManyToOne(optional = false)
     @JoinColumn(name = "branchId", nullable = false)
     private BranchEntity branch;

@@ -202,6 +202,13 @@ public class BranchAccountEntryService {
         return branchAccountEntryRepository.save(savedEntry);
     }
 
+    public void saveBranchAccountEntryNote (SaveNoteRequest request) {
+        BranchAccountEntryEntity branchAccountEntry = getEntryById(request.getId());
+        branchAccountEntry.setNote(request.getNote());
+
+        branchAccountEntryRepository.save(branchAccountEntry);
+    }
+
     public BranchAccountEntryEntity approveEntry(@NotNull UUID id) {
         BranchAccountEntryEntity approvedEntry = getEntryById(id);
 

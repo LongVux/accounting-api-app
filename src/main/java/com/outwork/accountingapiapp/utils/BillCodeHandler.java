@@ -6,15 +6,19 @@ import jakarta.validation.constraints.NotNull;
 import org.springframework.util.ObjectUtils;
 
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.Date;
 
 public class BillCodeHandler {
     private static final String BILL_CODE_REGEX = "^[A-Z0-9]+-\\d{6}-\\d+$";
     private static final String ERROR_MSG_INVALID_BILL_CDOE = "Mã Bill không hợp lệ";
-    public static String generateBillCode(@NotNull String posCode, String latestBillCode) {
-        LocalDate date = LocalDate.now();
+    public static String generateBillCode(@NotNull String posCode, String latestBillCode, Date date) {
+        LocalDate localDate = date.toInstant()
+                .atZone(ZoneId.systemDefault())
+                .toLocalDate();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DataFormat.DATE_FORMAT_ddMMyy);
-        String dateString = date.format(formatter);
+        String dateString = localDate.format(formatter);
 
         int orderNumber = getOrderNumber(latestBillCode) + 1;
 

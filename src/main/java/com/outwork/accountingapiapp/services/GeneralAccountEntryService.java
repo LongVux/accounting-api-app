@@ -79,6 +79,13 @@ public class GeneralAccountEntryService {
         return generalAccountEntryRepository.save(savedEntry);
     }
 
+    public void saveGeneralAccountEntryNote (SaveNoteRequest request) {
+        GeneralAccountEntryEntity generalAccountEntry = getEntryById(request.getId());
+        generalAccountEntry.setNote(request.getNote());
+
+        generalAccountEntryRepository.save(generalAccountEntry);
+    }
+
     public void generateGeneralAccountEntryFromMatchedBills(MatchingBillRequest request, List<BillEntity> matchedBills) {
         GeneralAccountEntryEntity savedEntry = new GeneralAccountEntryEntity();
 

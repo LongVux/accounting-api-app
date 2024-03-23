@@ -3,6 +3,7 @@ package com.outwork.accountingapiapp.controllers;
 import com.outwork.accountingapiapp.models.entity.GeneralAccountEntryEntity;
 import com.outwork.accountingapiapp.models.payload.requests.GetGeneralAccountEntryTableItemRequest;
 import com.outwork.accountingapiapp.models.payload.requests.SaveGeneralAccountEntryRequest;
+import com.outwork.accountingapiapp.models.payload.requests.SaveNoteRequest;
 import com.outwork.accountingapiapp.models.payload.responses.AccountEntrySumUpInfo;
 import com.outwork.accountingapiapp.models.payload.responses.GeneralAccountEntryTableItem;
 import com.outwork.accountingapiapp.services.GeneralAccountEntryService;
@@ -50,6 +51,11 @@ public class GeneralAccountEntryController {
     @PutMapping("/{id}")
     public ResponseEntity<GeneralAccountEntryEntity> updateEntry (@RequestBody @Valid SaveGeneralAccountEntryRequest request, @PathVariable @NotNull UUID id) {
         return ResponseEntity.ok(generalAccountEntryService.saveEntry(request, id));
+    }
+
+    @PutMapping("/note")
+    public void saveNote (@RequestBody @Valid SaveNoteRequest request) {
+        generalAccountEntryService.saveGeneralAccountEntryNote(request);
     }
 
     @DeleteMapping("/{id}")

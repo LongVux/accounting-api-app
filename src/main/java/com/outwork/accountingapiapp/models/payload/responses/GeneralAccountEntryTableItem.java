@@ -17,6 +17,7 @@ public class GeneralAccountEntryTableItem {
     private String entryType;
     private double moneyAmount;
     private AccountEntryStatusEnum entryStatus;
+    private String note;
 
     public GeneralAccountEntryTableItem(GeneralAccountEntryEntity entry) {
         this.id = entry.getId();
@@ -26,5 +27,6 @@ public class GeneralAccountEntryTableItem {
         this.entryType = entry.getEntryType();
         this.moneyAmount = entry.getMoneyAmount();
         this.entryStatus = entry.getEntryStatus();
+        this.note = entry.getNote();
     }
 }

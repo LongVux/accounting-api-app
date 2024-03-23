@@ -195,7 +195,6 @@ public class BillService {
             );
 
             bill.setCode(newBillCode);
-            bill.setCreatedDate(new Date());
 
             billCodeMap.put(
                     bill.getPos().getId(),
@@ -252,19 +251,21 @@ public class BillService {
             Optional<BillEntity> latestBill =
                     billRepository.findFirstByCodeNotNullAndPosAndCreatedDateBetweenOrderByCreatedDateDescTimeStampSeqDesc(
                             bill.getPos(),
-                            DateTimeUtils.atStartOfDay(new Date()),
-                            DateTimeUtils.atEndOfDay(new Date())
+                            DateTimeUtils.atStartOfDay(bill.getCreatedDate()),
+                            DateTimeUtils.atEndOfDay(bill.getCreatedDate())
                     );
 
             return BillCodeHandler.generateBillCode(
                     bill.getPos().getCode(),
-                    latestBill.map(BillEntity::getCode).orElse(null)
+                    latestBill.map(BillEntity::getCode).orElse(null),
+                    bill.getCreatedDate()
             );
         }
 
         return BillCodeHandler.generateBillCode(
                 bill.getPos().getCode(),
-                latestBillCode
+                latestBillCode,
+                bill.getCreatedDate()
         );
     }
 }

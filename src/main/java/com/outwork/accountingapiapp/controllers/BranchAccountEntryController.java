@@ -3,6 +3,7 @@ package com.outwork.accountingapiapp.controllers;
 import com.outwork.accountingapiapp.models.entity.BranchAccountEntryEntity;
 import com.outwork.accountingapiapp.models.payload.requests.GetBranchAccountEntryTableItemRequest;
 import com.outwork.accountingapiapp.models.payload.requests.SaveBranchAccountEntryRequest;
+import com.outwork.accountingapiapp.models.payload.requests.SaveNoteRequest;
 import com.outwork.accountingapiapp.models.payload.responses.AccountEntrySumUpInfo;
 import com.outwork.accountingapiapp.models.payload.responses.BranchAccountEntryTableItem;
 import com.outwork.accountingapiapp.services.BranchAccountEntryService;
@@ -50,6 +51,11 @@ public class BranchAccountEntryController {
     @PutMapping("/{id}")
     public ResponseEntity<BranchAccountEntryEntity> updateEntry (@RequestBody @Valid SaveBranchAccountEntryRequest request, @PathVariable @NotNull UUID id) {
         return ResponseEntity.ok(branchAccountEntryService.saveEntry(request, id));
+    }
+
+    @PutMapping("/note")
+    public void saveNote (@RequestBody @Valid SaveNoteRequest request) {
+        branchAccountEntryService.saveBranchAccountEntryNote(request);
     }
 
     @DeleteMapping("/{id}")

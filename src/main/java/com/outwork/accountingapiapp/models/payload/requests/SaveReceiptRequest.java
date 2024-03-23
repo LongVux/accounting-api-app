@@ -67,12 +67,6 @@ public class SaveReceiptRequest {
 
     private List<@Valid ReceiptBill> receiptBills;
 
-    @Size(
-            max = 255,
-            message = "{msg.err.string.range}"
-    )
-    private String note;
-
     private boolean usingCardPrePayFee;
 
     private boolean acceptExceededFee;

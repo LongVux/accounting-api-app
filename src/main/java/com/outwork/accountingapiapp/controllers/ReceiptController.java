@@ -1,10 +1,7 @@
 package com.outwork.accountingapiapp.controllers;
 
 import com.outwork.accountingapiapp.models.entity.ReceiptEntity;
-import com.outwork.accountingapiapp.models.payload.requests.GetReceiptTableItemRequest;
-import com.outwork.accountingapiapp.models.payload.requests.SaveReceiptEntryRequest;
-import com.outwork.accountingapiapp.models.payload.requests.SaveReceiptRepaymentEntryRequest;
-import com.outwork.accountingapiapp.models.payload.requests.SaveReceiptRequest;
+import com.outwork.accountingapiapp.models.payload.requests.*;
 import com.outwork.accountingapiapp.models.payload.responses.ReceiptSumUpInfo;
 import com.outwork.accountingapiapp.models.payload.responses.ReceiptTableItem;
 import com.outwork.accountingapiapp.services.BranchAccountEntryService;
@@ -64,10 +61,14 @@ public class ReceiptController {
         return ResponseEntity.ok(branchAccountEntryService.confirmRepayReceipt(request));
     }
 
-
     @PutMapping("/{id}")
     public ResponseEntity<ReceiptEntity> updateReceipt (@RequestBody @Valid SaveReceiptRequest request, @PathVariable @NotNull UUID id) {
         return ResponseEntity.ok(receiptService.saveReceipt(request, id));
+    }
+
+    @PutMapping("/note")
+    public void saveNote (@RequestBody @Valid SaveNoteRequest request) {
+        receiptService.saveReceiptNote(request);
     }
 
     @DeleteMapping("/{id}")
