@@ -5,6 +5,7 @@ import com.outwork.accountingapiapp.constants.PosStatusEnum;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 import lombok.Data;
+import org.springframework.lang.Nullable;
 
 import java.util.List;
 import java.util.UUID;
@@ -56,6 +57,6 @@ public class SavePosRequest {
     )
     private String note;
 
-    @NotNull(message = "{msg.err.string.blank}")
-    private UUID branchId;
+    @Nullable
+    private List<UUID> branchIds;
 }

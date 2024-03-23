@@ -5,7 +5,6 @@ import com.outwork.accountingapiapp.constants.ReceiptStatusEnum;
 import com.outwork.accountingapiapp.exceptions.InvalidDataException;
 import com.outwork.accountingapiapp.models.entity.*;
 import com.outwork.accountingapiapp.models.payload.requests.GetReceiptTableItemRequest;
-import com.outwork.accountingapiapp.models.payload.requests.ReceiptBill;
 import com.outwork.accountingapiapp.models.payload.requests.SaveReceiptRepaymentEntryRequest;
 import com.outwork.accountingapiapp.models.payload.requests.SaveReceiptRequest;
 import com.outwork.accountingapiapp.models.payload.responses.ReceiptSumUpInfo;
@@ -209,7 +208,9 @@ public class ReceiptService {
             throw new InvalidDataException(ERROR_MSG_EXPIRED_CUSTOMER_CARD);
         }
 
-        if (receipt.getBills().stream().anyMatch(bill -> !Objects.equals(bill.getPos().getBranch().getId(), receipt.getBranch().getId()))) {
+        if (receipt.getBills().stream().anyMatch(
+                bill -> bill.getPos().getBranches().stream().noneMatch(
+                        branch -> ObjectUtils.nullSafeEquals(branch.getId(), receipt.getBranch().getId())))) {
             throw new InvalidDataException(ERROR_MSG_SOME_POS_NOT_BELONG_TO_THE_RECEIPT_BRANCH);
         }
 

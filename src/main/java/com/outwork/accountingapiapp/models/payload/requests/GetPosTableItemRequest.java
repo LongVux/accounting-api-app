@@ -92,7 +92,7 @@ public class GetPosTableItemRequest extends SortedPagination<PosSortingEnum> imp
         }
 
         if (!ObjectUtils.isEmpty(branchCodes)) {
-            predicates.add(root.get(PosEntity.FIELD_BRANCH).get(BranchEntity.FIELD_CODE).in(branchCodes));
+            predicates.add(root.get(PosEntity.FIELD_BRANCHES).get(BranchEntity.FIELD_CODE).in(branchCodes));
         }
 
         return criteriaBuilder.and(predicates.toArray(new Predicate[0]));

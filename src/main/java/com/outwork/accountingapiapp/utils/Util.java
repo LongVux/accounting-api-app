@@ -91,29 +91,4 @@ public class Util {
     public static double numberStandardRound (double number) {
         return Math.round(number);
     }
-//
-//    public static double moneyStandardRound (double money) {
-//        return numberStandardRound(money / 1000)*1000;
-//    }
-//
-//    public static double moneyRoundUp (double money) {
-//        double roundedMoney = moneyStandardRound(money);
-//
-//        if (money % 1000 < 0.5) {
-//            roundedMoney += 1000;
-//        }
-//
-//        return roundedMoney;
-//    }
-//
-//    public static double moneyRoundDown (double money) {
-//        double roundedMoney = moneyStandardRound(money);
-//
-//        if (money % 1000 > 0.5) {
-//            roundedMoney -= 1000;
-//        }
-//
-//        return roundedMoney;
-//    }
-
 }

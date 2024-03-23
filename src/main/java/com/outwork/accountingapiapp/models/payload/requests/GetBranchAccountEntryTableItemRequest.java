@@ -56,7 +56,6 @@ public class GetBranchAccountEntryTableItemRequest extends SortedPagination<Bran
     @Nullable
     private String lastModifiedBy;
 
-
     @Override
     Map<BranchAccountEntrySortingEnum, String> getSorterMap() {
         return MapBuilder.buildBranchAccountTableItemSorter();

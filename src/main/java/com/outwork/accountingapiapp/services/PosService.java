@@ -59,7 +59,7 @@ public class PosService {
             return posRepository.findByCodeContainsIgnoreCaseAndPosStatus(searchKey, PosStatusEnum.AVAILABLE);
         }
 
-        return posRepository.findByCodeContainsIgnoreCaseAndPosStatusAndBranch_Id(searchKey, PosStatusEnum.AVAILABLE, branchId);
+        return posRepository.findByCodeContainsIgnoreCaseAndPosStatusAndBranches_Id(searchKey, PosStatusEnum.AVAILABLE, branchId);
     }
 
     public List<PosEntity> getPosesFromReceiptBillsAndCardTypeId (List<ReceiptBill> receiptBills, @NotNull UUID cardTypeId) {
@@ -142,7 +142,7 @@ public class PosService {
         pos.setBank(request.getBank());
         pos.setMaxBillAmount(request.getMaxBillAmount());
         pos.setNote(request.getNote());
-        pos.setBranch(branchService.getBranchById(request.getBranchId()));
+        pos.setBranches(branchService.getBranches(Optional.ofNullable(request.getBranchIds()).orElse(Collections.emptyList())));
 
         posCardFeeService.buildPosCardFeesForPos(request.getSupportedCardTypes(), pos);
 

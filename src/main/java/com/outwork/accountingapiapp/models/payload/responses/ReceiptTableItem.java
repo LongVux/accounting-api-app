@@ -28,6 +28,7 @@ public class ReceiptTableItem {
     private double estimatedProfit;
     private UUID customerCardId;
     private String customerCardName;
+    private String customerCardNumber;
     private UUID employeeId;
     private String employeeName;
     private UUID branchId;
@@ -50,6 +51,7 @@ public class ReceiptTableItem {
         this.estimatedProfit = receipt.getEstimatedProfit();
         this.customerCardId = receipt.getCustomerCard().getId();
         this.customerCardName = receipt.getCustomerCard().getName();
+        this.customerCardNumber = receipt.getCustomerCard().getAccountNumber();
         this.employeeId = receipt.getEmployee().getId();
         this.employeeName = receipt.getEmployee().getName();
         this.branchId = receipt.getBranch().getId();

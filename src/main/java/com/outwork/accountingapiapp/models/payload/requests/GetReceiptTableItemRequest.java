@@ -11,7 +11,6 @@ import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
-import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.springframework.data.jpa.domain.Specification;
@@ -97,6 +96,10 @@ public class GetReceiptTableItemRequest extends SortedPagination<ReceiptSortingE
 
     @Nullable
     private List<String> branchCodes;
+
+    @Nullable
+    private Boolean OnlyNotConfirmedReceipt;
+
 
     @Override
     public Predicate toPredicate(Root<ReceiptEntity> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder) {
@@ -231,6 +234,12 @@ public class GetReceiptTableItemRequest extends SortedPagination<ReceiptSortingE
                     root
                             .get(ReceiptEntity.FIELD_CREATED_BY),
                     createdBy
+            ));
+        }
+
+        if (Boolean.TRUE.equals(getOnlyNotConfirmedReceipt())) {
+            predicates.add(criteriaBuilder.isNull(
+                    root.get(ReceiptEntity.FIELD_CODE)
             ));
         }
 

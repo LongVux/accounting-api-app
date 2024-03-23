@@ -140,7 +140,7 @@ public class BillService {
     }
 
     public List<BillEntity> getMatchingBills (GetMatchingBillsRequest request) {
-        List<BillEntity> bills = billRepository.findByPos_IdAndCreatedDateBetweenAndCodeNotNullOrderByCreatedDateAscTimeStampSeqAsc(request.getPosId(), request.getFromCreatedDate(), request.getToCreatedDate());
+        List<BillEntity> bills = billRepository.findByPos_IdAndCreatedDateBetweenAndCodeNotNullAndReturnedTimeNullOrderByCreatedDateAscTimeStampSeqAsc(request.getPosId(), request.getFromCreatedDate(), request.getToCreatedDate());
 
         List<BillEntity> responseList = new ArrayList<>();
         double moneyAmount = 0d;

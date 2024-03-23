@@ -41,6 +41,10 @@ public class BranchService {
         return branchRepository.findAll();
     }
 
+    public List<BranchEntity> getBranches (List<UUID> branchIds) {
+        return branchRepository.findByIdIn(branchIds);
+    }
+
     public BranchEntity getBranchById (@NotNull UUID id) {
         return branchRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(id.toString()));
     }
