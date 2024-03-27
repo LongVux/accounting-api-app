@@ -114,7 +114,7 @@ public class GetReceiptTableItemRequest extends SortedPagination<ReceiptSortingE
             ));
         }
 
-        if (!ObjectUtils.isEmpty(employeeCode) && ObjectUtils.isEmpty(receiptStatusList)) {
+        if (!ObjectUtils.isEmpty(employeeCode)) {
             predicates.add(criteriaBuilder.like(
                     root
                             .get(ReceiptEntity.FIELD_EMPLOYEE)
@@ -229,7 +229,7 @@ public class GetReceiptTableItemRequest extends SortedPagination<ReceiptSortingE
             predicates.add(root.get(ReceiptEntity.FIELD_BRANCH).get(BranchEntity.FIELD_CODE).in(branchCodes));
         }
 
-        if (!ObjectUtils.isEmpty(createdBy)) {
+        if (!ObjectUtils.isEmpty(createdBy) && ObjectUtils.isEmpty(receiptStatusList)) {
             predicates.add(criteriaBuilder.equal(
                     root
                             .get(ReceiptEntity.FIELD_CREATED_BY),
