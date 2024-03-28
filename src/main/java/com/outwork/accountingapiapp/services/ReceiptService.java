@@ -253,9 +253,9 @@ public class ReceiptService {
             throw new InvalidDataException(ERROR_MSG_IMBALANCED_RECEIPT);
         }
 
-        if (receipt.getPayout() < totalBillAfterFee - receipt.getShipmentFee()) {
-            throw new InvalidDataException(ERROR_MSG_IMBALANCED_RECEIPT);
-        }
+//        if (receipt.getPayout() < totalBillAfterFee - receipt.getShipmentFee()) {
+//            throw new InvalidDataException(ERROR_MSG_IMBALANCED_RECEIPT);
+//        }
     }
 
     private void calculateReceiptTransactionTotal (ReceiptEntity receipt) {
