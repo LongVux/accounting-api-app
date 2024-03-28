@@ -72,8 +72,10 @@ public class BillEntity extends Auditable<String> {
 
         if (!ObjectUtils.isEmpty(receipt.getId())) {
             bill.setId(UUID.randomUUID());
-            bill.setReceipt(receipt);
         }
+
+        bill.setReceipt(receipt);
+
         return bill;
     }
 
