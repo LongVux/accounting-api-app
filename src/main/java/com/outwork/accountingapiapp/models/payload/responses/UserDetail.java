@@ -2,6 +2,7 @@ package com.outwork.accountingapiapp.models.payload.responses;
 
 import com.outwork.accountingapiapp.models.entity.BranchEntity;
 import com.outwork.accountingapiapp.models.entity.RoleEntity;
+import com.outwork.accountingapiapp.models.entity.UserBranchEntity;
 import com.outwork.accountingapiapp.models.entity.UserEntity;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -19,7 +20,7 @@ public class UserDetail {
     private String phoneNumber;
     private String token;
     private List<RoleEntity> roles;
-    private List<BranchEntity> branches;
+    private List<UserBranchEntity> branchManagementScopes;
 
     public static UserDetail toUserDetail(UserEntity userEntity) {
         return new UserDetail(
@@ -30,7 +31,7 @@ public class UserDetail {
                 userEntity.getPhoneNumber(),
                 null,
                 userEntity.getRoles(),
-                userEntity.getBranches()
+                userEntity.getBranchManagementScopes()
         );
     }
     public static UserDetail toUserDetail(UserEntity userEntity, String token) {
@@ -42,7 +43,7 @@ public class UserDetail {
                 userEntity.getPhoneNumber(),
                 token,
                 userEntity.getRoles(),
-                userEntity.getBranches()
+                userEntity.getBranchManagementScopes()
         );
     }
 }

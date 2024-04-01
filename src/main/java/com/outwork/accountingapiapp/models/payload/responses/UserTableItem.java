@@ -25,7 +25,7 @@ public class UserTableItem {
         this.code = user.getCode();
         this.email = user.getEmail();
         this.phoneNumber = user.getPhoneNumber();
-        this.branchCode = String.join(DataFormat.DEFAULT_SEPARATOR, user.getBranches().stream().map(BranchEntity::getCode).toList());
+        this.branchCode = String.join(DataFormat.DEFAULT_SEPARATOR, user.getBranchManagementScopes().stream().map(scope -> scope.getBranch().getCode()).toList());
         this.roleTitle = String.join(DataFormat.DEFAULT_SEPARATOR, user.getRoles().stream().map(RoleEntity::getTitle).toList());
         this.accountBalance = user.getAccountBalance();
     }

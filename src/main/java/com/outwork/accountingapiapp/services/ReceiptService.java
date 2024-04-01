@@ -199,7 +199,7 @@ public class ReceiptService {
         UserEntity editor = AuditorAwareImpl.getUserFromSecurityContext();
 
         if (!ObjectUtils.nullSafeEquals(receipt.getCreatedBy(), editor.getCode()) &&
-                editor.getBranches().stream().noneMatch(branch -> ObjectUtils.nullSafeEquals(branch.getId(), receipt.getBranch().getId()))) {
+                editor.getBranchManagementScopes().stream().noneMatch(scope -> ObjectUtils.nullSafeEquals(scope.getBranch().getId(), receipt.getBranch().getId()))) {
             throw new InvalidDataException(ERROR_MSG_USER_DOES_NOT_HAVE_RIGHT_TO_SAVE_RECEIPT_IN_THIS_BRANCH);
         }
 

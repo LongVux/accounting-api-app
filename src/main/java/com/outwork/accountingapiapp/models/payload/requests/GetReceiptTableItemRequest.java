@@ -98,7 +98,7 @@ public class GetReceiptTableItemRequest extends SortedPagination<ReceiptSortingE
     private List<String> branchCodes;
 
     @Nullable
-    private Boolean OnlyNotConfirmedReceipt;
+    private Boolean onlyNotConfirmedReceipt;
 
 
     @Override

@@ -52,10 +52,10 @@ public class PosCardFeeService {
         });
 
         if (ObjectUtils.isEmpty(pos.getSupportedCardTypes())) {
-            pos.setSupportedCardTypes( posCardFeeMap.values().stream().toList());
+            pos.setSupportedCardTypes(posCardFeeMap.values().stream().toList());
         } else {
             pos.getSupportedCardTypes().clear();
-            pos.getSupportedCardTypes().addAll( posCardFeeMap.values().stream().toList());
+            pos.getSupportedCardTypes().addAll(posCardFeeMap.values().stream().toList());
         }
     }
 }

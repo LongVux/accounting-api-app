@@ -4,6 +4,7 @@ import com.outwork.accountingapiapp.constants.DataFormat;
 import com.outwork.accountingapiapp.constants.UserSortingEnum;
 import com.outwork.accountingapiapp.models.entity.BranchEntity;
 import com.outwork.accountingapiapp.models.entity.RoleEntity;
+import com.outwork.accountingapiapp.models.entity.UserBranchEntity;
 import com.outwork.accountingapiapp.models.entity.UserEntity;
 import com.outwork.accountingapiapp.utils.MapBuilder;
 import jakarta.annotation.Nullable;
@@ -100,7 +101,7 @@ public class GetUserTableItemRequest extends SortedPagination<UserSortingEnum> i
 
         if (!ObjectUtils.isEmpty(branchCode)) {
             predicates.add(criteriaBuilder.like(
-                    root.join (UserEntity.FIELD_BRANCHES).get(BranchEntity.FIELD_CODE),
+                    root.join (UserEntity.FIELD_BRANCH_MANAGEMENT_SCOPES).get(UserBranchEntity.FIELD_BRANCH).get(BranchEntity.FIELD_CODE),
                     String.format(DataFormat.LIKE_QUERY_FORMAT, branchCode)
             ));
         }

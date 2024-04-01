@@ -29,7 +29,7 @@ public class UserService {
     public static final String ERROR_MSG_PHONE_NAME_EXISTED = "Số điện thoại đã tồn tại";
     public static final String ERROR_MSG_BRANCH_BANK_ACCOUNT_EXISTED = "Tài khoản ngân hàng đã tồn tại";
     public static final String ERROR_MSG_SOME_ROLE_NOT_EXISTED = "Một số chức danh không tồn tại";
-    public static final String ERROR_MSG_SOME_BRANCH_NOT_EXISTED = "Một số chi nhánh không tồn tại";
+
 
     public static final String ERROR_MSG_CANNOT_DELETE = "Dữ liệu này đã được sử dụng trong hệ thống, không thể xóa!";
 
@@ -38,6 +38,9 @@ public class UserService {
 
     @Autowired
     private RoleService roleService;
+
+    @Autowired
+    private UserBranchService userBranchService;
 
     @Autowired
     private BranchService branchService;
@@ -66,7 +69,6 @@ public class UserService {
         UserEntity newUser = new UserEntity();
 
         List<RoleEntity> roleEntities = roleService.findRolesByIds(request.getRoleIds());
-        List<BranchEntity> branchEntities = branchService.findBranchEntitiesByIds(request.getBranchIds());
 
         newUser.setName(request.getName());
         newUser.setCode(request.getCode());
@@ -75,12 +77,13 @@ public class UserService {
         newUser.setAccountNumber(request.getAccountNumber());
         newUser.setBank(request.getBank());
         newUser.setPassword(encodedPassword);
-        newUser.setBranches(branchEntities);
         newUser.setRoles(roleEntities);
         newUser.setSalary(request.getSalary());
         newUser.setAccountBalance(0);
 
-        validateSaveUserRequest(newUser, request.getRoleIds(), request.getBranchIds());
+        userBranchService.buildUserBranchesForUser(request.getSaveBranchManagementConfigRequests(), newUser);
+
+        validateSaveUserRequest(newUser, request.getRoleIds());
 
         return userRepository.save(newUser);
     }
@@ -89,18 +92,19 @@ public class UserService {
         UserEntity savedUser = getUserEntityById(id);
 
         List<RoleEntity> roleEntities = roleService.findRolesByIds(request.getRoleIds());
-        List<BranchEntity> branchEntities = branchService.findBranchEntitiesByIds(request.getBranchIds());
 
         savedUser.setName(request.getName());
         savedUser.setEmail(request.getEmail());
         savedUser.setPhoneNumber(request.getPhoneNumber());
         savedUser.setAccountNumber(request.getAccountNumber());
         savedUser.setBank(request.getBank());
-        savedUser.setBranches(branchEntities);
+
         savedUser.setRoles(roleEntities);
         savedUser.setSalary(request.getSalary());
 
-        validateSaveUserRequest(savedUser, request.getRoleIds(), request.getBranchIds());
+        userBranchService.buildUserBranchesForUser(request.getSaveBranchManagementConfigRequests(), savedUser);
+
+        validateSaveUserRequest(savedUser, request.getRoleIds());
 
         return userRepository.save(savedUser);
     }
@@ -108,24 +112,23 @@ public class UserService {
     public UserEntity saveUserEntity (UserEntity user) {
         validateSaveUserRequest(
                 user,
-                user.getRoles().stream().map(RoleEntity::getId).toList(),
-                user.getBranches().stream().map(BranchEntity::getId).toList()
+                user.getRoles().stream().map(RoleEntity::getId).toList()
         );
 
         return userRepository.save(user);
+    }
+
+    public void changePassword () {
+
     }
 
     public void deleteUser (@NotNull UUID id) {
         userRepository.deleteById(id);
     }
 
-    private void validateSaveUserRequest (UserEntity user, List<UUID> roleIds, List<UUID> branchIds) {
+    private void validateSaveUserRequest (UserEntity user, List<UUID> roleIds) {
         if (roleIds.size() > user.getRoles().size()) {
             throw new EntityNotFoundException(ERROR_MSG_SOME_ROLE_NOT_EXISTED);
-        }
-
-        if (branchIds.size() > user.getBranches().size()) {
-            throw new EntityNotFoundException(ERROR_MSG_SOME_BRANCH_NOT_EXISTED);
         }
 
         if (userRepository.existsByEmailAndIdNot(user.getEmail(), Optional.ofNullable(user.getId()).orElse(UUID.randomUUID()))) {

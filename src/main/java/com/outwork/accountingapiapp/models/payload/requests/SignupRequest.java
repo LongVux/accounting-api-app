@@ -75,5 +75,5 @@ public class SignupRequest {
     private List<UUID> roleIds;
 
     @NotEmpty(message = "{msg.err.list.empty}")
-    private List<UUID> branchIds;
+    private List<SaveBranchManagementConfigRequest> saveBranchManagementConfigRequests;
 }
