@@ -62,7 +62,8 @@ public class GetBranchAccountEntryTableItemRequest extends SortedPagination<Bran
     }
 
     @Override
-    public Predicate toPredicate(Root<BranchAccountEntryEntity> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder) {
+    public Predicate toPredicate(Root<BranchAccountEntryEntity> root, CriteriaQuery<?> query,
+                                 CriteriaBuilder criteriaBuilder) {
         List<Predicate> predicates = new ArrayList<>();
 
         if (!ObjectUtils.isEmpty(fromCreatedDate) && !ObjectUtils.isEmpty(toCreatedDate)) {

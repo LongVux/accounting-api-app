@@ -11,4 +11,6 @@ public interface SuggestedCustomer {
     String getName();
 
     String getNationalId();
+
+    Double getPercentageFee();
 }

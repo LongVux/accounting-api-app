@@ -31,19 +31,19 @@ public class CustomerService {
     @Autowired
     private CustomerRepository customerRepository;
 
-    public CustomerEntity getCustomerById (@NotNull UUID id) {
+    public CustomerEntity getCustomerById(@NotNull UUID id) {
         return customerRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(id.toString()));
     }
 
-    public Page<CustomerTableItem> getCustomerTableItems (GetCustomerTableItemRequest request) {
+    public Page<CustomerTableItem> getCustomerTableItems(GetCustomerTableItemRequest request) {
         return customerRepository.findAll(request, request.retrievePageConfig());
     }
 
-    public List<SuggestedCustomer> findCustomersByName (@Size(min = 2) String name) {
+    public List<SuggestedCustomer> findCustomersByName(@Size(min = 2) String name) {
         return customerRepository.findByNameLikeIgnoreCase(String.format(DataFormat.LIKE_QUERY_FORMAT, name));
     }
 
-    public CustomerEntity saveCustomerEntity (@Valid SaveCustomerRequest request, UUID id) {
+    public CustomerEntity saveCustomerEntity(@Valid SaveCustomerRequest request, UUID id) {
         validateSaveCustomerRequest(request, id);
 
         CustomerEntity savedCustomer = ObjectUtils.isEmpty(id) ? new CustomerEntity() : getCustomerById(id);
@@ -52,16 +52,15 @@ public class CustomerService {
         return customerRepository.save(savedCustomer);
     }
 
-    public void deleteCustomerEntity (@NotNull UUID id) {
+    public void deleteCustomerEntity(@NotNull UUID id) {
         try {
             customerRepository.deleteById(id);
         } catch (Exception e) {
             throw new InvalidDataException(ERROR_MSG_CANNOT_DELETE);
         }
-
     }
 
-    public void mapSaveCustomerRequestToEntity (SaveCustomerRequest request, CustomerEntity customer) {
+    public void mapSaveCustomerRequestToEntity(SaveCustomerRequest request, CustomerEntity customer) {
         customer.setName(request.getName());
         customer.setAddress(request.getAddress());
         customer.setPhoneNumber(request.getPhoneNumber());
@@ -70,12 +69,14 @@ public class CustomerService {
         customer.setNote(request.getNote());
     }
 
-    private void validateSaveCustomerRequest (SaveCustomerRequest request, UUID id) {
-        if (customerRepository.existsByPhoneNumberAndIdNot(request.getPhoneNumber(), Optional.ofNullable(id).orElse(UUID.randomUUID()))) {
+    private void validateSaveCustomerRequest(SaveCustomerRequest request, UUID id) {
+        if (customerRepository.existsByPhoneNumberAndIdNot(request.getPhoneNumber(),
+                Optional.ofNullable(id).orElse(UUID.randomUUID()))) {
             throw new DuplicatedValueException(ERROR_MSG_CUSTOMER_PHONE_EXISTED);
         }
 
-        if (customerRepository.existsByNationalIdAndIdNot(request.getNationalId(), Optional.ofNullable(id).orElse(UUID.randomUUID()))) {
+        if (customerRepository.existsByNationalIdAndIdNot(request.getNationalId(),
+                Optional.ofNullable(id).orElse(UUID.randomUUID()))) {
             throw new DuplicatedValueException(ERROR_MSG_CUSTOMER_NATION_ID_EXISTED);
         }
     }

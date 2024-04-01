@@ -25,17 +25,10 @@ import java.util.List;
 
 @Service
 public class AuthService implements UserDetailsService {
-    private String ERROR_MSG_USER_CODE_EXISTED = "Mã người dùng đã tồn tại";
-    private String ERROR_MSG_EMAIL_EXISTED = "Email đã tồn tại";
-    private String ERROR_MSG_PHONE_NUMBER_EXISTED = "Số điện thoại đã tồn tại";
-
     private String SUCCESS_MSG_REGISTRATION_SUCCESSFULLY = "Đăng ký tài khoản thành công";
 
     @Autowired
     private UserService userService;
-
-    @Autowired
-    private PasswordEncoder passwordEncoder;
 
     @Autowired
     private AuthenticationManager authenticationManager;
@@ -50,7 +43,7 @@ public class AuthService implements UserDetailsService {
     }
 
     public String registerUser (@Valid SignupRequest signUpRequest) {
-        userService.createUser(signUpRequest, passwordEncoder.encode(signUpRequest.getPassword()));
+        userService.createUser(signUpRequest);
 
         return SUCCESS_MSG_REGISTRATION_SUCCESSFULLY;
     }
@@ -69,4 +62,5 @@ public class AuthService implements UserDetailsService {
 
         return UserDetail.toUserDetail(securedUserDetails.getUserEntity(), jwt);
     }
+
 }
