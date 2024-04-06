@@ -1,9 +1,11 @@
 package com.outwork.accountingapiapp.services;
 
 import com.outwork.accountingapiapp.exceptions.DuplicatedValueException;
+import com.outwork.accountingapiapp.exceptions.InvalidDataException;
 import com.outwork.accountingapiapp.models.entity.BranchEntity;
 import com.outwork.accountingapiapp.models.entity.RoleEntity;
 import com.outwork.accountingapiapp.models.entity.UserEntity;
+import com.outwork.accountingapiapp.models.payload.requests.ChangePasswordRequest;
 import com.outwork.accountingapiapp.models.payload.requests.GetUserTableItemRequest;
 import com.outwork.accountingapiapp.models.payload.requests.SignupRequest;
 import com.outwork.accountingapiapp.models.payload.requests.UpdateUserRequest;
@@ -15,6 +17,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
@@ -45,11 +48,14 @@ public class UserService {
     @Autowired
     private BranchService branchService;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
     public Optional<UserEntity> findUserEntityByCode(String userCode) {
         return userRepository.findByCode(userCode);
     }
 
-    public List<String> searchUserCode (String searchKey) {
+    public List<String> searchUserCode(String searchKey) {
         return userRepository.findByCodeContainsIgnoreCase(searchKey).stream().map(UserEntity::getCode).toList();
     }
 
@@ -57,18 +63,19 @@ public class UserService {
         return userRepository.findByCode(userCode).orElseThrow(() -> new EntityNotFoundException(userCode));
     }
 
-    public Page<UserTableItem> getUserTableItems (GetUserTableItemRequest request) {
+    public Page<UserTableItem> getUserTableItems(GetUserTableItemRequest request) {
         return userRepository.findAll(request, request.retrievePageConfig()).map(UserTableItem::new);
     }
 
-    public UserEntity getUserEntityById (@NotNull UUID id) {
+    public UserEntity getUserEntityById(@NotNull UUID id) {
         return userRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(id.toString()));
     }
 
-    public UserEntity createUser (@Valid SignupRequest request, String encodedPassword) {
+    public UserEntity createUser(@Valid SignupRequest request) {
         UserEntity newUser = new UserEntity();
 
         List<RoleEntity> roleEntities = roleService.findRolesByIds(request.getRoleIds());
+        List<BranchEntity> branchEntities = branchService.findBranchEntitiesByIds(request.getBranchIds());
 
         newUser.setName(request.getName());
         newUser.setCode(request.getCode());
@@ -76,7 +83,7 @@ public class UserService {
         newUser.setPhoneNumber(request.getPhoneNumber());
         newUser.setAccountNumber(request.getAccountNumber());
         newUser.setBank(request.getBank());
-        newUser.setPassword(encodedPassword);
+        newUser.setPassword(passwordEncoder.encode(request.getPassword()));
         newUser.setRoles(roleEntities);
         newUser.setSalary(request.getSalary());
         newUser.setAccountBalance(0);
@@ -88,7 +95,14 @@ public class UserService {
         return userRepository.save(newUser);
     }
 
-    public UserEntity updateUser (@Valid UpdateUserRequest request, @NotNull UUID id) {
+    public void changePassword(@Valid ChangePasswordRequest request, @NotNull UUID id) {
+        UserEntity user = getUserEntityById(id);
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
+
+        userRepository.save(user);
+    }
+
+    public UserEntity updateUser(@Valid UpdateUserRequest request, @NotNull UUID id) {
         UserEntity savedUser = getUserEntityById(id);
 
         List<RoleEntity> roleEntities = roleService.findRolesByIds(request.getRoleIds());
@@ -118,12 +132,12 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    public void changePassword () {
-
-    }
-
-    public void deleteUser (@NotNull UUID id) {
-        userRepository.deleteById(id);
+    public void deleteUser(@NotNull UUID id) {
+        try {
+            userRepository.deleteById(id);
+        } catch (Exception e) {
+            throw new InvalidDataException(ERROR_MSG_CANNOT_DELETE);
+        }
     }
 
     private void validateSaveUserRequest (UserEntity user, List<UUID> roleIds) {
