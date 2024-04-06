@@ -75,7 +75,6 @@ public class UserService {
         UserEntity newUser = new UserEntity();
 
         List<RoleEntity> roleEntities = roleService.findRolesByIds(request.getRoleIds());
-        List<BranchEntity> branchEntities = branchService.findBranchEntitiesByIds(request.getBranchIds());
 
         newUser.setName(request.getName());
         newUser.setCode(request.getCode());

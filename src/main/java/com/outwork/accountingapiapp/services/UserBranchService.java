@@ -38,7 +38,7 @@ public class UserBranchService {
 
         Map<UUID, UserBranchEntity> userBranchMap = new HashMap<>();
 
-        for (int i = 0; i < requests.size(); i++) {
+        requests.forEach(request -> {
             UserBranchEntity newUserBranch = new UserBranchEntity();
 
             if (!ObjectUtils.isEmpty(user.getId())) {
@@ -46,15 +46,16 @@ public class UserBranchService {
                 newUserBranch.setUser(user);
             }
 
-            newUserBranch.setOrderId(i);
-            userBranchMap.put(requests.get(i).getBranchId(), newUserBranch);
-        }
+            newUserBranch.setOrderId(request.getOrderId());
+            userBranchMap.put(request.getBranchId(), newUserBranch);
+        });
 
         branches.forEach(branch -> {
             if (userBranchMap.containsKey(branch.getId())) {
                 userBranchMap.get(branch.getId()).setBranch(branch);
             }
         });
+
 
         if (ObjectUtils.isEmpty(user.getBranchManagementScopes())) {
             user.setBranchManagementScopes(userBranchMap.values().stream().toList());
