@@ -57,7 +57,7 @@ public class UserBranchService {
         });
 
 
-        if (ObjectUtils.isEmpty(user.getBranchManagementScopes())) {
+        if (user.getBranchManagementScopes() == null) {
             user.setBranchManagementScopes(userBranchMap.values().stream().toList());
         } else {
             user.getBranchManagementScopes().clear();

@@ -51,7 +51,7 @@ public class PosCardFeeService {
             }
         });
 
-        if (ObjectUtils.isEmpty(pos.getSupportedCardTypes())) {
+        if (pos.getSupportedCardTypes() == null) {
             pos.setSupportedCardTypes(posCardFeeMap.values().stream().toList());
         } else {
             pos.getSupportedCardTypes().clear();
