@@ -54,7 +54,7 @@ public class GetBranchAccountEntryTableItemRequest extends SortedPagination<Bran
     private List<String> branchCodes;
 
     @Nullable
-    private String lastModifiedBy;
+    private String createdBy;
 
     @Override
     Map<BranchAccountEntrySortingEnum, String> getSorterMap() {
@@ -105,10 +105,10 @@ public class GetBranchAccountEntryTableItemRequest extends SortedPagination<Bran
             predicates.add(root.get(BranchAccountEntryEntity.FIELD_BRANCH).get(BranchEntity.FIELD_CODE).in(branchCodes));
         }
 
-        if (!ObjectUtils.isEmpty(lastModifiedBy)) {
+        if (!ObjectUtils.isEmpty(createdBy)) {
             predicates.add(criteriaBuilder.like(
-                    root.get(BranchAccountEntryEntity.FIELD_LAST_MODIFIED_BY),
-                    String.format(DataFormat.LIKE_QUERY_FORMAT, lastModifiedBy)
+                    root.get(BranchAccountEntryEntity.FIELD_CREATED_BY),
+                    String.format(DataFormat.LIKE_QUERY_FORMAT, createdBy)
             ));
         }
 
