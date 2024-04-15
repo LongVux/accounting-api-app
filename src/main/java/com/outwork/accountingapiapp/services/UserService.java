@@ -77,6 +77,7 @@ public class UserService {
 
         List<RoleEntity> roleEntities = roleService.findRolesByIds(request.getRoleIds());
 
+        newUser.setId(UUID.randomUUID());
         newUser.setName(request.getName());
         newUser.setCode(request.getCode());
         newUser.setEmail(request.getEmail());

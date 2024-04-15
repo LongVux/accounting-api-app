@@ -78,7 +78,6 @@ public class UserEntity {
     }
 
     public List<UserBranchEntity> getBranchManagementScopes () {
-        this.branchManagementScopes.sort(Comparator.comparing(UserBranchEntity::getOrderId));
         return this.branchManagementScopes;
     }
 }
