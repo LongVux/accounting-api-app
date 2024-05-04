@@ -32,10 +32,10 @@ public class CustomerEntity extends Auditable<String> {
     @Column(unique = true, nullable = false, length = DataConstraint.ID_STRING_MAX_LENGTH)
     private String phoneNumber;
 
-    @Column(unique = true, nullable = false, length = DataConstraint.ID_STRING_MAX_LENGTH)
+    @Column(unique = true, length = DataConstraint.ID_STRING_MAX_LENGTH)
     private String nationalId;
 
-    @Column(nullable = false)
+    @Column
     private double percentageFee;
 
     private String note;

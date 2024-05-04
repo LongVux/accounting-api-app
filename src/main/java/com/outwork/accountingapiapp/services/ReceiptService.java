@@ -107,8 +107,11 @@ public class ReceiptService {
         savedReceipt.setPayout(request.getPayout());
         savedReceipt.setLoan(request.getLoan());
         savedReceipt.setRepayment(request.getRepayment());
-        savedReceipt.setImageId(request.getImageId());;
-        savedReceipt.setEmployee(AuditorAwareImpl.getUserFromSecurityContext());
+        savedReceipt.setImageId(request.getImageId());
+
+        // can not update the employee once created
+        // savedReceipt.setEmployee(AuditorAwareImpl.getUserFromSecurityContext());
+
         savedReceipt.setBranch(branchService.getBranchById(request.getBranchId()));
         savedReceipt.setCustomerCard(customerCardService.getCustomerCardById(request.getCustomerCardId()));
         savedReceipt.setUsingCardPrePayFee(request.isUsingCardPrePayFee());

@@ -18,7 +18,6 @@ public class SaveCustomerRequest {
     private String name;
 
     @Size(
-            min = DataConstraint.SHORT_STRING_MIN_LENGTH,
             max = DataConstraint.SHORT_STRING_MAX_LENGTH,
             message = "{msg.err.string.range}"
     )
@@ -36,16 +35,12 @@ public class SaveCustomerRequest {
     private String phoneNumber;
 
     @Size(
-            min = DataConstraint.SHORT_STRING_MIN_LENGTH,
             max = DataConstraint.ID_STRING_MAX_LENGTH,
             message = "{msg.err.string.range}"
     )
     private String nationalId;
 
-    @Min(
-            value = 0,
-            message = "{msg.err.double.min}"
-    )
+
     @Max(
             value = 100,
             message = "{msg.err.double.max}"
