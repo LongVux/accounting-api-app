@@ -2,6 +2,7 @@ package com.outwork.accountingapiapp.services;
 
 import com.outwork.accountingapiapp.configs.audit.AuditorAwareImpl;
 import com.outwork.accountingapiapp.constants.ReceiptStatusEnum;
+import com.outwork.accountingapiapp.exceptions.DuplicatedValueException;
 import com.outwork.accountingapiapp.exceptions.InvalidDataException;
 import com.outwork.accountingapiapp.models.entity.*;
 import com.outwork.accountingapiapp.models.payload.requests.GetReceiptTableItemRequest;
@@ -41,6 +42,7 @@ public class ReceiptService {
     public static final String ERROR_MSG_CAN_NOT_DETERMINE_PRE_PAID_FEE_HOLDER = "Hệ thống không xác định được người đang giữ số tiền đã ứng";
     public static final String ERROR_MSG_SOME_POS_NOT_BELONG_TO_THE_RECEIPT_BRANCH = "Một số POS không thuộc về chi nhánh của hóa đơn này";
     public static final String ERROR_MSG_USER_DOES_NOT_HAVE_RIGHT_TO_SAVE_RECEIPT_IN_THIS_BRANCH = "Khách hàng không có quyền lưu hóa đơn trên chi nhánh này";
+    public static final String ERROR_MSG_IMAGE_ID_EXISTED = "Lỗi hệ thống: ID của ảnh chứng từ đã tồn tại, vui lòng thử lại lần nữa hoặc tải lại trang";
     @Autowired
     private ReceiptRepository receiptRepository;
 
@@ -110,7 +112,9 @@ public class ReceiptService {
         savedReceipt.setImageId(request.getImageId());
 
         // can not update the employee once created
-        // savedReceipt.setEmployee(AuditorAwareImpl.getUserFromSecurityContext());
+        if (ObjectUtils.isEmpty(id)) {
+             savedReceipt.setEmployee(AuditorAwareImpl.getUserFromSecurityContext());
+        }
 
         savedReceipt.setBranch(branchService.getBranchById(request.getBranchId()));
         savedReceipt.setCustomerCard(customerCardService.getCustomerCardById(request.getCustomerCardId()));
@@ -222,6 +226,11 @@ public class ReceiptService {
                 bill -> bill.getPos().getBranches().stream().noneMatch(
                         branch -> ObjectUtils.nullSafeEquals(branch.getId(), receipt.getBranch().getId())))) {
             throw new InvalidDataException(ERROR_MSG_SOME_POS_NOT_BELONG_TO_THE_RECEIPT_BRANCH);
+        }
+
+        if (receiptRepository.existsByImageIdAndIdNot(receipt.getImageId(),
+                Optional.ofNullable(receipt.getId()).orElse(UUID.randomUUID()))) {
+            throw new DuplicatedValueException(ERROR_MSG_IMAGE_ID_EXISTED);
         }
 
         validateReceiptBalance(receipt);

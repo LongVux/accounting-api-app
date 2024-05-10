@@ -70,6 +70,7 @@ public class ReceiptEntity extends Auditable<String> {
     @Column(nullable = false)
     private double estimatedProfit;
 
+    @Column(unique = true)
     private String imageId;
 
     private String note;
