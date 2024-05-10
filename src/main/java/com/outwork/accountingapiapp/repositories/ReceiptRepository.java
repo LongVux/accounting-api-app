@@ -24,5 +24,4 @@ public interface ReceiptRepository extends JpaRepository<ReceiptEntity, UUID> {
 
     Page<ReceiptEntity> findAll (Specification<ReceiptEntity> receiptSpecification, Pageable pageable);
 
-    boolean existsByImageIdAndIdNot(String imageId, UUID id);
 }
