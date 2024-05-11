@@ -9,6 +9,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -100,6 +101,9 @@ public class ReceiptEntity extends Auditable<String> {
     @ManyToOne(optional = false)
     @JoinColumn(name = "branchId", nullable = false)
     private BranchEntity branch;
+
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date confirmedDate;
 
     public void setBills(List<BillEntity> bills) {
         this.bills = bills.stream().peek(bill -> bill.setReceipt(this)).toList();

@@ -169,6 +169,7 @@ public class ReceiptService {
 
         validateReceiptForApproval(receipt);
 
+        receipt.setConfirmedDate(new Date());
         assignReceiptStatus(receipt);
         assignNewReceiptCode(receipt);
         billService.approveBills(receipt.getBills());
@@ -296,7 +297,7 @@ public class ReceiptService {
 
     private void assignNewReceiptCode (ReceiptEntity receipt) {
         Optional<ReceiptEntity> latestReceipt =
-                receiptRepository.findFirstByCodeNotNullAndBranchAndEmployeeAndCreatedDateBetweenOrderByCreatedDateDesc(
+                receiptRepository.findFirstByCodeNotNullAndBranchAndEmployeeAndCreatedDateBetweenOrderByConfirmedDateDesc(
                         receipt.getBranch(),
                         receipt.getEmployee(),
                         DateTimeUtils.atStartOfDay(receipt.getCreatedDate()),

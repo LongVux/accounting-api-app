@@ -15,11 +15,11 @@ import java.util.UUID;
 
 @Repository
 public interface ReceiptRepository extends JpaRepository<ReceiptEntity, UUID> {
-    Optional<ReceiptEntity> findFirstByCodeNotNullAndBranchAndEmployeeAndCreatedDateBetweenOrderByCreatedDateDesc(
+    Optional<ReceiptEntity> findFirstByCodeNotNullAndBranchAndEmployeeAndCreatedDateBetweenOrderByConfirmedDateDesc(
             BranchEntity branch,
             UserEntity user,
-            Date createdDateStart,
-            Date createdDateEnd
+            Date confirmedDateStart,
+            Date confirmedDateEnd
     );
 
     Page<ReceiptEntity> findAll (Specification<ReceiptEntity> receiptSpecification, Pageable pageable);
