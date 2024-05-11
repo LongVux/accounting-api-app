@@ -188,7 +188,11 @@ public class BillService {
 
         Map<UUID, String> billCodeMap = new HashMap<>();
 
+        Date confirmedDate = new Date();
+
         for (BillEntity bill: bills) {
+            bill.setConfirmedDate(confirmedDate);
+
             String newBillCode = getNewBillCode(
                     bill,
                     billCodeMap.get(bill.getPos().getId())
@@ -249,7 +253,7 @@ public class BillService {
     private String getNewBillCode(BillEntity bill, String latestBillCode) {
         if (latestBillCode == null) {
             Optional<BillEntity> latestBill =
-                    billRepository.findFirstByCodeNotNullAndPosAndCreatedDateBetweenOrderByCreatedDateDescTimeStampSeqDesc(
+                    billRepository.findFirstByCodeNotNullAndPosAndCreatedDateBetweenOrderByConfirmedDateDescTimeStampSeqDesc(
                             bill.getPos(),
                             DateTimeUtils.atStartOfDay(bill.getCreatedDate()),
                             DateTimeUtils.atEndOfDay(bill.getCreatedDate())

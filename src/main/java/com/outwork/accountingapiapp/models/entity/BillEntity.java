@@ -67,6 +67,9 @@ public class BillEntity extends Auditable<String> {
     @JoinColumn(name = "receiptId", nullable = false)
     private ReceiptEntity receipt;
 
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date confirmedDate;
+
     public static BillEntity buildNewBill (ReceiptEntity receipt) {
         BillEntity bill = new BillEntity();
 
