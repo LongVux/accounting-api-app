@@ -2,7 +2,6 @@ package com.outwork.accountingapiapp.services;
 
 import com.outwork.accountingapiapp.configs.audit.AuditorAwareImpl;
 import com.outwork.accountingapiapp.constants.ReceiptStatusEnum;
-import com.outwork.accountingapiapp.exceptions.DuplicatedValueException;
 import com.outwork.accountingapiapp.exceptions.InvalidDataException;
 import com.outwork.accountingapiapp.models.entity.*;
 import com.outwork.accountingapiapp.models.payload.requests.GetReceiptTableItemRequest;
@@ -25,8 +24,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 
-import java.io.IOException;
-import java.time.ZoneId;
 import java.util.*;
 
 @Service
@@ -260,7 +257,7 @@ public class ReceiptService {
             throw new InvalidDataException(ERROR_MSG_IMBALANCED_RECEIPT);
         }
 
-//        if (receipt.getPayout() < totalBillAfterFee - receipt.getShipmentFee()) {
+//        if (receipt.getPayout() > totalBillAfterFee + receipt.getShipmentFee()) {
 //            throw new InvalidDataException(ERROR_MSG_IMBALANCED_RECEIPT);
 //        }
     }

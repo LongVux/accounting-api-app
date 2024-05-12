@@ -78,7 +78,7 @@ public class BranchAccountEntryService {
     private void handleAdjustBalanceForApprover (ReceiptEntity receipt) {
         UserEntity approver = AuditorAwareImpl.getUserFromSecurityContext();
 
-        Double adjustedBalanceAmount = receipt.getIntake() - receipt.getPayout() - receipt.getLoan() + receipt.getRepayment();
+        Double adjustedBalanceAmount = receipt.getIntake() - receipt.getPayout() + receipt.getRepayment();
 
         adjustedBalanceAmount -= !receipt.isAcceptExceededFee() ? 0 :
                 !receipt.isUsingCardPrePayFee()? receipt.getIntake() :
