@@ -80,11 +80,12 @@ public class BranchAccountEntryService {
 
         Double adjustedBalanceAmount = receipt.getIntake() - receipt.getPayout() + receipt.getRepayment();
 
-        adjustedBalanceAmount -= !receipt.isAcceptExceededFee() ? 0 :
-                !receipt.isUsingCardPrePayFee()? receipt.getIntake() :
-                        receipt.getCustomerCard().getPrePaidFee();
+        if (receipt.isUsingCardPrePayFee()) {
+            // when using the pre-paid fee, the approver do not actually receive any intake
+            adjustedBalanceAmount -= receipt.getIntake();
+        }
 
-        approver.setAccountBalance(approver.getAccountBalance() - adjustedBalanceAmount);
+        approver.setAccountBalance(approver.getAccountBalance() + adjustedBalanceAmount);
 
         userService.saveUserEntity(approver);
     }

@@ -225,6 +225,10 @@ public class ReceiptService {
             throw new InvalidDataException(ERROR_MSG_SOME_POS_NOT_BELONG_TO_THE_RECEIPT_BRANCH);
         }
 
+        if (receipt.isUsingCardPrePayFee() && !receipt.isAcceptExceededFee() && receipt.getIntake() > receipt.getCustomerCard().getPrePaidFee()) {
+            throw new InvalidDataException(ERROR_MSG_INTAKE_EXCEED_PRE_PAID_FEE);
+        }
+
         validateReceiptBalance(receipt);
     }
 
