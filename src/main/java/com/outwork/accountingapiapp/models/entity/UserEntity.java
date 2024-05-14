@@ -7,6 +7,7 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.util.ObjectUtils;
 
 import java.util.*;
 
@@ -66,7 +67,6 @@ public class UserEntity {
     private List<RoleEntity> roles;
 
     @OneToMany(mappedBy = "user", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
-    @Getter(AccessLevel.NONE)
     private List<UserBranchEntity> branchManagementScopes;
 
     public void setAccountBalance (double accountBalance) {
@@ -77,7 +77,12 @@ public class UserEntity {
         }
     }
 
-    public List<UserBranchEntity> getBranchManagementScopes () {
-        return this.branchManagementScopes;
+//    public List<UserBranchEntity> getBranchManagementScopes () {
+//        return this.branchManagementScopes;
+//    }
+
+    public UserBranchEntity getDefaultBranchManagementScopes () {
+        List<UserBranchEntity> scopes = this.branchManagementScopes.stream().sorted((s1, s2) -> s1.getOrderId() - s2.getOrderId()).toList();
+        return scopes.get(0);
     }
 }

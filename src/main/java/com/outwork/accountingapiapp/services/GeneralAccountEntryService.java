@@ -105,6 +105,8 @@ public class GeneralAccountEntryService {
 
         approver.setAccountBalance(approver.getAccountBalance() + savedEntry.getMoneyAmount());
 
+        savedEntry.setRemainingBalance(approver.getAccountBalance());
+
         userService.saveUserEntity(approver);
 
         generalAccountEntryRepository.save(savedEntry);
@@ -134,6 +136,7 @@ public class GeneralAccountEntryService {
         }
 
         userService.saveUserEntity(approver);
+        approvedEntry.setRemainingBalance(approver.getAccountBalance());
 
         return generalAccountEntryRepository.save(approvedEntry);
     }

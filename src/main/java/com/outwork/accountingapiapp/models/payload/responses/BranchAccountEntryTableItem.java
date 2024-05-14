@@ -20,6 +20,7 @@ public class BranchAccountEntryTableItem {
     private String branchCode;
     private String lastModifiedBy;
     private String note;
+    private double remainingBalance;
 
     public BranchAccountEntryTableItem (BranchAccountEntryEntity entry) {
         this.id = entry.getId();
@@ -32,5 +33,6 @@ public class BranchAccountEntryTableItem {
         this.branchCode = entry.getBranch().getCode();
         this.lastModifiedBy = entry.getLastModifiedBy();
         this.note = entry.getNote();
+        this.remainingBalance = entry.getRemainingBalance();
     }
 }

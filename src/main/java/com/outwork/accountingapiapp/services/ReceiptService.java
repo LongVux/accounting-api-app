@@ -91,6 +91,7 @@ public class ReceiptService {
         sumUpInfo.setTotalRepayment(Optional.ofNullable(result.get(4)).orElse(0d));
         sumUpInfo.setTotalEstimatedProfit(Optional.ofNullable(result.get(5)).orElse(0d));
         sumUpInfo.setTotalCalculatedProfit(Optional.ofNullable(result.get(6)).orElse(0d));
+        sumUpInfo.setTotalShipmentFee(Optional.ofNullable(result.get(7)).orElse(0d));
 
         return sumUpInfo;
     }

@@ -11,4 +11,5 @@ public class ReceiptSumUpInfo {
     private double totalRepayment;
     private double totalEstimatedProfit;
     private double totalCalculatedProfit;
+    private double totalShipmentFee;
 }

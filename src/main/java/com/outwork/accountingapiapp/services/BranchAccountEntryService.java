@@ -4,10 +4,7 @@ import com.outwork.accountingapiapp.configs.audit.AuditorAwareImpl;
 import com.outwork.accountingapiapp.constants.AccountEntryStatusEnum;
 import com.outwork.accountingapiapp.constants.TransactionTypeEnum;
 import com.outwork.accountingapiapp.exceptions.InvalidDataException;
-import com.outwork.accountingapiapp.models.entity.BranchAccountEntryEntity;
-import com.outwork.accountingapiapp.models.entity.CustomerCardEntity;
-import com.outwork.accountingapiapp.models.entity.ReceiptEntity;
-import com.outwork.accountingapiapp.models.entity.UserEntity;
+import com.outwork.accountingapiapp.models.entity.*;
 import com.outwork.accountingapiapp.models.payload.requests.*;
 import com.outwork.accountingapiapp.models.payload.responses.AccountEntrySumUpInfo;
 import com.outwork.accountingapiapp.models.payload.responses.BranchAccountEntryTableItem;
@@ -19,6 +16,7 @@ import com.outwork.accountingapiapp.utils.Util;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
+import org.apache.catalina.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
@@ -59,9 +57,9 @@ public class BranchAccountEntryService {
     public ReceiptEntity confirmReceiptEntry(@Valid SaveReceiptEntryRequest request) {
         ReceiptEntity receipt = receiptService.approveReceiptForEntry(request.getReceiptId());
 
-        handleCreateEntriesForReceipt(receipt, request);
+        UserEntity approverAfterBalance = handleAdjustBalanceForApprover(receipt);
 
-        handleAdjustBalanceForApprover(receipt);
+        handleCreateEntriesForReceipt(receipt, request, approverAfterBalance);
 
         if (receipt.isUsingCardPrePayFee()) {
             handleAdjustBalanceForCard(receipt);
@@ -70,12 +68,12 @@ public class BranchAccountEntryService {
         return receipt;
     }
 
-    private void handleCreateEntriesForReceipt (ReceiptEntity receipt, SaveReceiptEntryRequest request) {
-        List<BranchAccountEntryEntity> entities = generateBranchAccountEntriesFromReceipt(receipt, request);
+    private void handleCreateEntriesForReceipt (ReceiptEntity receipt, SaveReceiptEntryRequest request, UserEntity approverAfterBalance) {
+        List<BranchAccountEntryEntity> entities = generateBranchAccountEntriesFromReceipt(receipt, request, approverAfterBalance);
         branchAccountEntryRepository.saveAll(entities);
     }
 
-    private void handleAdjustBalanceForApprover (ReceiptEntity receipt) {
+    private UserEntity handleAdjustBalanceForApprover (ReceiptEntity receipt) {
         UserEntity approver = AuditorAwareImpl.getUserFromSecurityContext();
 
         Double adjustedBalanceAmount = receipt.getIntake() - receipt.getPayout() + receipt.getRepayment();
@@ -83,11 +81,15 @@ public class BranchAccountEntryService {
         if (receipt.isUsingCardPrePayFee()) {
             // when using the pre-paid fee, the approver do not actually receive any intake
             adjustedBalanceAmount -= receipt.getIntake();
+
+            if (receipt.isAcceptExceededFee()) {
+                adjustedBalanceAmount = receipt.getIntake() - receipt.getCustomerCard().getPrePaidFee();
+            }
         }
 
         approver.setAccountBalance(approver.getAccountBalance() + adjustedBalanceAmount);
 
-        userService.saveUserEntity(approver);
+        return userService.saveUserEntity(approver);
     }
 
     private void handleAdjustBalanceForCard (ReceiptEntity receipt) {
@@ -122,6 +124,7 @@ public class BranchAccountEntryService {
 
         userService.saveUserEntity(approver);
 
+        repaidEntry.setRemainingBalance(approver.getAccountBalance());
         branchAccountEntryRepository.save(repaidEntry);
 
         return receipt;
@@ -156,6 +159,8 @@ public class BranchAccountEntryService {
         entry.setEntryCode(getNewBranchEntryCode(entry));
 
         editor.setAccountBalance(editor.getAccountBalance() + adjustment);
+
+        entry.setRemainingBalance(editor.getAccountBalance());
 
         userService.saveUserEntity(editor);
 
@@ -228,6 +233,7 @@ public class BranchAccountEntryService {
         }
 
         userService.saveUserEntity(approver);
+        approvedEntry.setRemainingBalance(approver.getAccountBalance());
 
         return branchAccountEntryRepository.save(approvedEntry);
     }
@@ -247,7 +253,7 @@ public class BranchAccountEntryService {
     }
 
     private List<BranchAccountEntryEntity> generateBranchAccountEntriesFromReceipt(ReceiptEntity receipt,
-                                                                                   SaveReceiptEntryRequest request) {
+                                                                                   SaveReceiptEntryRequest request, UserEntity approverAfterBalance) {
         Map<TransactionTypeEnum, Double> receiptEntryMap = new HashMap<>();
 
         receiptEntryMap.put(TransactionTypeEnum.INTAKE, receipt.getIntake());
@@ -264,7 +270,12 @@ public class BranchAccountEntryService {
                     receiptEntryMap.get(key),
                     request.getImageId()
             )).peek(entry ->
-                entry.setEntryCode(getNewBranchEntryCode(entry))
+                {
+                    entry.setEntryCode(getNewBranchEntryCode(entry));
+                    if (TransactionTypeEnum.PAYOUT.equals(entry.getTransactionType())) {
+                        entry.setRemainingBalance(approverAfterBalance.getAccountBalance());
+                    }
+                }
             ).toList());
 
         if (receipt.isUsingCardPrePayFee() && receipt.getIntake() > 0) {
