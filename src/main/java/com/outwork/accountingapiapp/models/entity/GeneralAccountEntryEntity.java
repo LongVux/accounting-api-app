@@ -37,7 +37,7 @@ public class GeneralAccountEntryEntity extends Auditable<String> {
     private double moneyAmount;
 
     @Column
-    private double remainingBalance;
+    private Double remainingBalance;
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
