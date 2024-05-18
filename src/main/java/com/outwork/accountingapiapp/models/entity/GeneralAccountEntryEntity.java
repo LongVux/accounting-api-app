@@ -43,7 +43,7 @@ public class GeneralAccountEntryEntity extends Auditable<String> {
     @Enumerated(EnumType.STRING)
     private AccountEntryStatusEnum entryStatus;
 
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "LONGTEXT")
     private String explanation;
 
     private String note;
