@@ -34,6 +34,7 @@ public class ReceiptTableItem {
     private UUID branchId;
     private String branchName;
     private String note;
+    private String approverCode;
 
     public ReceiptTableItem(ReceiptEntity receipt) {
         this.id = receipt.getId();
@@ -58,5 +59,6 @@ public class ReceiptTableItem {
         this.branchName = receipt.getBranch().getName();
         this.totalFee = receipt.getBills().stream().mapToDouble(BillEntity::getFee).sum() + receipt.getShipmentFee();
         this.note = receipt.getNote();
+        this.approverCode = receipt.getApproverCode();
     }
 }

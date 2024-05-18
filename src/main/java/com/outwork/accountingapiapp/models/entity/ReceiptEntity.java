@@ -106,6 +106,8 @@ public class ReceiptEntity extends Auditable<String> {
     @Temporal(TemporalType.TIMESTAMP)
     private Date confirmedDate;
 
+    private String approverCode;
+
     public void setBills(List<BillEntity> bills) {
         this.bills = bills.stream().peek(bill -> bill.setReceipt(this)).toList();
     }

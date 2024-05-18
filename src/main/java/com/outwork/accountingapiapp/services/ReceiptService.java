@@ -162,12 +162,14 @@ public class ReceiptService {
 
     public ReceiptEntity approveReceiptForEntry (@NotNull UUID id) {
         ReceiptEntity receipt = getReceipt(id);
-
+        UserEntity approver = AuditorAwareImpl.getUserFromSecurityContext();
+        
         validateReceiptForModify(receipt);
 
         validateReceiptForApproval(receipt);
 
         receipt.setConfirmedDate(new Date());
+        receipt.setApproverCode(approver.getCode());
         assignReceiptStatus(receipt);
         assignNewReceiptCode(receipt);
         billService.approveBills(receipt.getBills());
@@ -256,15 +258,9 @@ public class ReceiptService {
     private void validateReceiptBalance (ReceiptEntity receipt) {
         double totalBillFee = receipt.getBills().stream().mapToDouble(BillEntity::getFee).sum();
 
-        double totalBillAfterFee = receipt.getBills().stream().mapToDouble(bill -> bill.getMoneyAmount() - bill.getFee()).sum();
-
-        if (receipt.getTransactionTotal() < totalBillFee + receipt.getShipmentFee() + receipt.getPayout() - receipt.getIntake() - receipt.getLoan()) {
+        if (receipt.getTransactionTotal() - receipt.getShipmentFee() < totalBillFee + receipt.getPayout() - receipt.getIntake() - receipt.getLoan()) {
             throw new InvalidDataException(ERROR_MSG_IMBALANCED_RECEIPT);
         }
-
-//        if (receipt.getPayout() > totalBillAfterFee + receipt.getShipmentFee()) {
-//            throw new InvalidDataException(ERROR_MSG_IMBALANCED_RECEIPT);
-//        }
     }
 
     private void calculateReceiptTransactionTotal (ReceiptEntity receipt) {
@@ -273,7 +269,6 @@ public class ReceiptService {
                 .map(BillEntity::getMoneyAmount)
                 .mapToDouble(Double::doubleValue)
                 .sum()
-                + receipt.getShipmentFee()
          );
     }
 

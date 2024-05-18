@@ -100,6 +100,11 @@ public class GetReceiptTableItemRequest extends SortedPagination<ReceiptSortingE
     @Nullable
     private Boolean onlyNotConfirmedReceipt;
 
+    @Nullable
+    private Boolean onlyInDebtReceipt;
+
+    @Nullable
+    private Boolean onlyHaveShipmentFee;
 
     @Override
     public Predicate toPredicate(Root<ReceiptEntity> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder) {
@@ -241,6 +246,14 @@ public class GetReceiptTableItemRequest extends SortedPagination<ReceiptSortingE
             predicates.add(criteriaBuilder.isNull(
                     root.get(ReceiptEntity.FIELD_CODE)
             ));
+        }
+
+        if (Boolean.TRUE.equals(getOnlyInDebtReceipt())) {
+            predicates.add(criteriaBuilder.greaterThan(root.get(ReceiptEntity.FIELD_LOAN), root.get(ReceiptEntity.FIELD_REPAYMENT)));
+        }
+
+        if (Boolean.TRUE.equals(getOnlyHaveShipmentFee())) {
+            predicates.add(criteriaBuilder.greaterThan(root.get(ReceiptEntity.FIELD_SHIPMENT_FEE), 0));
         }
 
         // return a conjunction of all predicates
