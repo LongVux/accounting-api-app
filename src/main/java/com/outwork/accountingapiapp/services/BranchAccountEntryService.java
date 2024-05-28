@@ -34,7 +34,7 @@ public class BranchAccountEntryService {
     public static final String ENTRY_TYPE_USING_PRE_PAID_FEE_FOR_RECEIPT = "HPU-%s";
     public static final String ENTRY_TYPE_RETURN_PRE_PAID_FEE = "Hoàn phí đã ứng";
     public static final String ENTRY_TYPE_COLLECT_PRE_PAID_FEE = "Thu phí muốn ứng";
-    public static final String EXPLANATION_ADJUST_PREPAID_FEE_FOR_CARD = "Thay đổi phí ứng trước của thẻ %s - %s - %s";
+    public static final String EXPLANATION_ADJUST_PREPAID_FEE_FOR_CARD = "Thay đổi phí ứng trước của thẻ %s - %s - %s - %s";
 
     public static final String ENTRY_TYPE_DELETE_CONFIRMED_RECEIPT = "Hủy hóa đơn";
 
@@ -190,7 +190,7 @@ public class BranchAccountEntryService {
         BranchAccountEntryEntity entry = new BranchAccountEntryEntity();
         entry.setEntryStatus(AccountEntryStatusEnum.APPROVED);
         entry.setMoneyAmount(Math.abs(adjustment));
-        entry.setExplanation(String.format(EXPLANATION_ADJUST_PREPAID_FEE_FOR_CARD, customerCard.getName(), customerCard.getBank(), customerCard.getAccountNumber()));
+        entry.setExplanation(String.format(EXPLANATION_ADJUST_PREPAID_FEE_FOR_CARD, customerCard.getName(), customerCard.getBank(), customerCard.getAccountNumber(), customerCard.getId().toString()));
         entry.setImageId(request.getImageId());
         entry.setBranch(branchService.getBranchById(request.getBranchId()));
 
