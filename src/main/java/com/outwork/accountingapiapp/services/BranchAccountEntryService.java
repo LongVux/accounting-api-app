@@ -13,6 +13,7 @@ import com.outwork.accountingapiapp.repositories.BranchAccountEntryRepository;
 import com.outwork.accountingapiapp.utils.BranchAccountEntryCodeHandler;
 import com.outwork.accountingapiapp.utils.DateTimeUtils;
 import com.outwork.accountingapiapp.utils.Util;
+import jakarta.annotation.Nullable;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -127,9 +128,13 @@ public class BranchAccountEntryService {
 
         String defaultExplanation = String.format(EXPLANATION_DELETE_CONFIRMED_RECEIPT, receipt.getCode(), receipt.getApproverCode(), receipt.getEmployee().getCode());
 
+        if (!ObjectUtils.isEmpty(explanation)) {
+            defaultExplanation += explanation;
+        }
+
         deleteReceiptEntry.setEntryType(ENTRY_TYPE_DELETE_CONFIRMED_RECEIPT);
         deleteReceiptEntry.setBranch(receipt.getBranch());
-        deleteReceiptEntry.setExplanation(defaultExplanation + explanation);
+        deleteReceiptEntry.setExplanation(defaultExplanation);
         deleteReceiptEntry.setMoneyAmount(Math.abs(refundAmount));
         deleteReceiptEntry.setEntryStatus(AccountEntryStatusEnum.APPROVED);
         deleteReceiptEntry.setRemainingBalance(approver.getAccountBalance());

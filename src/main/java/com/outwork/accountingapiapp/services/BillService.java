@@ -132,9 +132,9 @@ public class BillService {
     }
 
     public void deleteBills (List<BillEntity> bills) {
-        if (bills.stream().anyMatch(bill -> !ObjectUtils.isEmpty(bill.getCode()))) {
-            throw new InvalidDataException(ERROR_MSG_BILL_ALREADY_HAS_CODE);
-        }
+//        if (bills.stream().anyMatch(bill -> !ObjectUtils.isEmpty(bill.getCode()))) {
+//            throw new InvalidDataException(ERROR_MSG_BILL_ALREADY_HAS_CODE);
+//        }
 
         billRepository.deleteAll(bills);
     }

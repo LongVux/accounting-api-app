@@ -6,6 +6,7 @@ import com.outwork.accountingapiapp.models.payload.responses.ReceiptSumUpInfo;
 import com.outwork.accountingapiapp.models.payload.responses.ReceiptTableItem;
 import com.outwork.accountingapiapp.services.BranchAccountEntryService;
 import com.outwork.accountingapiapp.services.ReceiptService;
+import jakarta.annotation.Nullable;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -72,7 +73,7 @@ public class ReceiptController {
     }
 
     @DeleteMapping("/{id}")
-    public void deleteReceipt (@PathVariable @NotNull UUID id, @RequestParam String explanation) {
+    public void deleteReceipt (@PathVariable @NotNull UUID id, @RequestParam(defaultValue = "") String explanation) {
         receiptService.deleteReceipt(id, explanation);
     }
 }

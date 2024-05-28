@@ -14,6 +14,7 @@ import com.outwork.accountingapiapp.repositories.ReceiptRepository;
 import com.outwork.accountingapiapp.utils.DateTimeUtils;
 import com.outwork.accountingapiapp.utils.ReceiptCodeHandler;
 import com.outwork.accountingapiapp.utils.Util;
+import jakarta.annotation.Nullable;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -198,7 +199,7 @@ public class ReceiptService {
     public void deleteReceipt (@NotNull UUID id, String explanation) {
         ReceiptEntity receipt = getReceipt(id);
 
-        if (ObjectUtils.isEmpty(receipt.getCode())) {
+        if (!ObjectUtils.isEmpty(receipt.getCode())) {
             branchAccountEntryService.handleDeleteConfirmedReceiptRelatedEntries(receipt);
             branchAccountEntryService.handleRefundForDeletedConfirmedReceipt(receipt, explanation);
         }
