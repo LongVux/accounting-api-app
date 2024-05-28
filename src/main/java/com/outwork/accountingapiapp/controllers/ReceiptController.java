@@ -72,7 +72,7 @@ public class ReceiptController {
     }
 
     @DeleteMapping("/{id}")
-    public void deleteReceipt (@PathVariable @NotNull UUID id) {
-        receiptService.deleteReceipt(id);
+    public void deleteReceipt (@PathVariable @NotNull UUID id, @RequestParam String explanation) {
+        receiptService.deleteReceipt(id, explanation);
     }
 }

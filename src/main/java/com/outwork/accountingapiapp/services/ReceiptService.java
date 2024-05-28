@@ -55,6 +55,9 @@ public class ReceiptService {
     private FileStoringService fileStoringService;
 
     @Autowired
+    private BranchAccountEntryService branchAccountEntryService;
+
+    @Autowired
     private Util util;
 
     public ReceiptEntity getReceipt (@NotNull UUID id) {
@@ -192,10 +195,13 @@ public class ReceiptService {
     }
 
     @Transactional(rollbackFor = {Exception.class, Throwable.class})
-    public void deleteReceipt (@NotNull UUID id) {
+    public void deleteReceipt (@NotNull UUID id, String explanation) {
         ReceiptEntity receipt = getReceipt(id);
 
-        validateReceiptForModify(receipt);
+        if (ObjectUtils.isEmpty(receipt.getCode())) {
+            branchAccountEntryService.handleDeleteConfirmedReceiptRelatedEntries(receipt);
+            branchAccountEntryService.handleRefundForDeletedConfirmedReceipt(receipt, explanation);
+        }
 
         fileStoringService.deleteFile(receipt.getImageId());
         billService.deleteBills(receipt.getBills());

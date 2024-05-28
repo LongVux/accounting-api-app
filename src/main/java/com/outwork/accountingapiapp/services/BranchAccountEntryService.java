@@ -34,6 +34,10 @@ public class BranchAccountEntryService {
     public static final String ENTRY_TYPE_RETURN_PRE_PAID_FEE = "Hoàn phí đã ứng";
     public static final String ENTRY_TYPE_COLLECT_PRE_PAID_FEE = "Thu phí muốn ứng";
     public static final String EXPLANATION_ADJUST_PREPAID_FEE_FOR_CARD = "Thay đổi phí ứng trước của thẻ %s - %s - %s";
+
+    public static final String ENTRY_TYPE_DELETE_CONFIRMED_RECEIPT = "Hủy hóa đơn";
+
+    public static final String EXPLANATION_DELETE_CONFIRMED_RECEIPT = "Mã hóa đơn bị hủy: %s\nNgười xác nhận: %s\nNgười tạo: %s\n";
     @Autowired
     private BranchAccountEntryRepository branchAccountEntryRepository;
 
@@ -102,6 +106,46 @@ public class BranchAccountEntryService {
         receipt.getCustomerCard().setPrePaidFee(receipt.getCustomerCard().getPrePaidFee() - adjustedBalanceAmount);
 
         customerCardService.saveCustomerCardEntity(receipt.getCustomerCard());
+    }
+
+    public void handleDeleteConfirmedReceiptRelatedEntries (ReceiptEntity receipt) {
+        UserEntity approver = userService.getUserEntityByCode(receipt.getApproverCode());
+
+        List<BranchAccountEntryEntity> relatedEntries = branchAccountEntryRepository.findByReceipt_Id(receipt.getId());
+
+        relatedEntries.forEach(entry -> entry.setReceipt(null));
+
+        branchAccountEntryRepository.saveAll(relatedEntries);
+    }
+
+    public void handleRefundForDeletedConfirmedReceipt (ReceiptEntity receipt, String explanation) {
+        BranchAccountEntryEntity deleteReceiptEntry = new BranchAccountEntryEntity();
+        double refundAmount = receipt.getPayout() - receipt.getIntake() + receipt.getLoan() - receipt.getRepayment();
+
+        UserEntity approver = userService.getUserEntityByCode(receipt.getApproverCode());
+        approver.setAccountBalance(approver.getAccountBalance() + refundAmount);
+
+        String defaultExplanation = String.format(EXPLANATION_DELETE_CONFIRMED_RECEIPT, receipt.getCode(), receipt.getApproverCode(), receipt.getEmployee().getCode());
+
+        deleteReceiptEntry.setEntryType(ENTRY_TYPE_DELETE_CONFIRMED_RECEIPT);
+        deleteReceiptEntry.setBranch(receipt.getBranch());
+        deleteReceiptEntry.setExplanation(defaultExplanation + explanation);
+        deleteReceiptEntry.setMoneyAmount(Math.abs(refundAmount));
+        deleteReceiptEntry.setEntryStatus(AccountEntryStatusEnum.APPROVED);
+        deleteReceiptEntry.setRemainingBalance(approver.getAccountBalance());
+
+        if (refundAmount < 0) {
+            deleteReceiptEntry.setTransactionType(TransactionTypeEnum.PAYOUT);
+        }
+
+        if (refundAmount > 0) {
+            deleteReceiptEntry.setTransactionType(TransactionTypeEnum.INTAKE);
+        }
+
+        deleteReceiptEntry.setEntryCode(getNewBranchEntryCode(deleteReceiptEntry));
+
+        userService.saveUserEntity(approver);
+        branchAccountEntryRepository.save(deleteReceiptEntry);
     }
 
     @Transactional(rollbackFor = {Exception.class, Throwable.class})
