@@ -292,11 +292,10 @@ public class ReceiptService {
     private void calculateReceiptProfit (ReceiptEntity receipt) {
         double billReturnSum = receipt.getBills().stream()
                 .filter(bill -> !ObjectUtils.isEmpty(bill.getReturnedTime()))
-                .map(BillEntity::getReturnFromBank)
+                .map(bill -> bill.getFee() + bill.getReturnFromBank() - bill.getMoneyAmount())
                 .mapToDouble(Double::doubleValue)
                 .sum();
-
-        receipt.setCalculatedProfit(billReturnSum + receipt.getIntake() - receipt.getPayout() - receipt.getLoan() + receipt.getRepayment() + receipt.getShipmentFee());
+        receipt.setCalculatedProfit(billReturnSum + receipt.getShipmentFee());
     }
 
     private void assignNewReceiptCode (ReceiptEntity receipt) {
