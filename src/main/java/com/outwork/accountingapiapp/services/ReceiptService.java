@@ -189,7 +189,7 @@ public class ReceiptService {
         }
 
         receipt.setRepayment(receipt.getRepayment() + request.getRepaidAmount());
-        receipt.setCalculatedProfit(receipt.getCalculatedProfit() + request.getRepaidAmount());
+        //receipt.setCalculatedProfit(receipt.getCalculatedProfit() + request.getRepaidAmount());
         assignReceiptStatus(receipt);
 
         return receiptRepository.save(receipt);
@@ -291,7 +291,6 @@ public class ReceiptService {
 
     private void calculateReceiptProfit (ReceiptEntity receipt) {
         double billReturnSum = receipt.getBills().stream()
-                .filter(bill -> !ObjectUtils.isEmpty(bill.getReturnedTime()))
                 .map(bill -> bill.getFee() + bill.getReturnFromBank() - bill.getMoneyAmount())
                 .mapToDouble(Double::doubleValue)
                 .sum();
