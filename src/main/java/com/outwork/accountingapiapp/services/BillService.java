@@ -193,6 +193,8 @@ public class BillService {
         for (BillEntity bill: bills) {
             bill.setConfirmedDate(confirmedDate);
 
+            bill.setCreatedDate(bill.getReceipt().getCreatedDate());
+
             String newBillCode = getNewBillCode(
                     bill,
                     billCodeMap.get(bill.getPos().getId())
