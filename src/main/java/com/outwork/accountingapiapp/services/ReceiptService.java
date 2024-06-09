@@ -164,6 +164,17 @@ public class ReceiptService {
         return receiptRepository.save(receipt);
     }
 
+    public List<ReceiptEntity> reCalculatedReceipts (List<ReceiptEntity> receipts) {
+
+        receipts.forEach(receipt -> {
+            calculateReceiptTransactionTotal(receipt);
+            estimateReceiptProfit(receipt);
+            calculateReceiptProfit(receipt);
+        });
+
+        return receiptRepository.saveAll(receipts);
+    }
+
     public ReceiptEntity approveReceiptForEntry (@NotNull UUID id) {
         ReceiptEntity receipt = getReceipt(id);
         UserEntity approver = AuditorAwareImpl.getUserFromSecurityContext();

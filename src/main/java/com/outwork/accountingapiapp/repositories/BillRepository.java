@@ -26,4 +26,6 @@ public interface BillRepository extends JpaRepository<BillEntity, UUID> {
 
     List<BillEntity> findByPos_IdAndCreatedDateBetweenAndCodeNotNullAndReturnedTimeNullOrderByCreatedDateAscTimeStampSeqAsc(UUID id, Date createdDateStart,
                                                                             Date createdDateEnd);
+
+    List<BillEntity> findByPos_IdAndCreatedDateBetweenOrderByCreatedDateAscTimeStampSeqAsc(UUID posId, Date fromCreatedDate, Date toCreatedDate);
 }

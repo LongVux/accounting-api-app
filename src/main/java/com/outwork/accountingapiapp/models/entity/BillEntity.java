@@ -70,6 +70,12 @@ public class BillEntity extends Auditable<String> {
     @Temporal(TemporalType.TIMESTAMP)
     private Date confirmedDate;
 
+    @Column(columnDefinition = "LONGTEXT")
+    private String note;
+
+    @Column(columnDefinition = "LONGTEXT")
+    private String history;
+
     public static BillEntity buildNewBill (ReceiptEntity receipt) {
         BillEntity bill = new BillEntity();
 

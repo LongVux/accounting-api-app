@@ -5,10 +5,7 @@ import com.outwork.accountingapiapp.exceptions.InvalidDataException;
 import com.outwork.accountingapiapp.models.entity.BillEntity;
 import com.outwork.accountingapiapp.models.entity.PosEntity;
 import com.outwork.accountingapiapp.models.entity.ReceiptEntity;
-import com.outwork.accountingapiapp.models.payload.requests.GetBillTableItemRequest;
-import com.outwork.accountingapiapp.models.payload.requests.GetMatchingBillsRequest;
-import com.outwork.accountingapiapp.models.payload.requests.MatchingBillRequest;
-import com.outwork.accountingapiapp.models.payload.requests.ReceiptBill;
+import com.outwork.accountingapiapp.models.payload.requests.*;
 import com.outwork.accountingapiapp.models.payload.responses.BillSumUpInfo;
 import com.outwork.accountingapiapp.models.payload.responses.BillTableItem;
 import com.outwork.accountingapiapp.repositories.BillRepository;
@@ -19,6 +16,7 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -30,7 +28,6 @@ import java.util.stream.Collectors;
 
 @Service
 public class BillService {
-    public static final String ERROR_MSG_BILL_ALREADY_HAS_CODE = "Bill đã được tạo mã. Không thể xử lý";
     public static final String ERROR_MSG_SOME_BILL_INVALID_TO_APPROVE = "Một số bill không hợp lệ để tạo bút toán";
     public static final String ERROR_MSG_NO_BILL_TO_APPROVE = "Không có bill để tạo bút toán";
     public static final String ERROR_MSG_BILL_VALUE_EXCEED_POS_LIMIT = "Giá trị Bill %.2f vượt quá giới hạn của POS %.2f";
@@ -39,7 +36,7 @@ public class BillService {
     public static final String ERROR_MSG_SOME_BILL_IDS_NOT_FOUND = "Một số bill không tồn tại";
     public static final String ERROR_MSG_SOME_BILL_INVALID_TO_MATCH = "Một số bill chưa có mã để kết toán";
     public static final String ERROR_MSG_POS_DOES_NOT_SUPPORT_CARD = "Pos %s không hỗ trợ thanh toán thẻ loại này";
-
+    public static final String ERROR_MSG_MATCHED_BILL_CAN_NOT_BE_UPDATE = "Bill đã khớp thì không thể cập nhật";
     @Autowired
     private BillRepository billRepository;
 
@@ -63,6 +60,10 @@ public class BillService {
         return billRepository.findAll(request, request.retrievePageConfig()).map(BillTableItem::new);
     }
 
+    public List<BillTableItem> getAllBillTableItems (GetBillTableItemRequest request) {
+        return billRepository.findAll(request, Pageable.unpaged()).map(BillTableItem::new).getContent();
+    }
+
     public BillSumUpInfo getBillSumUpInfo (GetBillTableItemRequest request) {
         List<Double> result = util.getSumsBySpecifications(Collections.singletonList(request), BillEntity.getSumUpFields(), BillEntity.class);
 
@@ -72,6 +73,65 @@ public class BillService {
         sumUpInfo.setTotalReturnFromBank(Optional.ofNullable(result.get(1)).orElse(0d));
 
         return sumUpInfo;
+    }
+
+    public void saveBillNote (SaveNoteRequest request) {
+        BillEntity bill = getBillById(request.getId());
+        bill.setNote(request.getNote());
+
+        billRepository.save(bill);
+    }
+
+    @Transactional(rollbackFor = {Exception.class, Throwable.class})
+    public List<BillEntity> updatePosFeeForBills (UpdatePosFeeForBillsRequest request) {
+        List<BillEntity> bills = billRepository.findAllById(request.getBillIds());
+
+        Map<UUID, ReceiptEntity> recalculatedReceipts = new HashMap<>();
+
+        bills.forEach(bill -> {
+            bill.setPosFeeStamp(request.getPosFeeStamp());
+            recalculatedReceipts.put(bill.getReceipt().getId(), bill.getReceipt());
+
+            if (!ObjectUtils.isEmpty(bill.getReturnFromBank())) {
+                bill.setReturnFromBank(bill.getEstimatedReturnFromBank());
+            }
+        });
+
+        receiptService.reCalculatedReceipts(recalculatedReceipts.values().stream().toList());
+
+        return billRepository.saveAll(bills);
+    }
+
+    @Transactional(rollbackFor = {Exception.class, Throwable.class})
+    public BillEntity updateBill (UpdateBillRequest request, UUID billId) {
+        BillEntity bill = getBillById(billId);
+
+//        if (!ObjectUtils.isEmpty(bill.getReturnedTime())) {
+//            throw new InvalidDataException(ERROR_MSG_MATCHED_BILL_CAN_NOT_BE_UPDATE);
+//        }
+
+        if (!ObjectUtils.isEmpty(request.getPosId()) &&
+                !request.getPosId().equals(bill.getPos().getId()) &&
+                !ObjectUtils.isEmpty(bill.getCode())) {
+            updateBillCode(request, bill);
+        }
+
+        if (bill.getPosFeeStamp() != request.getPosFeeStamp()) {
+            bill.setPosFeeStamp(request.getPosFeeStamp());
+            receiptService.reCalculatedReceipts(List.of(bill.getReceipt()));
+        }
+
+        return billRepository.save(bill);
+    }
+
+    private void updateBillCode (UpdateBillRequest request, BillEntity bill) {
+        PosEntity pos = posService.getPosById(request.getPosId());
+
+        bill.setPos(pos);
+        bill.setCode(null);
+
+        bill.setHistory(bill.getHistory() + (new Date()) + "-" + bill.getCode() + "\n");
+        bill.setCode(getNewBillCode(bill, null));
     }
 
     public void buildBillsForReceipt (List<ReceiptBill> billRequests, @NotNull ReceiptEntity savedReceipt) {
@@ -158,6 +218,10 @@ public class BillService {
         return responseList;
     }
 
+    public List<BillEntity> getPosFeeModifyingBills (GetPosFeeModifyingBillRequest request) {
+       return billRepository.findByPos_IdAndCreatedDateBetweenOrderByCreatedDateAscTimeStampSeqAsc(request.getPosId(), request.getFromCreatedDate(), request.getToCreatedDate());
+    }
+
     @Transactional(rollbackFor = {Exception.class, Throwable.class})
     public List<BillEntity> matchBill (MatchingBillRequest request) {
         List<BillEntity> bills = billRepository.findAllById(request.getBillIds());
@@ -192,8 +256,6 @@ public class BillService {
 
         for (BillEntity bill: bills) {
             bill.setConfirmedDate(confirmedDate);
-
-            bill.setCreatedDate(bill.getReceipt().getCreatedDate());
 
             String newBillCode = getNewBillCode(
                     bill,
