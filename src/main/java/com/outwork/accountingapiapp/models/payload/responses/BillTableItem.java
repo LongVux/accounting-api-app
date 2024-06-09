@@ -63,6 +63,9 @@ public class BillTableItem {
     @CsvIgnore
     private RecordStatusEnum recordStatusEnum;
 
+    @CsvIgnore
+    private UUID posId;
+
     public BillTableItem (BillEntity bill) {
         this.createdBy = bill.getCreatedBy();
         this.createdDate = bill.getCreatedDate();
@@ -77,6 +80,7 @@ public class BillTableItem {
         this.returnFromBank = bill.getReturnFromBank();
         this.returnedTime = bill.getReturnedTime();
         this.posCode = bill.getPos().getCode();
+        this.posId = bill.getPos().getId();
         this.receiptCode = bill.getReceipt().getCode();
         this.note = bill.getNote();
     }
