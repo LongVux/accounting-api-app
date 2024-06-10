@@ -3,6 +3,7 @@ package com.outwork.accountingapiapp.models.payload.responses;
 import com.opencsv.bean.CsvBindByName;
 import com.opencsv.bean.CsvDate;
 import com.opencsv.bean.CsvIgnore;
+import com.opencsv.bean.CsvNumber;
 import com.outwork.accountingapiapp.constants.RecordStatusEnum;
 import com.outwork.accountingapiapp.models.entity.BillEntity;
 import com.outwork.accountingapiapp.models.entity.PosCardFeeEntity;
@@ -36,18 +37,23 @@ public class BillTableItem {
     private String code;
 
     @CsvBindByName(column = "F. So tien")
+    @CsvNumber("#.##")
     private double moneyAmount;
 
     @CsvBindByName(column = "G. So phi bill")
+    @CsvNumber("#.##")
     private double fee;
 
     @CsvBindByName(column = "H. Phan tram phi POS")
+    @CsvNumber("#.##")
     private double posFeeStamp;
 
     @CsvBindByName(column = "I. Tien ve du tinh")
+    @CsvNumber("#.##")
     private double estimateReturnFromBank;
 
     @CsvBindByName(column = "J. Tien ve thuc te")
+    @CsvNumber("#.##")
     private double returnFromBank;
 
     @CsvBindByName(column = "K. Thoi diem ve tien")
