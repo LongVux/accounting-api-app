@@ -63,7 +63,7 @@ public class ReceiptTableItem {
     @CsvBindByName(column = "L. Ten the")
     private String customerCardName;
 
-    @CsvBindByName(column = "M. So the")
+    @CsvBindByName(column = "M. So the", capture="([^ ]+) .*")
     private String customerCardNumber;
 
     @CsvBindByName(column = "N. Phan tram phi hoa don")
