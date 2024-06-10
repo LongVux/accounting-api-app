@@ -27,11 +27,10 @@ import java.util.Map;
 @EqualsAndHashCode(callSuper = true)
 @Data
 public class GetBillTableItemRequest extends SortedPagination<BillSortingEnum> implements Specification<BillEntity> {
-    @Nullable
+
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private Date fromCreatedDate;
 
-    @Nullable
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private Date toCreatedDate;
 

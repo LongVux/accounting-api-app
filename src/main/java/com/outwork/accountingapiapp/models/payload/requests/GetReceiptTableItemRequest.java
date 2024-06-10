@@ -29,11 +29,9 @@ public class GetReceiptTableItemRequest extends SortedPagination<ReceiptSortingE
     @Nullable
     private String employeeCode;
 
-    @Nullable
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private Date fromCreatedDate;
 
-    @Nullable
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private Date toCreatedDate;
 

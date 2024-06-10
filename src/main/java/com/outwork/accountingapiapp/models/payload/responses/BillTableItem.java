@@ -16,45 +16,45 @@ import java.util.UUID;
 
 @Data
 public class BillTableItem {
-    @CsvBindByName(column = "A. ID")
+    @CsvIgnore
     private UUID id;
 
-    @CsvBindByName(column = "B. Ngay tao")
+    @CsvBindByName(column = "A. Ngay tao")
     @CsvDate("dd.MM.yyyy hh:mm")
     private Date createdDate;
 
-    @CsvBindByName(column = "C. Nguoi tao")
+    @CsvBindByName(column = "B. Nguoi tao")
     private String createdBy;
 
-    @CsvBindByName(column = "D. Ma hoa don")
+    @CsvBindByName(column = "C. Ma hoa don")
     private String receiptCode;
 
-    @CsvBindByName(column = "E. Ma POS")
+    @CsvBindByName(column = "D. Ma POS")
     private String posCode;
 
-    @CsvBindByName(column = "F. Ma bill")
+    @CsvBindByName(column = "E. Ma bill")
     private String code;
 
-    @CsvBindByName(column = "G. So tien")
+    @CsvBindByName(column = "F. So tien")
     private double moneyAmount;
 
-    @CsvBindByName(column = "H. So phi bill")
+    @CsvBindByName(column = "G. So phi bill")
     private double fee;
 
-    @CsvBindByName(column = "I. Phan tram phi POS")
+    @CsvBindByName(column = "H. Phan tram phi POS")
     private double posFeeStamp;
 
-    @CsvBindByName(column = "J. Tien ve du tinh")
+    @CsvBindByName(column = "I. Tien ve du tinh")
     private double estimateReturnFromBank;
 
-    @CsvBindByName(column = "K. Tien ve thuc te")
+    @CsvBindByName(column = "J. Tien ve thuc te")
     private double returnFromBank;
 
-    @CsvBindByName(column = "L. Thoi diem ve tien")
+    @CsvBindByName(column = "K. Thoi diem ve tien")
     @CsvDate("dd.MM.yyyy hh:mm")
     private Date returnedTime;
 
-    @CsvBindByName(column = "M. Ghi chu")
+    @CsvBindByName(column = "L. Ghi chu")
     private String note;
 
     @CsvIgnore

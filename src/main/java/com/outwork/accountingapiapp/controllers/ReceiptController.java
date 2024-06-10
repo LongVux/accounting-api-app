@@ -1,20 +1,27 @@
 package com.outwork.accountingapiapp.controllers;
 
+import com.opencsv.CSVWriter;
+import com.opencsv.bean.StatefulBeanToCsv;
+import com.opencsv.bean.StatefulBeanToCsvBuilder;
+import com.opencsv.exceptions.CsvDataTypeMismatchException;
+import com.opencsv.exceptions.CsvRequiredFieldEmptyException;
 import com.outwork.accountingapiapp.models.entity.ReceiptEntity;
 import com.outwork.accountingapiapp.models.payload.requests.*;
 import com.outwork.accountingapiapp.models.payload.responses.ReceiptSumUpInfo;
 import com.outwork.accountingapiapp.models.payload.responses.ReceiptTableItem;
 import com.outwork.accountingapiapp.services.BranchAccountEntryService;
 import com.outwork.accountingapiapp.services.ReceiptService;
-import jakarta.annotation.Nullable;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.UUID;
 
 @RestController
@@ -75,5 +82,25 @@ public class ReceiptController {
     @DeleteMapping("/{id}")
     public void deleteReceipt (@PathVariable @NotNull UUID id, @RequestParam(defaultValue = "") String explanation) {
         receiptService.deleteReceipt(id, explanation);
+    }
+
+    @GetMapping("/export")
+    public void exportBills (@ModelAttribute @Valid GetReceiptTableItemRequest request, HttpServletResponse response) throws CsvRequiredFieldEmptyException, CsvDataTypeMismatchException, IOException {
+        //set file name and content type
+        String filename = "receipts.csv";
+
+        response.setContentType("text/csv");
+        response.setHeader(HttpHeaders.CONTENT_DISPOSITION,
+                "attachment; filename=\"" + filename + "\"");
+
+        //create a csv writer
+        StatefulBeanToCsv<ReceiptTableItem> writer = new StatefulBeanToCsvBuilder<ReceiptTableItem>(response.getWriter())
+                .withQuotechar(CSVWriter.NO_QUOTE_CHARACTER)
+                .withSeparator(CSVWriter.DEFAULT_SEPARATOR)
+                .withOrderedResults(false)
+                .build();
+
+        //write all users to csv file
+        writer.write(receiptService.getAllReceiptTableItems(request));
     }
 }

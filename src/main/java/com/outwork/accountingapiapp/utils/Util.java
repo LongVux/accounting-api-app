@@ -10,9 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Component
@@ -90,5 +88,20 @@ public class Util {
 
     public static double numberStandardRound (double number) {
         return Math.round(number);
+    }
+
+    public static boolean isPeriodGreaterThanSomeMonths(Date fromDate, Date toDate, int month) {
+        // Create a Calendar instance and set it to the fromDate
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(fromDate);
+
+        // Add 2 months to the fromDate
+        calendar.add(Calendar.MONTH, month);
+
+        // Get the new date after adding 2 months
+        Date dateAfterTwoMonths = calendar.getTime();
+
+        // Compare the adjusted fromDate with toDate
+        return toDate.after(dateAfterTwoMonths);
     }
 }

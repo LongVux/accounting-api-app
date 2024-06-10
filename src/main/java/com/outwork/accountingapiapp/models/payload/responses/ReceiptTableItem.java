@@ -1,5 +1,8 @@
 package com.outwork.accountingapiapp.models.payload.responses;
 
+import com.opencsv.bean.CsvBindByName;
+import com.opencsv.bean.CsvDate;
+import com.opencsv.bean.CsvIgnore;
 import com.outwork.accountingapiapp.constants.ReceiptStatusEnum;
 import com.outwork.accountingapiapp.models.entity.BillEntity;
 import com.outwork.accountingapiapp.models.entity.ReceiptEntity;
@@ -12,29 +15,76 @@ import java.util.UUID;
 @Data
 @AllArgsConstructor
 public class ReceiptTableItem {
-    private UUID id;
-    private String code;
+
+    @CsvBindByName(column = "A. Ngay tao")
+    @CsvDate("dd.MM.yyyy hh:mm")
     private Date createdDate;
-    private ReceiptStatusEnum receiptStatusEnum;
-    private double percentageFee;
-    private double shipmentFee;
-    private double intake;
-    private double payout;
-    private double loan;
-    private double repayment;
-    private double totalFee;
+
+    @CsvBindByName(column = "B. Ma hoa don")
+    private String code;
+
+    @CsvBindByName(column = "C. Tong giao dich")
     private double transactionTotal;
-    private double calculatedProfit;
+
+    @CsvBindByName(column = "D. Tong phi bill")
+    private double totalFee;
+
+    @CsvBindByName(column = "E. Phi ship")
+    private double shipmentFee;
+
+    @CsvBindByName(column = "F. Thu")
+    private double intake;
+
+    @CsvBindByName(column = "G. Chi")
+    private double payout;
+
+    @CsvBindByName(column = "H. No")
+    private double loan;
+
+    @CsvBindByName(column = "I. Thu no")
+    private double repayment;
+
+    @CsvBindByName(column = "J. Loi nhuan uoc tinh")
     private double estimatedProfit;
-    private UUID customerCardId;
+
+    @CsvBindByName(column = "K. Loi nhuan thuc te")
+    private double calculatedProfit;
+
+    @CsvBindByName(column = "L. Ten the")
     private String customerCardName;
+
+    @CsvBindByName(column = "M. So the")
     private String customerCardNumber;
-    private UUID employeeId;
+
+    @CsvBindByName(column = "N. Phan tram phi hoa don")
+    private double percentageFee;
+
+    @CsvBindByName(column = "O. Ma nhan vien")
     private String employeeName;
-    private UUID branchId;
+
+    @CsvBindByName(column = "P. Ma chi nhanh")
     private String branchName;
-    private String note;
+
+    @CsvBindByName(column = "Q. Ma quan ly xac nhan")
     private String approverCode;
+
+    @CsvBindByName(column = "R. Ghi chu")
+    private String note;
+
+    @CsvIgnore
+    private UUID id;
+
+    @CsvIgnore
+    private ReceiptStatusEnum receiptStatusEnum;
+
+    @CsvIgnore
+    private UUID customerCardId;
+
+    @CsvIgnore
+    private UUID employeeId;
+
+    @CsvIgnore
+    private UUID branchId;
 
     public ReceiptTableItem(ReceiptEntity receipt) {
         this.id = receipt.getId();

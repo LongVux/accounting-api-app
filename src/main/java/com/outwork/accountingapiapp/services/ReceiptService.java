@@ -4,27 +4,25 @@ import com.outwork.accountingapiapp.configs.audit.AuditorAwareImpl;
 import com.outwork.accountingapiapp.constants.ReceiptStatusEnum;
 import com.outwork.accountingapiapp.exceptions.InvalidDataException;
 import com.outwork.accountingapiapp.models.entity.*;
-import com.outwork.accountingapiapp.models.payload.requests.GetReceiptTableItemRequest;
-import com.outwork.accountingapiapp.models.payload.requests.SaveNoteRequest;
-import com.outwork.accountingapiapp.models.payload.requests.SaveReceiptRepaymentEntryRequest;
-import com.outwork.accountingapiapp.models.payload.requests.SaveReceiptRequest;
+import com.outwork.accountingapiapp.models.payload.requests.*;
 import com.outwork.accountingapiapp.models.payload.responses.ReceiptSumUpInfo;
 import com.outwork.accountingapiapp.models.payload.responses.ReceiptTableItem;
 import com.outwork.accountingapiapp.repositories.ReceiptRepository;
 import com.outwork.accountingapiapp.utils.DateTimeUtils;
 import com.outwork.accountingapiapp.utils.ReceiptCodeHandler;
 import com.outwork.accountingapiapp.utils.Util;
-import jakarta.annotation.Nullable;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 
+import java.time.Period;
 import java.util.*;
 
 @Service
@@ -40,6 +38,8 @@ public class ReceiptService {
     public static final String ERROR_MSG_CAN_NOT_DETERMINE_PRE_PAID_FEE_HOLDER = "Hệ thống không xác định được người đang giữ số tiền đã ứng";
     public static final String ERROR_MSG_SOME_POS_NOT_BELONG_TO_THE_RECEIPT_BRANCH = "Một số POS không thuộc về chi nhánh của hóa đơn này";
     public static final String ERROR_MSG_USER_DOES_NOT_HAVE_RIGHT_TO_SAVE_RECEIPT_IN_THIS_BRANCH = "Khách hàng không có quyền lưu hóa đơn trên chi nhánh này";
+    public static final int MAXIMUM_MONTH_FOR_EXPORT = 2;
+    public static final String ERROR_MSG_EXCEED_MAXIMUM_PERIOD_FOR_EXPORT = "Vượt quá giới hạn xuất csv là 2 tháng";
     @Autowired
     private ReceiptRepository receiptRepository;
 
@@ -69,6 +69,14 @@ public class ReceiptService {
         Page<ReceiptEntity> results = receiptRepository.findAll(request, request.retrievePageConfig());
 
         return reCalculateReceiptsProfit(results).map(ReceiptTableItem::new);
+    }
+
+    public List<ReceiptTableItem> getAllReceiptTableItems (GetReceiptTableItemRequest request) {
+
+        if (Util.isPeriodGreaterThanSomeMonths(request.getFromCreatedDate(), request.getToCreatedDate(), MAXIMUM_MONTH_FOR_EXPORT)) {
+            throw new InvalidDataException(ERROR_MSG_EXCEED_MAXIMUM_PERIOD_FOR_EXPORT);
+        }
+        return receiptRepository.findAll(request, Pageable.unpaged()).map(ReceiptTableItem::new).getContent();
     }
 
     public Page<ReceiptEntity> reCalculateReceiptsProfit (Page<ReceiptEntity> receiptEntities) {
