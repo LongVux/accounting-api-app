@@ -3,6 +3,7 @@ package com.outwork.accountingapiapp.models.payload.responses;
 import com.opencsv.bean.CsvBindByName;
 import com.opencsv.bean.CsvDate;
 import com.opencsv.bean.CsvIgnore;
+import com.opencsv.bean.CsvNumber;
 import com.outwork.accountingapiapp.constants.ReceiptStatusEnum;
 import com.outwork.accountingapiapp.models.entity.BillEntity;
 import com.outwork.accountingapiapp.models.entity.ReceiptEntity;
@@ -24,30 +25,39 @@ public class ReceiptTableItem {
     private String code;
 
     @CsvBindByName(column = "C. Tong giao dich")
+    @CsvNumber("#.##")
     private double transactionTotal;
 
     @CsvBindByName(column = "D. Tong phi bill")
+    @CsvNumber("#.##")
     private double totalFee;
 
     @CsvBindByName(column = "E. Phi ship")
+    @CsvNumber("#.##")
     private double shipmentFee;
 
     @CsvBindByName(column = "F. Thu")
+    @CsvNumber("#.##")
     private double intake;
 
     @CsvBindByName(column = "G. Chi")
+    @CsvNumber("#.##")
     private double payout;
 
     @CsvBindByName(column = "H. No")
+    @CsvNumber("#.##")
     private double loan;
 
     @CsvBindByName(column = "I. Thu no")
+    @CsvNumber("#.##")
     private double repayment;
 
     @CsvBindByName(column = "J. Loi nhuan uoc tinh")
+    @CsvNumber("#.##")
     private double estimatedProfit;
 
     @CsvBindByName(column = "K. Loi nhuan thuc te")
+    @CsvNumber("#.##")
     private double calculatedProfit;
 
     @CsvBindByName(column = "L. Ten the")
@@ -57,6 +67,7 @@ public class ReceiptTableItem {
     private String customerCardNumber;
 
     @CsvBindByName(column = "N. Phan tram phi hoa don")
+    @CsvNumber("#.##")
     private double percentageFee;
 
     @CsvBindByName(column = "O. Ma nhan vien")
@@ -104,9 +115,9 @@ public class ReceiptTableItem {
         this.customerCardName = receipt.getCustomerCard().getName();
         this.customerCardNumber = receipt.getCustomerCard().getAccountNumber();
         this.employeeId = receipt.getEmployee().getId();
-        this.employeeName = receipt.getEmployee().getName();
+        this.employeeName = receipt.getEmployee().getCode();
         this.branchId = receipt.getBranch().getId();
-        this.branchName = receipt.getBranch().getName();
+        this.branchName = receipt.getBranch().getCode();
         this.totalFee = receipt.getBills().stream().mapToDouble(BillEntity::getFee).sum() + receipt.getShipmentFee();
         this.note = receipt.getNote();
         this.approverCode = receipt.getApproverCode();
