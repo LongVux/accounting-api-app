@@ -66,7 +66,14 @@ public class BillService {
             throw new InvalidDataException(ERROR_MSG_EXCEED_MAXIMUM_PERIOD_FOR_EXPORT);
         }
 
-        return billRepository.findAll(request, Pageable.unpaged()).map(BillTableItem::new).getContent();
+        Page<BillEntity> items = billRepository.findAll(request, Pageable.unpaged());
+        List<BillTableItem> result = new ArrayList<>();
+
+        for (BillEntity item : items) {
+            result.add(new BillTableItem(item));
+        }
+
+        return result;
     }
 
     public BillSumUpInfo getBillSumUpInfo (GetBillTableItemRequest request) {

@@ -76,7 +76,15 @@ public class ReceiptService {
         if (Util.isPeriodGreaterThanSomeMonths(request.getFromCreatedDate(), request.getToCreatedDate(), MAXIMUM_MONTH_FOR_EXPORT)) {
             throw new InvalidDataException(ERROR_MSG_EXCEED_MAXIMUM_PERIOD_FOR_EXPORT);
         }
-        return receiptRepository.findAll(request, Pageable.unpaged()).map(ReceiptTableItem::new).getContent();
+
+        Page<ReceiptEntity> items = receiptRepository.findAll(request, Pageable.unpaged());
+        List<ReceiptTableItem> result = new ArrayList<>();
+
+        for (ReceiptEntity item : items) {
+            result.add(new ReceiptTableItem(item));
+        }
+
+        return result;
     }
 
     public Page<ReceiptEntity> reCalculateReceiptsProfit (Page<ReceiptEntity> receiptEntities) {
