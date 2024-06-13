@@ -79,7 +79,10 @@ public class ReceiptTableItem {
     @CsvBindByName(column = "Q. Ma quan ly xac nhan")
     private String approverCode;
 
-    @CsvBindByName(column = "R. Ghi chu")
+    @CsvBindByName(column = "R. Ten khach hang")
+    private String customerName;
+
+    @CsvBindByName(column = "S. Ghi chu")
     private String note;
 
     @CsvIgnore
@@ -121,5 +124,6 @@ public class ReceiptTableItem {
         this.totalFee = receipt.getBills().stream().mapToDouble(BillEntity::getFee).sum() + receipt.getShipmentFee();
         this.note = receipt.getNote();
         this.approverCode = receipt.getApproverCode();
+        this.customerName = receipt.getCustomerCard().getCustomer().getName();
     }
 }
