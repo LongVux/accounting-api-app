@@ -31,6 +31,8 @@ public class ReceiptService {
     public static final String ERROR_MSG_RECEIPT_ALREADY_HAS_CODE = "Hóa đơn đã được tạo mã. Không thể xử lý";
     public static final String ERROR_MSG_RECEIPT_HAS_NO_BILL = "Hóa đơn phải chứa tối thiểu một bill";
     public static final String ERROR_MSG_RECEIPT_NOT_HAVE_CODE = "Hóa đơn chưa được tạo mã. Không thể xử lý";
+
+    public static final String ERROR_MSG_RECEIPT_NO_LONGER_IN_DEBT = "Hóa đơn không còn nợ phải trả";
     public static final String ERROR_MSG_IMAGE_IS_REQUIRED = "Hóa đơn muốn xác nhận thì phải có ảnh chứng từ";
     public static final String ERROR_MSG_EXPIRED_CUSTOMER_CARD = "Thẻ khách đã hết hạn, không thể dùng cho hóa đơn này";
     public static final String ERROR_MSG_INTAKE_EXCEED_PRE_PAID_FEE = "Số tiền phải thu của hóa đơn vượt quá phí đã ứng của thẻ khách";
@@ -213,6 +215,10 @@ public class ReceiptService {
 
         if (ObjectUtils.isEmpty(receipt.getCode())) {
             throw new InvalidDataException(ERROR_MSG_RECEIPT_NOT_HAVE_CODE);
+        }
+
+        if (receipt.getRepayment() > receipt.getLoan()) {
+            throw new InvalidDataException(ERROR_MSG_RECEIPT_NO_LONGER_IN_DEBT);
         }
 
         receipt.setRepayment(receipt.getRepayment() + request.getRepaidAmount());

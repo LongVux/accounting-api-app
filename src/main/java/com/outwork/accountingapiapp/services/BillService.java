@@ -118,10 +118,6 @@ public class BillService {
     public BillEntity updateBill (UpdateBillRequest request, UUID billId) {
         BillEntity bill = getBillById(billId);
 
-//        if (!ObjectUtils.isEmpty(bill.getReturnedTime())) {
-//            throw new InvalidDataException(ERROR_MSG_MATCHED_BILL_CAN_NOT_BE_UPDATE);
-//        }
-
         if (!ObjectUtils.isEmpty(request.getPosId()) &&
                 !request.getPosId().equals(bill.getPos().getId())) {
             updateBillPos(request, bill);
@@ -142,6 +138,7 @@ public class BillService {
 
         if (!ObjectUtils.isEmpty(bill.getCode())) {
             bill.setCode(null);
+            bill.setConfirmedDate(new Date());
 
             bill.setHistory(bill.getHistory() + (new Date()) + "-" + bill.getCode() + "\n");
             bill.setCode(getNewBillCode(bill, null));
@@ -234,7 +231,7 @@ public class BillService {
     }
 
     public List<BillEntity> getPosFeeModifyingBills (GetPosFeeModifyingBillRequest request) {
-       return billRepository.findByPos_IdAndCreatedDateBetweenAndReturnedTimeNullOrderByCreatedDateAscTimeStampSeqAsc(request.getPosId(), DateTimeUtils.atStartOfDay(request.getFromCreatedDate()), DateTimeUtils.atEndOfDay(request.getToCreatedDate()));
+       return billRepository.findByPos_IdAndCreatedDateBetweenOrderByCreatedDateAscTimeStampSeqAsc(request.getPosId(), DateTimeUtils.atStartOfDay(request.getFromCreatedDate()), DateTimeUtils.atEndOfDay(request.getToCreatedDate()));
     }
 
     @Transactional(rollbackFor = {Exception.class, Throwable.class})
