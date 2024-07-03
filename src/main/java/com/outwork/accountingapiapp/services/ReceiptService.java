@@ -1,6 +1,7 @@
 package com.outwork.accountingapiapp.services;
 
 import com.outwork.accountingapiapp.configs.audit.AuditorAwareImpl;
+import com.outwork.accountingapiapp.constants.DataConstraint;
 import com.outwork.accountingapiapp.constants.ReceiptStatusEnum;
 import com.outwork.accountingapiapp.exceptions.InvalidDataException;
 import com.outwork.accountingapiapp.models.entity.*;
@@ -24,6 +25,7 @@ import org.springframework.util.ObjectUtils;
 
 import java.time.Period;
 import java.util.*;
+import java.util.regex.Pattern;
 
 @Service
 public class ReceiptService {
@@ -296,10 +298,11 @@ public class ReceiptService {
     }
 
     private void validateReceiptBalance (ReceiptEntity receipt) {
-        double totalBillFee = receipt.getBills().stream().mapToDouble(BillEntity::getFee).sum();
-
-        if (receipt.getTransactionTotal() - receipt.getShipmentFee() < totalBillFee + receipt.getPayout() - receipt.getIntake() - receipt.getLoan()) {
-            throw new InvalidDataException(ERROR_MSG_IMBALANCED_RECEIPT);
+        if (!Pattern.matches(DataConstraint.COMPANY_CARD_REGEX, receipt.getCustomerCard().getName())) {
+            double totalBillFee = receipt.getBills().stream().mapToDouble(BillEntity::getFee).sum();
+            if (receipt.getTransactionTotal() - receipt.getShipmentFee() < totalBillFee + receipt.getPayout() - receipt.getIntake() - receipt.getLoan()) {
+                throw new InvalidDataException(ERROR_MSG_IMBALANCED_RECEIPT);
+            }
         }
     }
 
