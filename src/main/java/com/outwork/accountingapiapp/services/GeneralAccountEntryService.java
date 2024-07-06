@@ -29,7 +29,7 @@ import java.util.*;
 public class GeneralAccountEntryService {
     public static final String ERROR_MSG_INVALID_ACTION_ON_ENTRY = "Không thể thực hiện hành động này trên bút toán được chọn";
     public static final String ERROR_UNSUPPORTED_TRANSACTION_TYPE = "Không hỗ trợ loại giao dịch này";
-    public static final String ENTRY_TYPE_BANK_RETURN = "Ngân hàng kết toán";
+    public static final String ENTRY_TYPE_BANK_RETURN = "NHKT-%s";
     @Autowired
     private GeneralAccountEntryRepository generalAccountEntryRepository;
 
@@ -87,11 +87,18 @@ public class GeneralAccountEntryService {
     }
 
     public void generateGeneralAccountEntryFromMatchedBills(MatchingBillRequest request, List<BillEntity> matchedBills) {
+        if (matchedBills.isEmpty()) {
+            return;
+        }
+
         GeneralAccountEntryEntity savedEntry = new GeneralAccountEntryEntity();
 
         double moneyAmount = matchedBills.stream().mapToDouble(BillEntity::getReturnFromBank).sum();
 
-        savedEntry.setEntryType(ENTRY_TYPE_BANK_RETURN);
+        savedEntry.setEntryType(String.format(
+                ENTRY_TYPE_BANK_RETURN,
+                matchedBills.get(0).getPos().getCode()
+        ));
         savedEntry.setTransactionType(moneyAmount < 0 ? TransactionTypeEnum.PAYOUT : TransactionTypeEnum.INTAKE);
         savedEntry.setEntryCode(getNewGeneralEntryCode(savedEntry));
         savedEntry.setEntryStatus(AccountEntryStatusEnum.APPROVED);

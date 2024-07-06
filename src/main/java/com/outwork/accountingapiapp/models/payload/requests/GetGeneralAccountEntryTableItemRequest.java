@@ -36,7 +36,7 @@ public class GetGeneralAccountEntryTableItemRequest extends SortedPagination<Gen
     private String entryCode;
 
     @Nullable
-    private List<String> entryTypes;
+    private String entryType;
 
     @Nullable
     private List<TransactionTypeEnum> transactionTypes;
@@ -75,8 +75,10 @@ public class GetGeneralAccountEntryTableItemRequest extends SortedPagination<Gen
             ));
         }
 
-        if (!ObjectUtils.isEmpty(entryTypes)) {
-            predicates.add(root.get(GeneralAccountEntryEntity.FIELD_ENTRY_TYPE).in(entryTypes));
+        if (!ObjectUtils.isEmpty(entryType)) {
+            predicates.add(criteriaBuilder.like(
+                    root.get(GeneralAccountEntryEntity.FIELD_ENTRY_TYPE),
+                    String.format(DataFormat.LIKE_QUERY_FORMAT, entryType)));
         }
 
         if (!ObjectUtils.isEmpty(entryStatusList)) {
