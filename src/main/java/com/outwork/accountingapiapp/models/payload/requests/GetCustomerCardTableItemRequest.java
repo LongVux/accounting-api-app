@@ -56,6 +56,12 @@ public class GetCustomerCardTableItemRequest extends SortedPagination<CustomerCa
     private Integer toPaymentDueDate;
 
     @Nullable
+    private Integer fromPrePaidFee;
+
+    @Nullable
+    private Integer toPrePaidFee;
+
+    @Nullable
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private Date fromCreatedDate;
 
@@ -122,6 +128,14 @@ public class GetCustomerCardTableItemRequest extends SortedPagination<CustomerCa
                     root.get(CustomerCardEntity.FIELD_PAYMENT_DUE_DATE),
                     fromPaymentDueDate,
                     toPaymentDueDate
+            ));
+        }
+
+        if (!ObjectUtils.isEmpty(fromPrePaidFee) && !ObjectUtils.isEmpty(toPrePaidFee)) {
+            predicates.add(criteriaBuilder.between(
+                    root.get(CustomerCardEntity.FIELD_PREPAID_FEE),
+                    fromPrePaidFee,
+                    toPrePaidFee
             ));
         }
 

@@ -32,6 +32,7 @@ public class CustomerCardEntity extends Auditable<String> {
     public static final String FIELD_CUSTOMER = "customer";
     public static final String FIELD_ACCOUNT_NUMBER = "accountNumber";
     public static final String FIELD_EXPIRED_DATE = "expiredDate";
+    public static final String FIELD_PREPAID_FEE = "prePaidFee";
 
     public static final String ERROR_MSG_PRE_PAID_FEE_NOT_ENOUGH = "Số tiền ứng trước của thẻ không đủ để thực hiện hành động này";
 
