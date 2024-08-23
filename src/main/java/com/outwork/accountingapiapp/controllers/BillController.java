@@ -81,7 +81,7 @@ public class BillController {
 
         //create a csv writer
         StatefulBeanToCsv<BillTableItem> writer = new StatefulBeanToCsvBuilder<BillTableItem>(response.getWriter())
-                .withQuotechar(CSVWriter.NO_QUOTE_CHARACTER)
+                .withQuotechar(CSVWriter.DEFAULT_QUOTE_CHARACTER)
                 .withSeparator(CSVWriter.DEFAULT_SEPARATOR)
                 .withOrderedResults(false)
                 .build();

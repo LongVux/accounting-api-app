@@ -21,7 +21,7 @@ public class BillTableItem {
     private UUID id;
 
     @CsvBindByName(column = "A. Ngay tao")
-    @CsvDate("dd.MM.yyyy hh:mm")
+    @CsvDate("dd.MM.yyyy HH:mm")
     private Date createdDate;
 
     @CsvBindByName(column = "B. Nguoi tao")
