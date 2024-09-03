@@ -1,5 +1,7 @@
 package com.outwork.accountingapiapp.utils;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.outwork.accountingapiapp.services.MessageService;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
@@ -21,6 +23,8 @@ public class Util {
 
     @Autowired
     private MessageService messageService;
+
+    private static final ObjectMapper objectMapper = new ObjectMapper();
 
     public String getSimpleMessage(String title, String content, Locale locale) {
         if (StringUtils.isEmpty(title) && StringUtils.isEmpty(content)) {
@@ -103,5 +107,13 @@ public class Util {
 
         // Compare the adjusted fromDate with toDate
         return toDate.after(dateAfterTwoMonths);
+    }
+
+    public String castObjectToJson(Object object) {
+        try {
+            return objectMapper.writeValueAsString(object);
+        } catch (JsonProcessingException e) {
+            return "Cannot interpret the object as json";
+        }
     }
 }

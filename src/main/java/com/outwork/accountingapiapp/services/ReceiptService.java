@@ -1,5 +1,6 @@
 package com.outwork.accountingapiapp.services;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.outwork.accountingapiapp.configs.audit.AuditorAwareImpl;
 import com.outwork.accountingapiapp.constants.DataConstraint;
 import com.outwork.accountingapiapp.constants.ReceiptStatusEnum;
@@ -156,7 +157,7 @@ public class ReceiptService {
 
         ReceiptEntity response = receiptRepository.save(savedReceipt);
 
-        log.info(String.join(" :", "Saved receipt", response.getId().toString()), response);
+        log.info(String.join(" :", "Saved receipt", util.castObjectToJson(response)));
 
         return response;
     }
