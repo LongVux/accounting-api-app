@@ -100,6 +100,12 @@ public class ReceiptTableItem {
     @CsvIgnore
     private UUID branchId;
 
+    @CsvIgnore
+    private Date lastModifiedDate;
+
+    @CsvIgnore
+    private String lastModifiedBy;
+
     public ReceiptTableItem(ReceiptEntity receipt) {
         this.id = receipt.getId();
         this.code = receipt.getCode();
@@ -125,5 +131,7 @@ public class ReceiptTableItem {
         this.note = receipt.getNote();
         this.approverCode = receipt.getApproverCode();
         this.customerName = receipt.getCustomerCard().getCustomer().getName();
+        this.lastModifiedBy = receipt.getLastModifiedBy();
+        this.lastModifiedDate = receipt.getLastModifiedDate();
     }
 }

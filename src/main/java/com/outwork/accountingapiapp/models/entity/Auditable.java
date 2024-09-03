@@ -19,6 +19,7 @@ import java.util.Date;
 public abstract class Auditable<U> {
     public static final String FIELD_CREATED_DATE = "createdDate";
     public static final String FIELD_CREATED_BY = "createdBy";
+    public static final String FIELD_LAST_MODIFIED_DATE = "lastModifiedDate";
     public static final String FIELD_LAST_MODIFIED_BY = "lastModifiedBy";
 
     @CreatedBy

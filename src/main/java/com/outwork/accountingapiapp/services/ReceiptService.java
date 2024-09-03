@@ -15,6 +15,8 @@ import com.outwork.accountingapiapp.utils.Util;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -33,7 +35,6 @@ public class ReceiptService {
     public static final String ERROR_MSG_RECEIPT_ALREADY_HAS_CODE = "Hóa đơn đã được tạo mã. Không thể xử lý";
     public static final String ERROR_MSG_RECEIPT_HAS_NO_BILL = "Hóa đơn phải chứa tối thiểu một bill";
     public static final String ERROR_MSG_RECEIPT_NOT_HAVE_CODE = "Hóa đơn chưa được tạo mã. Không thể xử lý";
-
     public static final String ERROR_MSG_RECEIPT_NO_LONGER_IN_DEBT = "Hóa đơn không còn nợ phải trả";
     public static final String ERROR_MSG_IMAGE_IS_REQUIRED = "Hóa đơn muốn xác nhận thì phải có ảnh chứng từ";
     public static final String ERROR_MSG_EXPIRED_CUSTOMER_CARD = "Thẻ khách đã hết hạn, không thể dùng cho hóa đơn này";
@@ -44,6 +45,9 @@ public class ReceiptService {
     public static final String ERROR_MSG_USER_DOES_NOT_HAVE_RIGHT_TO_SAVE_RECEIPT_IN_THIS_BRANCH = "Khách hàng không có quyền lưu hóa đơn trên chi nhánh này";
     public static final int MAXIMUM_MONTH_FOR_EXPORT = 2;
     public static final String ERROR_MSG_EXCEED_MAXIMUM_PERIOD_FOR_EXPORT = "Vượt quá giới hạn xuất csv là 2 tháng";
+
+    private static final Logger log = LoggerFactory.getLogger(ReceiptService.class);
+
     @Autowired
     private ReceiptRepository receiptRepository;
 
@@ -150,7 +154,11 @@ public class ReceiptService {
 
         validateReceiptForModify(savedReceipt);
 
-        return receiptRepository.save(savedReceipt);
+        ReceiptEntity response = receiptRepository.save(savedReceipt);
+
+        log.info(String.join(" :", "Saved receipt", response.getId().toString()), response);
+
+        return response;
     }
 
     public void saveReceiptNote (SaveNoteRequest request) {
@@ -274,7 +282,10 @@ public class ReceiptService {
             throw new InvalidDataException(ERROR_MSG_INTAKE_EXCEED_PRE_PAID_FEE);
         }
 
-        validateReceiptBalance(receipt);
+        double totalBillFee = receipt.getBills().stream().mapToDouble(BillEntity::getFee).sum();
+        if (receipt.getTransactionTotal() - receipt.getShipmentFee() < totalBillFee + receipt.getPayout() - receipt.getIntake() - receipt.getLoan()) {
+            throw new InvalidDataException(ERROR_MSG_IMBALANCED_RECEIPT);
+        }
     }
 
     private void validateReceiptForApproval (ReceiptEntity receipt) {
@@ -297,15 +308,6 @@ public class ReceiptService {
         }
     }
 
-    private void validateReceiptBalance (ReceiptEntity receipt) {
-        if (!Pattern.matches(DataConstraint.COMPANY_CARD_REGEX, receipt.getCustomerCard().getName())) {
-            double totalBillFee = receipt.getBills().stream().mapToDouble(BillEntity::getFee).sum();
-            if (receipt.getTransactionTotal() - receipt.getShipmentFee() < totalBillFee + receipt.getPayout() - receipt.getIntake() - receipt.getLoan()) {
-                throw new InvalidDataException(ERROR_MSG_IMBALANCED_RECEIPT);
-            }
-        }
-    }
-
     private void calculateReceiptTransactionTotal (ReceiptEntity receipt) {
          receipt.setTransactionTotal(
                  receipt.getBills().stream()
@@ -321,6 +323,7 @@ public class ReceiptService {
                 .mapToDouble(Double::doubleValue)
                 .sum()
                 + receipt.getShipmentFee();
+
 
         receipt.setEstimatedProfit(estimatedProfit);
     }
