@@ -19,6 +19,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 
 import java.util.*;
+import java.util.regex.Pattern;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
@@ -107,6 +108,9 @@ public class GetReceiptTableItemRequest extends SortedPagination<ReceiptSortingE
     @Nullable
     private Boolean onlyHaveShipmentFee;
 
+    @Nullable
+    private String customerCardCombinedName;
+
     @Override
     public Predicate toPredicate(Root<ReceiptEntity> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder) {
         List<Predicate> predicates = new ArrayList<>();
@@ -162,6 +166,10 @@ public class GetReceiptTableItemRequest extends SortedPagination<ReceiptSortingE
                             .get(CustomerCardEntity.FIELD_ID),
                     customerCardId
             ));
+        }
+
+        if (!ObjectUtils.isEmpty(customerCardCombinedName)) {
+            predicates.addAll(filterByCustomerCardCombinedName(customerCardCombinedName, root, criteriaBuilder));
         }
 
         if (!ObjectUtils.isEmpty(customerCardType)) {
@@ -268,8 +276,41 @@ public class GetReceiptTableItemRequest extends SortedPagination<ReceiptSortingE
         return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
     }
 
+    private List<Predicate> filterByCustomerCardCombinedName (String customerCardCombinedName, Root<ReceiptEntity> root, CriteriaBuilder criteriaBuilder) {
+        if (Pattern.matches("^[0-9]+$", customerCardCombinedName)) {
+            return List.of(criteriaBuilder.like(
+                    root
+                            .get(ReceiptEntity.FIELD_CUSTOMER_CARD)
+                            .get(CustomerCardEntity.FIELD_ACCOUNT_NUMBER),
+                    String.format(DataFormat.LIKE_QUERY_FORMAT, customerCardCombinedName)
+            ));
+        } else if (Pattern.matches("^[a-zA-Z0-9]*-[0-9]*$", customerCardCombinedName)) {
+            String[] searchTerms = customerCardCombinedName.split("-");
+            return List.of(
+                    criteriaBuilder.equal(
+                            root
+                                    .get(ReceiptEntity.FIELD_CUSTOMER_CARD)
+                                    .get(CustomerCardEntity.FIELD_NAME),
+                             searchTerms[0]),
+                    criteriaBuilder.like(
+                            root
+                                    .get(ReceiptEntity.FIELD_CUSTOMER_CARD)
+                                    .get(CustomerCardEntity.FIELD_ACCOUNT_NUMBER),
+                            String.format(DataFormat.LIKE_THE_END_QUERY_FORMAT, searchTerms[1])
+            ));
+        } else {
+            return List.of(criteriaBuilder.like(
+                    root
+                            .get(ReceiptEntity.FIELD_CUSTOMER_CARD)
+                            .get(CustomerCardEntity.FIELD_NAME),
+                    String.format(DataFormat.LIKE_QUERY_FORMAT, customerCardCombinedName)));
+        }
+    }
+
     @Override
     Map<ReceiptSortingEnum, String> getSorterMap() {
         return MapBuilder.buildReceiptTableItemSorter();
     }
+
+
 }
