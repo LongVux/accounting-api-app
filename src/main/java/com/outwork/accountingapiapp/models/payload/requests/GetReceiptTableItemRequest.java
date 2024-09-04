@@ -284,7 +284,7 @@ public class GetReceiptTableItemRequest extends SortedPagination<ReceiptSortingE
                             .get(CustomerCardEntity.FIELD_ACCOUNT_NUMBER),
                     String.format(DataFormat.LIKE_QUERY_FORMAT, customerCardCombinedName)
             ));
-        } else if (Pattern.matches("^[a-zA-Z0-9]*-[0-9]*$", customerCardCombinedName)) {
+        } else if (Pattern.matches("^[a-zA-Z0-9 ]*-[0-9]*$", customerCardCombinedName)) {
             String[] searchTerms = customerCardCombinedName.split("-");
             return List.of(
                     criteriaBuilder.equal(
