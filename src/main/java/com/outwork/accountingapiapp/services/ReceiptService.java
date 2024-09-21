@@ -146,6 +146,8 @@ public class ReceiptService {
         savedReceipt.setCustomerCard(customerCardService.getCustomerCardById(request.getCustomerCardId()));
         savedReceipt.setUsingCardPrePayFee(request.isUsingCardPrePayFee());
         savedReceipt.setAcceptExceededFee(request.isAcceptExceededFee());
+        savedReceipt.setLastSavedBy(AuditorAwareImpl.getUserFromSecurityContext().getCode());
+        savedReceipt.setLastSaveDate(new Date());
 
         billService.buildBillsForReceipt(request.getReceiptBills(), savedReceipt);
 

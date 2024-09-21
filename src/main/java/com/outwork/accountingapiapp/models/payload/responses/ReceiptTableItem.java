@@ -131,7 +131,7 @@ public class ReceiptTableItem {
         this.note = receipt.getNote();
         this.approverCode = receipt.getApproverCode();
         this.customerName = receipt.getCustomerCard().getCustomer().getName();
-        this.lastModifiedBy = receipt.getLastModifiedBy();
-        this.lastModifiedDate = receipt.getLastModifiedDate();
+        this.lastModifiedBy = receipt.getLastSavedBy();
+        this.lastModifiedDate = receipt.getLastSaveDate();
     }
 }

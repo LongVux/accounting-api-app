@@ -7,6 +7,8 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.data.annotation.LastModifiedBy;
+import org.springframework.data.annotation.LastModifiedDate;
 
 import java.util.Arrays;
 import java.util.Date;
@@ -81,6 +83,11 @@ public class ReceiptEntity extends Auditable<String> {
     private boolean acceptExceededFee;
 
     private boolean skipRecalculateProfit;
+
+    protected String lastSavedBy;
+
+    @Temporal(TemporalType.TIMESTAMP)
+    protected Date lastSaveDate;
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "customerCardId", nullable = false)
