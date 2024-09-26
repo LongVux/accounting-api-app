@@ -212,7 +212,7 @@ public class BillService {
     }
 
     public List<BillEntity> getMatchingBills (GetMatchingBillsRequest request) {
-        List<BillEntity> bills = billRepository.findByPos_IdAndCreatedDateBetweenAndCodeNotNullAndReturnedTimeNullOrderByCreatedDateAscTimeStampSeqAsc(request.getPosId(), request.getFromCreatedDate(), request.getToCreatedDate());
+        List<BillEntity> bills = billRepository.findByPos_IdAndCreatedDateBetweenAndCodeNotNullAndReturnedTimeNullOrderByCreatedDateAscTimeStampSeqAsc(request.getPosId(), DateTimeUtils.atStartOfDay(request.getFromCreatedDate()), DateTimeUtils.atEndOfDay(request.getToCreatedDate()));
 
         List<BillEntity> responseList = new ArrayList<>();
         double moneyAmount = 0d;
