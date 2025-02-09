@@ -101,6 +101,6 @@ public class ReceiptController {
                 .build();
 
         //write all users to csv file
-        writer.write(receiptService.getAllReceiptTableItems(request));
+        writer.write(receiptService.getAllReceiptTableItems(request).stream().peek(item -> item.setCustomerCardNumber("'" + item.getCustomerCardNumber())));
     }
 }
