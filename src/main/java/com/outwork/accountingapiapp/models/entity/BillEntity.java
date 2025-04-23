@@ -27,6 +27,7 @@ public class BillEntity extends Auditable<String> {
     public static final String FIELD_RETURNED_TIME = "returnedTime";
     public static final String FIELD_POS = "pos";
     public static final String FIELD_RECEIPT = "receipt";
+    public static final String FIELD_BATCH = "batch";
 
     public static List<String> getSumUpFields () {
         return Arrays.asList(FIELD_MONEY_AMOUNT, FIELD_RETURN_FROM_BANK);
@@ -66,6 +67,9 @@ public class BillEntity extends Auditable<String> {
     @ManyToOne(optional = false)
     @JoinColumn(name = "receiptId", nullable = false)
     private ReceiptEntity receipt;
+
+    @Column
+    private String batchNo;
 
     @Temporal(TemporalType.TIMESTAMP)
     private Date confirmedDate;

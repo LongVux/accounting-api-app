@@ -3,10 +3,14 @@ package com.outwork.accountingapiapp.models.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.outwork.accountingapiapp.constants.DataConstraint;
 import com.outwork.accountingapiapp.exceptions.InvalidDataException;
+import com.outwork.accountingapiapp.services.DataBackupService;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.util.ObjectUtils;
 
 import java.util.*;
@@ -27,6 +31,9 @@ public class UserEntity {
     public static final String FIELD_ACCOUNT_BALANCE = "accountBalance";
 
     public static final String ERROR_MSG_ACCOUNT_BALANCE_NOT_ENOUGH = "Số dư tài khoản không đủ để thực hiện hành động này";
+    public static final String ERROR_MSG_ACCOUNT_BALANCE_BEING_INVALID = "Số dư tài khoản đang bị lỗi";
+
+    private static final Logger log = LoggerFactory.getLogger(UserEntity.class);
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -54,7 +61,8 @@ public class UserEntity {
     private String bank;
 
     @Setter(AccessLevel.NONE)
-    private Double accountBalance;
+    @Getter(AccessLevel.NONE)
+    private String accountBalance;
 
     @JsonIgnore
     @Column(nullable = false)
@@ -73,7 +81,36 @@ public class UserEntity {
         if (accountBalance < 0) {
             throw new InvalidDataException(ERROR_MSG_ACCOUNT_BALANCE_NOT_ENOUGH);
         } else {
-            this.accountBalance = accountBalance;
+            this.accountBalance = encrypt(accountBalance);
+        }
+    }
+
+    public double getAccountBalance () {
+        return decrypt(accountBalance);
+    }
+
+    private String encrypt(double value) {
+        try {
+            if (ObjectUtils.isEmpty(value)) return null;
+            String str = Double.toString(value);
+            return Base64.getEncoder().encodeToString(str.getBytes());
+        } catch (Exception e) {
+            log.error("Failed to encrypt account balance of {} with value {}", this.code, value);
+            log.error("Failed to encrypt account balance: ", e);
+            throw new InvalidDataException(ERROR_MSG_ACCOUNT_BALANCE_BEING_INVALID);
+        }
+
+    }
+
+    private double decrypt(String encrypted) {
+        try {
+            if (StringUtils.isBlank(encrypted)) return 0;
+            String decoded = new String(Base64.getDecoder().decode(encrypted));
+            return Double.parseDouble(decoded);
+        } catch (Exception e) {
+            log.error("Failed to decrypt account balance of {} with value {}", this.code, encrypted);
+            log.error("Failed to decrypt account balance: ", e);
+            throw new InvalidDataException(ERROR_MSG_ACCOUNT_BALANCE_BEING_INVALID);
         }
     }
 
@@ -82,7 +119,7 @@ public class UserEntity {
 //    }
 
     public UserBranchEntity getDefaultBranchManagementScopes () {
-        List<UserBranchEntity> scopes = this.branchManagementScopes.stream().sorted((s1, s2) -> s1.getOrderId() - s2.getOrderId()).toList();
+        List<UserBranchEntity> scopes = this.branchManagementScopes.stream().sorted(Comparator.comparingInt(UserBranchEntity::getOrderId)).toList();
         return scopes.get(0);
     }
 }

@@ -36,31 +36,34 @@ public class BillTableItem {
     @CsvBindByName(column = "E. Ma bill")
     private String code;
 
-    @CsvBindByName(column = "F. So tien")
+    @CsvBindByName(column = "F. Lo")
+    private String batchNo;
+
+    @CsvBindByName(column = "G. So tien")
     @CsvNumber("#.##")
     private double moneyAmount;
 
-    @CsvBindByName(column = "G. So phi bill")
+    @CsvBindByName(column = "H. So phi bill")
     @CsvNumber("#.##")
     private double fee;
 
-    @CsvBindByName(column = "H. Phan tram phi POS")
+    @CsvBindByName(column = "I. Phan tram phi POS")
     @CsvNumber("#.##")
     private double posFeeStamp;
 
-    @CsvBindByName(column = "I. Tien ve du tinh")
+    @CsvBindByName(column = "J. Tien ve du tinh")
     @CsvNumber("#.##")
     private double estimateReturnFromBank;
 
-    @CsvBindByName(column = "J. Tien ve thuc te")
+    @CsvBindByName(column = "K. Tien ve thuc te")
     @CsvNumber("#.##")
     private double returnFromBank;
 
-    @CsvBindByName(column = "K. Thoi diem ve tien")
+    @CsvBindByName(column = "L. Thoi diem ve tien")
     @CsvDate("dd.MM.yyyy hh:mm")
     private Date returnedTime;
 
-    @CsvBindByName(column = "L. Ghi chu")
+    @CsvBindByName(column = "M. Ghi chu")
     private String note;
 
     @CsvIgnore
@@ -89,5 +92,6 @@ public class BillTableItem {
         this.posId = bill.getPos().getId();
         this.receiptCode = bill.getReceipt().getCode();
         this.note = bill.getNote();
+        this.batchNo = bill.getBatchNo();
     }
 }

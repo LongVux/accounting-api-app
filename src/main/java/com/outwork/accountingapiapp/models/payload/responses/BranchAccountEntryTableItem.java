@@ -20,7 +20,7 @@ public class BranchAccountEntryTableItem {
     private String branchCode;
     private String lastModifiedBy;
     private String note;
-    private double remainingBalance;
+    private Double remainingBalance;
 
     public BranchAccountEntryTableItem (BranchAccountEntryEntity entry) {
         this.id = entry.getId();

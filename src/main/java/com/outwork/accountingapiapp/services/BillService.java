@@ -167,6 +167,7 @@ public class BillService {
         billRequests.forEach(request -> {
             BillEntity savedBill = billMap.getOrDefault(request.getBillId(), BillEntity.buildNewBill(savedReceipt));
 
+            savedBill.setBatchNo(request.getBatchNo());
             savedBill.setMoneyAmount(request.getMoneyAmount());
             savedBill.setFee(request.getFee());
 

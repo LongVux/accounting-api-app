@@ -16,6 +16,8 @@ public class ReceiptBill {
         @NotNull(message = "{msg.err.string.blank}")
         private UUID posId;
 
+        private String batchNo;
+
         @Min(
                 value = 1000,
                 message = "{msg.err.double.min}"
