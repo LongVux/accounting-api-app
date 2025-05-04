@@ -138,6 +138,7 @@ public class BranchAccountEntryService {
         deleteReceiptEntry.setMoneyAmount(Math.abs(refundAmount));
         deleteReceiptEntry.setEntryStatus(AccountEntryStatusEnum.APPROVED);
         deleteReceiptEntry.setRemainingBalance(approver.getAccountBalance());
+        deleteReceiptEntry.setTargetEmployee(receipt.getApproverCode());
 
         if (refundAmount < 0) {
             deleteReceiptEntry.setTransactionType(TransactionTypeEnum.PAYOUT);

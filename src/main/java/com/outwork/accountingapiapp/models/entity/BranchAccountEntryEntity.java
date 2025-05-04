@@ -22,6 +22,7 @@ public class BranchAccountEntryEntity extends Auditable<String> {
     public static final String FIELD_ENTRY_STATUS = "entryStatus";
     public static final String FIELD_TRANSACTION_TYPE = "transactionType";
     public static final String FIELD_MONEY_AMOUNT = "moneyAmount";
+    public static final String FIELD_TARGET_EMPLOYEE = "targetEmployee";
 
     public static BranchAccountEntryEntity createSystemBranchAccountEntry (
             ReceiptEntity receipt,
@@ -84,4 +85,6 @@ public class BranchAccountEntryEntity extends Auditable<String> {
     private ReceiptEntity receipt;
 
     private String imageId;
+
+    private String targetEmployee;
 }

@@ -109,9 +109,15 @@ public class GetBranchAccountEntryTableItemRequest extends SortedPagination<Bran
         }
 
         if (!ObjectUtils.isEmpty(createdBy)) {
-            predicates.add(criteriaBuilder.like(
-                    root.get(BranchAccountEntryEntity.FIELD_CREATED_BY),
-                    String.format(DataFormat.LIKE_QUERY_FORMAT, createdBy)
+            predicates.add(criteriaBuilder.or(
+                    criteriaBuilder.like(
+                            root.get(BranchAccountEntryEntity.FIELD_CREATED_BY),
+                            String.format(DataFormat.LIKE_QUERY_FORMAT, createdBy)
+                    ),
+                    criteriaBuilder.like(
+                            root.get(BranchAccountEntryEntity.FIELD_TARGET_EMPLOYEE),
+                            String.format(DataFormat.LIKE_QUERY_FORMAT, createdBy)
+                    )
             ));
         }
 
