@@ -1,16 +1,14 @@
 package com.outwork.accountingapiapp.services;
 
 import com.outwork.accountingapiapp.configs.security.JwtTokenProvider;
-import com.outwork.accountingapiapp.exceptions.DuplicatedValueException;
-import com.outwork.accountingapiapp.models.entity.BranchEntity;
-import com.outwork.accountingapiapp.models.entity.RoleEntity;
 import com.outwork.accountingapiapp.models.entity.UserEntity;
 import com.outwork.accountingapiapp.models.payload.requests.LoginRequest;
 import com.outwork.accountingapiapp.models.payload.requests.SignupRequest;
 import com.outwork.accountingapiapp.models.payload.responses.UserDetail;
 import com.outwork.accountingapiapp.models.security.SecuredUserDetails;
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -18,13 +16,12 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-
 @Service
+
 public class AuthService implements UserDetailsService {
+    private static final Logger log = LoggerFactory.getLogger(AuthService.class);
     private String SUCCESS_MSG_REGISTRATION_SUCCESSFULLY = "Đăng ký tài khoản thành công";
 
     @Autowired
@@ -60,7 +57,11 @@ public class AuthService implements UserDetailsService {
         String jwt = jwtTokenProvider.createToken(authentication);
         SecuredUserDetails securedUserDetails = (SecuredUserDetails) authentication.getPrincipal();
 
-        return UserDetail.toUserDetail(securedUserDetails.getUserEntity(), jwt);
+        UserDetail userDetail = UserDetail.toUserDetail(securedUserDetails.getUserEntity(), jwt);
+
+        log.info("User login: {}", userDetail);
+
+        return userDetail;
     }
 
 }

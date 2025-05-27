@@ -46,4 +46,12 @@ public class UserDetail {
                 userEntity.getBranchManagementScopes()
         );
     }
+
+    @Override
+    public String toString() {
+        return "UserDetail{" +
+                "name='" + name + '\'' +
+                ", code='" + code + '\'' +
+                '}';
+    }
 }
